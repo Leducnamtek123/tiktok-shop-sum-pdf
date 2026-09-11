@@ -74,6 +74,19 @@
       background: #94a3b8;
     }
 
+    /* Modern Progress Shimmer */
+    @keyframes shimmerProgress {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(250%); }
+    }
+    .progress-shimmer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+      animation: shimmerProgress 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
     /* Professional A4 Print Stylesheet - 1:1 TikTok Shop Picking List Replica */
     @media print {
       @page {
@@ -317,17 +330,52 @@
         </div>
       </div>
 
-      <!-- Processing Progress Bar -->
-      <div id="progressContainer" class="hidden mt-5 bg-white border border-slate-200/90 p-4.5 rounded-2xl shadow-xs">
-        <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-2">
-          <span id="progressText" class="flex items-center">
-            <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin text-rose-600"></i>
-            Đang trích xuất dữ liệu và ảnh từ file PDF...
-          </span>
-          <span id="progressPercent" class="font-extrabold text-rose-600">0%</span>
+      <!-- Processing Progress Card (Upgraded with high-end typography & smooth motion) -->
+      <div id="progressContainer" class="hidden mt-5 bg-white border border-slate-200/90 rounded-2xl shadow-sm p-5 space-y-3.5 transition-all">
+        <!-- Top Row: Status, Page Counter & Percentage -->
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <!-- Sleek SVG Spinner (No broken font glyphs) -->
+            <div class="relative w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <svg class="w-4.5 h-4.5 text-rose-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
+                <path class="opacity-95" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h4 id="progressStatusTitle" class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight truncate">Đang bóc tách dữ liệu PDF...</h4>
+                <span id="progressPageBadge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/70 font-mono shrink-0">
+                  Trang 1 / 1
+                </span>
+              </div>
+              <p id="progressSubtitle" class="text-[11px] text-slate-500 font-normal truncate mt-0.5">Trích xuất mã vận đơn, người nhận, thông tin sản phẩm và ảnh SKU</p>
+            </div>
+          </div>
+
+          <!-- Bold Percentage Badge -->
+          <div class="text-right shrink-0 flex flex-col items-end">
+            <span id="progressPercent" class="text-xl sm:text-2xl font-black text-rose-600 font-mono tracking-tight">0%</span>
+            <span id="progressPageBadgeMobile" class="sm:hidden text-[10px] font-bold text-rose-700 font-mono">Trang 1/1</span>
+          </div>
         </div>
-        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-          <div id="progressBar" class="bg-gradient-to-r from-rose-500 to-rose-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+
+        <!-- File Pill Info (Clean truncated badge, avoids cramped text) -->
+        <div id="progressFileRow" class="flex items-center justify-between text-xs bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 text-slate-600">
+          <div class="flex items-center gap-2 min-w-0 flex-1 mr-2">
+            <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span id="progressFileName" class="font-mono text-slate-700 text-[11px] font-semibold truncate max-w-xs sm:max-w-md md:max-w-xl" title="">Đang chuẩn bị file...</span>
+          </div>
+          <span id="progressFileCountBadge" class="text-[10px] font-bold uppercase tracking-wider text-slate-500 shrink-0 font-mono">Tự động xử lý</span>
+        </div>
+
+        <!-- Progress Track with Shimmer -->
+        <div class="relative w-full bg-slate-100/90 rounded-full h-2.5 sm:h-3 p-0.5 ring-1 ring-slate-900/5 overflow-hidden">
+          <div id="progressBar" class="bg-gradient-to-r from-rose-500 via-rose-600 to-rose-500 h-full rounded-full transition-all duration-200 relative overflow-hidden shadow-xs" style="width: 0%">
+            <div class="progress-shimmer"></div>
+          </div>
         </div>
       </div>
 
@@ -352,27 +400,29 @@
 
     <!-- Fulfillment Progress Bar (Sticky / Highlight) -->
     <section id="fulfillmentSection" class="hidden no-print">
-      <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2.5">
-          <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center font-bold">
+      <div class="bg-white border border-slate-200/90 p-5 rounded-2xl shadow-xs space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center font-bold shadow-2xs shrink-0">
               <i data-lucide="check-check" class="w-5 h-5"></i>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-slate-900 flex items-center">
-                Tiến độ nhặt hàng kho thực tế
-                <span id="fulfillmentBadge" class="ml-2.5 px-2.5 py-0.5 text-xs font-bold rounded-full bg-slate-100 text-slate-800 border border-slate-200">0 / 0</span>
-              </h3>
-              <p class="text-xs text-slate-500">Tích chọn các món đã lấy vào xe đẩy để thủ kho kiểm soát không bị sót hàng</p>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-sm font-bold text-slate-900">Tiến độ nhặt hàng kho thực tế</h3>
+                <span id="fulfillmentBadge" class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-slate-100 text-slate-800 border border-slate-200 font-mono">0 / 0</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Tích chọn các món đã lấy vào xe đẩy để thủ kho kiểm soát không bị sót hàng</p>
             </div>
           </div>
-          <div class="text-right flex items-center sm:block justify-between">
-            <span class="text-xs text-slate-500 sm:block">Đã gom hoàn tất:</span>
-            <span id="fulfillmentPercent" class="text-xl sm:text-2xl font-black text-emerald-600">0%</span>
+          <div class="text-right flex items-center sm:block justify-between pl-13 sm:pl-0">
+            <span class="text-xs text-slate-500 sm:block font-medium">Đã gom hoàn tất:</span>
+            <span id="fulfillmentPercent" class="text-xl sm:text-2xl font-black text-emerald-600 font-mono">0%</span>
           </div>
         </div>
-        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-          <div id="fulfillmentBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div class="w-full bg-slate-100/90 rounded-full h-2.5 sm:h-3 p-0.5 ring-1 ring-slate-900/5 overflow-hidden relative">
+          <div id="fulfillmentBar" class="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 h-full rounded-full transition-all duration-300 shadow-xs relative overflow-hidden" style="width: 0%">
+            <div class="progress-shimmer"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -786,6 +836,7 @@
             Xuất Excel Vận Đơn
           </button>
           <button 
+            id="btnDownloadReorderedPdf"
             onclick="downloadReorderedPdf()" 
             class="inline-flex items-center px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
           >
@@ -1757,6 +1808,46 @@
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
     const progressPercent = document.getElementById('progressPercent');
+    const progressStatusTitle = document.getElementById('progressStatusTitle');
+    const progressSubtitle = document.getElementById('progressSubtitle');
+    const progressPageBadge = document.getElementById('progressPageBadge');
+    const progressPageBadgeMobile = document.getElementById('progressPageBadgeMobile');
+    const progressFileName = document.getElementById('progressFileName');
+    const progressFileCountBadge = document.getElementById('progressFileCountBadge');
+
+    function setProgressState({ title, subtitle, fileName, pageText, percent, countBadge }) {
+      if (progressStatusTitle && title !== undefined) progressStatusTitle.textContent = title;
+      if (progressSubtitle && subtitle !== undefined) progressSubtitle.textContent = subtitle;
+      if (progressFileName && fileName !== undefined) {
+        progressFileName.textContent = fileName;
+        progressFileName.setAttribute('title', fileName);
+      }
+      if (pageText !== undefined) {
+        if (progressPageBadge) {
+          if (pageText) {
+            progressPageBadge.textContent = pageText;
+            progressPageBadge.classList.remove('hidden');
+          } else {
+            progressPageBadge.classList.add('hidden');
+          }
+        }
+        if (progressPageBadgeMobile) {
+          progressPageBadgeMobile.textContent = pageText || '';
+        }
+      }
+      if (progressFileCountBadge && countBadge !== undefined) {
+        progressFileCountBadge.textContent = countBadge;
+      }
+      if (percent !== undefined) {
+        const p = Math.max(0, Math.min(100, Math.round(percent)));
+        if (progressPercent) progressPercent.textContent = `${p}%`;
+        if (progressBar) progressBar.style.width = `${p}%`;
+      }
+      if (progressText && title) {
+        progressText.textContent = title;
+      }
+    }
+
     const fileChipsContainer = document.getElementById('fileChipsContainer');
     const fileChipsList = document.getElementById('fileChipsList');
     const clearBtn = document.getElementById('clearBtn');
@@ -1844,6 +1935,7 @@
       statsSection.classList.add('hidden');
       fulfillmentSection.classList.add('hidden');
       resultSection.classList.add('hidden');
+      progressContainer.classList.add('hidden');
       tableBody.innerHTML = '';
       cardViewWrapper.innerHTML = '';
 
@@ -2074,7 +2166,9 @@
         if (shippingIcon) shippingIcon.className = 'w-4 h-4 mr-2 text-slate-400';
         if (badge) badge.className = 'ml-2 px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-200 text-slate-700';
 
-        if (aggregatedItems.length > 0) {
+        const isProgressRunning = progressContainer && !progressContainer.classList.contains('hidden');
+
+        if (aggregatedItems.length > 0 && !isProgressRunning) {
           statsSection.classList.remove('hidden');
           fulfillmentSection.classList.remove('hidden');
           resultSection.classList.remove('hidden');
@@ -2094,7 +2188,10 @@
         resultSection.classList.add('hidden');
 
         if (shippingSection) {
-          shippingSection.classList.remove('hidden');
+          const isProgressRunning = progressContainer && !progressContainer.classList.contains('hidden');
+          if (!isProgressRunning) {
+            shippingSection.classList.remove('hidden');
+          }
           if (shippingOrders.length === 0) {
             renderShippingUI();
           }
@@ -2129,15 +2226,16 @@
     async function processShippingLabelFile(file, onProgress) {
       try {
         currentShippingFile = file;
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
-        const progressText = document.getElementById('progressText');
-
         if (!onProgress) {
           progressContainer.classList.remove('hidden');
-          progressText.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin text-rose-600"></i> Đang đọc mã vận đơn và sản phẩm...`;
-          lucide.createIcons();
+          setProgressState({
+            title: 'Đang đọc tem vận đơn & đơn hàng',
+            subtitle: 'Trích xuất mã vận đơn, người nhận, trọng lượng và ảnh tem',
+            fileName: file.name,
+            pageText: 'Khởi tạo...',
+            percent: 5,
+            countBadge: '1 file'
+          });
         }
 
         const arrayBuffer = await file.arrayBuffer();
@@ -2153,10 +2251,15 @@
           if (onProgress) {
             onProgress(pNum, numPages);
           } else {
-            const pct = Math.round((pNum / numPages) * 75) + 10;
-            progressBar.style.width = `${pct}%`;
-            progressPercent.textContent = `${pct}%`;
-            progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang bóc tách mã vận đơn trang ${pNum} / ${numPages}...`;
+            const pct = Math.round((pNum / numPages) * 80) + 10;
+            setProgressState({
+              title: 'Đang bóc tách tem vận đơn & đơn hàng',
+              subtitle: 'Trích xuất mã vận đơn, người nhận, trọng lượng và ảnh tem',
+              fileName: file.name,
+              pageText: `Trang ${pNum} / ${numPages}`,
+              percent: pct,
+              countBadge: '1 file'
+            });
           }
 
           const page = await pdfDoc.getPage(pNum);
@@ -2385,17 +2488,26 @@
 
         // Only perform tab navigation & standalone completion when not in a coordinated multi-file batch
         if (!onProgress) {
-          processAggregatedData(lastParsedFilesData);
+          setProgressState({
+            title: 'Đã hoàn tất xử lý tem vận đơn!',
+            subtitle: `Đã bóc tách ${parsedOrders.length} mã vận đơn thành công`,
+            fileName: file.name,
+            pageText: '',
+            percent: 100,
+            countBadge: 'Hoàn tất'
+          });
 
-          if (currentMainTab === 'shipping') {
-            switchMainTab('shipping');
-          } else {
-            switchMainTab('picking');
-          }
+          setTimeout(() => {
+            progressContainer.classList.add('hidden');
+            processAggregatedData(lastParsedFilesData);
 
-          progressBar.style.width = '100%';
-          progressPercent.textContent = '100%';
-          setTimeout(() => progressContainer.classList.add('hidden'), 400);
+            if (currentMainTab === 'shipping') {
+              switchMainTab('shipping');
+            } else {
+              switchMainTab('picking');
+            }
+          }, 350);
+
           showToast(`Đã quét ${parsedOrders.length} mã vận đơn và cập nhật dữ liệu!`);
         }
 
@@ -2488,7 +2600,10 @@
         return;
       }
 
-      section.classList.remove('hidden');
+      const isProgressRunning = progressContainer && !progressContainer.classList.contains('hidden');
+      if (currentMainTab === 'shipping' && !isProgressRunning) {
+        section.classList.remove('hidden');
+      }
 
       const totalOrders = sortedShippingOrders.length;
       const totalPages = sortedShippingOrders.reduce((sum, o) => sum + o.pages.length, 0);
@@ -2804,6 +2919,19 @@
         return;
       }
 
+      const btn = document.getElementById('btnDownloadReorderedPdf');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `
+          <svg class="w-4 h-4 mr-1.5 animate-spin text-white inline shrink-0" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
+            <path class="opacity-95" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+          Đang tạo PDF...
+        `;
+      }
+
       showToast('Đang tạo và sắp xếp các trang PDF theo thứ tự món...');
 
       try {
@@ -2836,6 +2964,12 @@
       } catch (err) {
         console.error('Lỗi khi ghép PDF:', err);
         alert('Lỗi tạo file PDF: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+          lucide.createIcons();
+        }
       }
     }
 
@@ -2907,30 +3041,33 @@
       const totalFiles = pdfFiles.length;
       let currentFileIndex = 0;
 
-      const progressContainer = document.getElementById('progressContainer');
-      const progressBar = document.getElementById('progressBar');
-      const progressPercent = document.getElementById('progressPercent');
-      const progressText = document.getElementById('progressText');
-
       progressContainer.classList.remove('hidden');
-      progressBar.style.width = '0%';
-      progressPercent.textContent = '0%';
-      progressText.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin text-rose-600"></i> Đang chuẩn bị phân tích ${totalFiles} file PDF...`;
-      lucide.createIcons();
+      setProgressState({
+        title: `Đang chuẩn bị phân tích ${totalFiles} file PDF...`,
+        subtitle: 'Tự động phân loại: Phiếu nhặt hàng & Tem vận đơn',
+        fileName: pdfFiles[0]?.name || '',
+        pageText: '',
+        percent: 0,
+        countBadge: `File 1 / ${totalFiles}`
+      });
 
-      const updateProgress = (pNum, numPages, fileName, label) => {
+      const updateProgress = (pNum, numPages, fileName, label, subtitle) => {
         const fileFraction = numPages > 0 ? (pNum / numPages) : 0;
         const totalPct = Math.min(99, Math.round(((currentFileIndex + fileFraction) / totalFiles) * 100));
-        progressBar.style.width = `${totalPct}%`;
-        progressPercent.textContent = `${totalPct}%`;
-        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> ${label}: <strong>${escapeHtml(fileName)}</strong> (${pNum}/${numPages})...`;
-        lucide.createIcons();
+        setProgressState({
+          title: label,
+          subtitle: subtitle || 'Trích xuất dữ liệu, phân loại SKU & mã vận đơn',
+          fileName: fileName,
+          pageText: `Trang ${pNum} / ${numPages}`,
+          percent: totalPct,
+          countBadge: `File ${currentFileIndex + 1} / ${totalFiles}`
+        });
       };
 
       // 1. Process shipping label files first (extracts tracking numbers & orders)
       for (const sf of shippingFiles) {
         await processShippingLabelFile(sf, (pNum, numPages) => {
-          updateProgress(pNum, numPages, sf.name, 'Đang đọc tem vận đơn');
+          updateProgress(pNum, numPages, sf.name, 'Đang đọc tem vận đơn & đơn hàng', 'Bóc tách mã vận đơn, người nhận, trọng lượng và ảnh tem');
         });
         currentFileIndex++;
       }
@@ -2942,7 +3079,7 @@
         }
         try {
           const fileData = await parsePdfFileWithThumbnails(pf, (pIdx, numPages) => {
-            updateProgress(pIdx, numPages, pf.name, 'Bóc tách phiếu nhặt & cắt ảnh');
+            updateProgress(pIdx, numPages, pf.name, 'Bóc tách phiếu nhặt hàng & cắt ảnh', 'Tổng hợp số lượng sản phẩm & phân loại SKU');
           });
           const existingIdx = lastParsedFilesData.findIndex(d => d.metadata.filename === pf.name);
           if (existingIdx >= 0) {
@@ -2959,10 +3096,14 @@
       updateFileChips();
 
       // Final completion
-      progressBar.style.width = '100%';
-      progressPercent.textContent = '100%';
-      progressText.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 mr-2 text-emerald-600"></i> Đã hoàn tất xử lý ${totalFiles} file!`;
-      lucide.createIcons();
+      setProgressState({
+        title: `Đã hoàn tất xử lý ${totalFiles} file PDF!`,
+        subtitle: 'Dữ liệu đã được đồng bộ và gộp chính xác 100%',
+        fileName: 'Hoàn tất trích xuất',
+        pageText: '',
+        percent: 100,
+        countBadge: 'Hoàn tất'
+      });
 
       setTimeout(() => {
         progressContainer.classList.add('hidden');
@@ -4422,9 +4563,14 @@
     window.loadSampleData = async function() {
       try {
         progressContainer.classList.remove('hidden');
-        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang nạp dữ liệu mẫu 09-06 Picking list...`;
-        lucide.createIcons();
-        progressBar.style.width = '50%';
+        setProgressState({
+          title: 'Đang nạp dữ liệu mẫu Picking list...',
+          subtitle: 'Tải file mẫu từ hệ thống để kiểm tra tính năng',
+          fileName: '09-06_11-05-12_Picking list_1.pdf',
+          pageText: '',
+          percent: 25,
+          countBadge: 'Mẫu thử'
+        });
 
         const response = await fetch('09-06_11-05-12_Picking list_1.pdf');
         if (!response.ok) {
