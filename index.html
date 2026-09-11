@@ -183,46 +183,42 @@
 </head>
 <body class="min-h-full bg-[#f8fafc] text-slate-900 antialiased flex flex-col selection:bg-rose-500 selection:text-white">
 
-  <!-- Top Banner (no-print) -->
-  <div class="bg-white border-b border-slate-200/80 py-2 px-4 text-xs text-slate-600 font-medium no-print">
+  <!-- Top Status Bar (no-print) -->
+  <div class="bg-white border-b border-slate-200/80 py-2 px-4 text-xs no-print">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-      <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-          Xử Lý Nội Bộ Trên Máy
+      <div class="flex items-center space-x-2 text-slate-600">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+          Bảo mật nội bộ
         </span>
-        <span class="text-slate-500 hidden md:inline">Toàn bộ file PDF được đọc trực tiếp trên trình duyệt, tuyệt đối bảo mật thông tin đơn hàng</span>
+        <span class="text-slate-500 text-xs hidden md:inline">Toàn bộ dữ liệu xử lý 100% trên trình duyệt, không lưu trữ trên máy chủ</span>
       </div>
       <div class="flex items-center space-x-3 text-slate-500 text-[11px]">
-        <span class="flex items-center">
-          <i data-lucide="check-circle" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
-          Định dạng chuẩn TikTok Shop 200 đơn/file
-        </span>
-        <span class="flex items-center">
-          <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
-          Cộng dồn 1.000 đơn &lt; 2 giây
-        </span>
+        <span>Chuẩn TikTok Shop 200 đơn/file</span>
+        <span>&bull;</span>
+        <span class="font-mono font-bold text-slate-700">Tốc độ xử lý: ~2.000 đơn/giây</span>
       </div>
     </div>
   </div>
 
   <!-- Main App Header (no-print) -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs no-print">
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30 shadow-2xs no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
-      <!-- Brand Logo -->
+      <!-- Brand Logo & App Title -->
       <div class="flex items-center space-x-3.5">
         <img 
           src="assets/tiktok_shop_logo.png" 
           alt="TikTok Shop" 
-          class="h-8 sm:h-9 w-auto object-contain select-none"
+          class="h-8 w-auto object-contain select-none"
         />
-        <div class="border-l border-slate-200 pl-3.5">
+        <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+        <div>
           <div class="flex items-center space-x-2">
-            <h1 class="font-bold text-base text-slate-900 leading-tight tracking-tight">Bộ Công Cụ Kho Vận TikTok Shop</h1>
-            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200/80 rounded-md">Logistics</span>
+            <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro</span>
           </div>
-          <p class="text-xs text-slate-500">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món Chuẩn 1:1</p>
+          <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
       </div>
 
@@ -230,7 +226,7 @@
       <div class="flex items-center space-x-2.5">
         <button 
           onclick="openComboModal()" 
-          class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition-all border border-slate-200 active:scale-[0.98] shadow-2xs"
+          class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 transition-all border border-slate-200 shadow-2xs cursor-pointer active:scale-[0.98]"
           title="Quản lý và thiết lập quy tắc quy đổi Combo &amp; Thùng"
         >
           <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
@@ -238,8 +234,8 @@
           <span id="comboBadgeCount" class="ml-1.5 px-1.5 py-0.2 text-[10px] font-black rounded-full bg-rose-100 text-rose-700 border border-rose-200">3</span>
         </button>
 
-        <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+        <span class="hidden sm:inline-flex items-center px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-slate-50 text-slate-600 border border-slate-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
           Chuẩn Kho
         </span>
       </div>
@@ -250,30 +246,30 @@
   <!-- Main App Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- Main Navigation Tabs (no-print) -->
-    <div class="bg-white p-2 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
-      <div class="flex items-center space-x-1.5 sm:space-x-2.5">
+    <!-- Main Navigation Tabs (Segmented Control - no-print) -->
+    <div class="bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print">
+      <div class="flex items-center space-x-1 sm:space-x-1.5 flex-1 sm:flex-initial">
         <button 
           id="tabPickingBtn" 
           onclick="switchMainTab('picking')" 
-          class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs"
+          class="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center transition-all bg-white text-slate-900 shadow-2xs border border-slate-200/90 cursor-pointer"
         >
-          <i data-lucide="boxes" class="w-4 h-4 mr-2"></i>
-          <span>1. Gộp Phiếu Nhặt Hàng (Picking List)</span>
+          <i data-lucide="boxes" class="w-4 h-4 mr-2 text-rose-600"></i>
+          <span>1. Gộp Phiếu Nhặt Hàng</span>
         </button>
         <button 
           id="tabShippingBtn" 
           onclick="switchMainTab('shipping')" 
-          class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80"
+          class="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center transition-all text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer"
         >
-          <i data-lucide="tags" class="w-4 h-4 mr-2 text-blue-600"></i>
-          <span>2. Sắp Xếp Mã Vận Đơn Theo Món</span>
-          <span id="shippingBadge" class="hidden ml-2 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-slate-200 text-slate-800">0 đơn</span>
+          <i data-lucide="tags" class="w-4 h-4 mr-2 text-slate-400"></i>
+          <span>2. Sắp Xếp Mã Vận Đơn</span>
+          <span id="shippingBadge" class="hidden ml-2 px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-200 text-slate-700">0 đơn</span>
         </button>
       </div>
 
-      <div class="hidden lg:flex items-center text-xs font-semibold text-slate-500 pr-3">
-        <i data-lucide="sparkles" class="w-4 h-4 mr-1.5 text-amber-500"></i>
+      <div class="hidden lg:flex items-center text-xs text-slate-500 pr-3 font-medium">
+        <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>
         <span>Tự động nhận diện định dạng file khi kéo thả</span>
       </div>
     </div>
@@ -287,7 +283,7 @@
     <section class="no-print">
       <div 
         id="dropZone"
-        class="relative overflow-hidden rounded-3xl border-2 border-dashed border-slate-300 hover:border-rose-500 bg-white hover:bg-rose-50/15 transition-all duration-200 cursor-pointer group p-9 sm:p-12 text-center shadow-xs"
+        class="relative overflow-hidden rounded-3xl border-2 border-dashed border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all duration-200 cursor-pointer group p-9 sm:p-12 text-center shadow-xs"
       >
         <input 
           type="file" 
@@ -297,33 +293,26 @@
           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
         
-        <div class="flex flex-col items-center justify-center space-y-4">
-          <div class="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center group-hover:scale-105 group-hover:bg-rose-100 transition-all duration-200 shadow-2xs">
-            <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+        <div class="flex flex-col items-center justify-center space-y-4 pointer-events-none">
+          <div class="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center group-hover:scale-105 group-hover:bg-rose-50 group-hover:text-rose-600 group-hover:border-rose-200 transition-all duration-200 shadow-2xs">
+            <i data-lucide="upload-cloud" class="w-7 h-7"></i>
           </div>
           
-          <div class="max-w-xl">
+          <div class="max-w-xl space-y-1.5">
             <p class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-              Kéo thả file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4 font-extrabold">Phiếu nhặt hàng</span> hoặc <span class="text-slate-900 underline decoration-slate-300 underline-offset-4 font-extrabold">Mã vận đơn (Shipping label)</span> vào đây
+              Kéo thả file PDF vào đây hoặc bấm để tải lên
             </p>
-            <p class="text-xs sm:text-sm text-slate-600 mt-1.5">
-              Hệ thống tự nhận diện: Gộp nhiều phiếu nhặt hàng hoặc Sắp xếp mã vận đơn theo đúng thứ tự món
+            <p class="text-xs sm:text-sm text-slate-500 font-normal">
+              Tự động phân loại: <strong class="text-slate-700 font-semibold">Phiếu nhặt hàng</strong> (Picking list) hoặc <strong class="text-slate-700 font-semibold">Tem vận đơn</strong> (Shipping label)
             </p>
           </div>
 
-          <div class="flex flex-wrap justify-center items-center gap-2.5 pt-1">
-            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-2xs">
-              <i data-lucide="combine" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
-              Gộp phiếu nhặt hàng
-            </span>
-            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-2xs">
-              <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
-              Sắp xếp vận đơn theo món
-            </span>
-            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-2xs">
-              <i data-lucide="file-down" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
-              Tải PDF vận đơn đã xếp
-            </span>
+          <div class="pt-1 flex flex-col sm:flex-row items-center gap-2">
+            <div class="inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 group-hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-all">
+              <i data-lucide="file-plus" class="w-3.5 h-3.5 mr-1.5"></i>
+              Chọn file PDF từ máy tính
+            </div>
+            <span class="text-[11px] text-slate-400 font-medium">Hỗ trợ nhiều file cùng lúc &bull; Tối đa 200 đơn/file</span>
           </div>
         </div>
       </div>
@@ -437,7 +426,7 @@
           </div>
         </div>
         <div class="mt-3 text-xs text-slate-600 flex items-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
           <span id="statSkusSub">Đã gộp trùng lặp</span>
         </div>
       </div>
@@ -813,24 +802,65 @@
 
     </section>
 
-    <!-- Guide & Warehouse Info Footer (no-print) -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs text-xs text-slate-600 space-y-3 no-print">
-      <div class="flex items-center space-x-2 text-slate-900 font-bold text-sm">
-        <i data-lucide="info" class="w-4 h-4 text-rose-600"></i>
-        <span>Hướng dẫn vận hành gom đơn hiệu quả:</span>
+    <!-- Operation Guide & Best Practices (no-print) -->
+    <section class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-2xs text-xs space-y-4 no-print">
+      <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-7 h-7 rounded-lg bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm tracking-tight leading-tight">Quy trình xử lý kho vận TikTok Shop</h4>
+            <p class="text-[11px] text-slate-400 font-medium">Chuẩn hóa 3 bước giúp gom đơn và dán nhãn chính xác 100%</p>
+          </div>
+        </div>
+        <span class="hidden md:inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-50 text-slate-600 border border-slate-200/80">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+          Đạt chuẩn kho vận
+        </span>
       </div>
-      <div class="grid md:grid-cols-3 gap-5 text-slate-600">
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-          <strong class="text-slate-900 block mb-1 text-xs">1. Kéo thả 1 lượt tất cả các file:</strong>
-          Tải toàn bộ các file PDF Picking list của ngày hôm đó (mỗi file tối đa 200 đơn) rồi kéo thả cùng lúc vào web. Hệ thống tự động gộp các món giống hệt nhau.
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-slate-600">
+        <!-- Step 1 -->
+        <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[11px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">01 / TẢI HÀNG LOẠT</span>
+              <i data-lucide="files" class="w-3.5 h-3.5 text-slate-400"></i>
+            </div>
+            <h5 class="text-xs font-bold text-slate-900">Kéo thả toàn bộ file PDF trong ngày</h5>
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              Thả đồng thời cả file <strong class="text-slate-700 font-semibold">Picking list</strong> và file <strong class="text-slate-700 font-semibold">Shipping label</strong>. Hệ thống tự động phân loại, trích xuất ảnh và gộp dữ liệu trong 1 giây.
+            </p>
+          </div>
         </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-          <strong class="text-slate-900 block mb-1 text-xs">2. Nhặt hàng theo hình ảnh:</strong>
-          Nhân viên kho quan sát hình ảnh sản phẩm và số lượng màu đỏ để lấy hàng nhanh chóng, không bị nhầm lẫn giữa các quy cách chai 100ml hay thùng.
+
+        <!-- Step 2 -->
+        <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[11px] font-black text-slate-700 bg-slate-200/60 px-2 py-0.5 rounded-md border border-slate-300/50">02 / NHẶT TRỰC QUAN</span>
+              <i data-lucide="package-check" class="w-3.5 h-3.5 text-slate-400"></i>
+            </div>
+            <h5 class="text-xs font-bold text-slate-900">Quan sát hình ảnh &amp; quy cách</h5>
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              Nhân viên kho kiểm tra ảnh đại diện sản phẩm và phân loại thùng/lẻ để gom chuẩn xác lên xe đẩy, giảm thiểu sai sót nhầm lẫn phân loại mẫu.
+            </p>
+          </div>
         </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-          <strong class="text-slate-900 block mb-1 text-xs">3. Tra cứu theo mã đơn 18 số:</strong>
-          Gõ mã đơn TikTok (ví dụ: 585908...) vào ô tìm kiếm để biết ngay đơn đó mua sản phẩm nào và số lượng bao nhiêu.
+
+        <!-- Step 3 -->
+        <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[11px] font-black text-slate-700 bg-slate-200/60 px-2 py-0.5 rounded-md border border-slate-300/50">03 / DÁN TEM TỰ ĐỘNG</span>
+              <i data-lucide="tags" class="w-3.5 h-3.5 text-slate-400"></i>
+            </div>
+            <h5 class="text-xs font-bold text-slate-900">Tải PDF tem đã xếp theo món</h5>
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              Chuyển sang Tab 2 bấm <strong class="text-slate-700 font-semibold">"Tải PDF Đã Sắp Xếp"</strong>. Toàn bộ tem cùng món sẽ xếp liền kề nhau để thợ dán tem dán liên tục tốc độ cao.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -855,7 +885,7 @@
         <div class="flex items-center gap-2">
           <button 
             onclick="copyTrackings()" 
-            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
+            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             title="Sao chép toàn bộ danh sách mã vận đơn để đối soát"
           >
             <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
@@ -1228,7 +1258,7 @@
       } else if (type === 'warn') {
         statusEl.innerHTML = `<span class="inline-flex items-center text-amber-600 font-semibold"><i data-lucide="hard-drive" class="w-3.5 h-3.5 mr-1 text-amber-500"></i> ${escapeHtml(msg)}</span>`;
       } else {
-        statusEl.innerHTML = `<span class="inline-flex items-center text-slate-500"><i data-lucide="cloud" class="w-3.5 h-3.5 mr-1 text-blue-500"></i> ${escapeHtml(msg)}</span>`;
+        statusEl.innerHTML = `<span class="inline-flex items-center text-slate-500"><i data-lucide="cloud" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${escapeHtml(msg)}</span>`;
       }
       lucide.createIcons();
     }
@@ -1409,8 +1439,8 @@
       document.getElementById('newComboUnit').value = rule.unit || '';
 
       document.getElementById('formHeaderTitle').innerHTML = `
-        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-blue-600"></i>
-        <span>Đang Chỉnh Sửa: <strong class="text-blue-700">${escapeHtml(rule.name)}</strong></span>
+        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+        <span>Đang Chỉnh Sửa: <strong class="text-rose-700">${escapeHtml(rule.name)}</strong></span>
       `;
       document.getElementById('btnSaveComboText').textContent = 'Cập Nhật Quy Tắc';
       document.getElementById('btnCancelEditCombo').classList.remove('hidden');
@@ -1543,7 +1573,7 @@
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <button onclick="editComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa quy tắc này">
+            <button onclick="editComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa quy tắc này">
               <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
             <button onclick="deleteComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa quy tắc này">
@@ -1723,6 +1753,7 @@
         e.preventDefault();
         e.stopPropagation();
         dropZone.classList.add('border-rose-500', 'bg-rose-50/40');
+        dropZone.classList.remove('border-slate-300');
       });
     });
 
@@ -1731,6 +1762,7 @@
         e.preventDefault();
         e.stopPropagation();
         dropZone.classList.remove('border-rose-500', 'bg-rose-50/40');
+        dropZone.classList.add('border-slate-300');
       });
     });
 
@@ -1966,9 +1998,13 @@
       const badge = document.getElementById('shippingBadge');
 
       if (tab === 'picking') {
-        if (tabPickingBtn) tabPickingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
-        if (tabShippingBtn) tabShippingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
-        if (badge) badge.className = 'ml-2 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-slate-200 text-slate-800';
+        if (tabPickingBtn) tabPickingBtn.className = 'flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center transition-all bg-white text-slate-900 shadow-2xs border border-slate-200/90 cursor-pointer';
+        if (tabShippingBtn) tabShippingBtn.className = 'flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center transition-all text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer';
+        const pickingIcon = tabPickingBtn ? tabPickingBtn.querySelector('i') : null;
+        const shippingIcon = tabShippingBtn ? tabShippingBtn.querySelector('i') : null;
+        if (pickingIcon) pickingIcon.className = 'w-4 h-4 mr-2 text-rose-600';
+        if (shippingIcon) shippingIcon.className = 'w-4 h-4 mr-2 text-slate-400';
+        if (badge) badge.className = 'ml-2 px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-200 text-slate-700';
 
         if (aggregatedItems.length > 0) {
           statsSection.classList.remove('hidden');
@@ -1977,9 +2013,13 @@
         }
         if (shippingSection) shippingSection.classList.add('hidden');
       } else {
-        if (tabShippingBtn) tabShippingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
-        if (tabPickingBtn) tabPickingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
-        if (badge) badge.className = 'ml-2 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-white/20 text-white border border-white/30';
+        if (tabShippingBtn) tabShippingBtn.className = 'flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center transition-all bg-white text-slate-900 shadow-2xs border border-slate-200/90 cursor-pointer';
+        if (tabPickingBtn) tabPickingBtn.className = 'flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center transition-all text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer';
+        const pickingIcon = tabPickingBtn ? tabPickingBtn.querySelector('i') : null;
+        const shippingIcon = tabShippingBtn ? tabShippingBtn.querySelector('i') : null;
+        if (shippingIcon) shippingIcon.className = 'w-4 h-4 mr-2 text-rose-600';
+        if (pickingIcon) pickingIcon.className = 'w-4 h-4 mr-2 text-slate-400';
+        if (badge) badge.className = 'ml-2 px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-100 text-rose-700 border border-rose-200/60';
 
         statsSection.classList.add('hidden');
         fulfillmentSection.classList.add('hidden');
@@ -2028,7 +2068,7 @@
           const pct = Math.round((pNum / numPages) * 75) + 10;
           progressBar.style.width = `${pct}%`;
           progressPercent.textContent = `${pct}%`;
-          progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-blue-600"></i> Đang bóc tách mã vận đơn trang ${pNum} / ${numPages}...`;
+          progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang bóc tách mã vận đơn trang ${pNum} / ${numPages}...`;
 
           const page = await pdfDoc.getPage(pNum);
           const textContent = await page.getTextContent();
@@ -2333,7 +2373,7 @@
       if (sortedShippingOrders.length === 0) {
         container.innerHTML = `
           <div class="p-12 text-center bg-white border border-slate-200 rounded-2xl">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200/80 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <i data-lucide="tags" class="w-6 h-6"></i>
             </div>
             <p class="text-sm font-bold text-slate-900">Chưa có file mã vận đơn nào được tải lên</p>
