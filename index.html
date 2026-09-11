@@ -243,8 +243,8 @@
           title="Quản lý và thiết lập quy tắc quy đổi Combo &amp; Thùng"
         >
           <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
-          <span>Cấu hình Combo</span>
-          <span id="comboBadgeCount" class="ml-1.5 px-1.5 py-0.2 text-[10px] font-black rounded-full bg-rose-100 text-rose-700 border border-rose-200">3</span>
+          <span>Quy Cách &amp; Combo</span>
+          <span id="comboBadgeCount" class="ml-1.5 px-1.5 py-0.2 text-[10px] font-black rounded-full bg-rose-100 text-rose-700 border border-rose-200">6</span>
         </button>
 
         <span class="hidden sm:inline-flex items-center px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-slate-50 text-slate-600 border border-slate-200">
@@ -1136,19 +1136,19 @@
     </div>
   </div>
 
-  <!-- Combo & Packaging Rule Configuration Modal -->
-  <div id="comboModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeComboModal()">
-    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+  <!-- Combo & Packaging Rule Configuration Modal (2 Tabs: Packaging Spec & Combo Definition) -->
+  <div id="comboModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="closeComboModal()">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
       
       <!-- Modal Header -->
-      <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-white">
+      <div class="px-6 py-4.5 border-b border-slate-200 flex justify-between items-center bg-white">
         <div class="flex items-center space-x-3.5">
           <div class="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shadow-2xs">
             <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-slate-900">Cấu Hình Combo &amp; Quy Cách Đóng Gói</h3>
-            <p class="text-xs text-slate-600 mt-0.5">Tự động quy đổi thùng/lốc ra món lẻ &amp; gom đơn chuẩn xác (Lưu vĩnh viễn)</p>
+            <h3 class="font-extrabold text-base text-slate-900">Cấu Hình Quy Cách Đóng Gói &amp; Combo Sản Phẩm</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Phân tách rõ ràng: (1) Thùng/Hộp quy đổi lẻ &bull; (2) Combo nhiều món thành phần (Lưu vĩnh viễn)</p>
           </div>
         </div>
         <button onclick="closeComboModal()" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-all cursor-pointer">
@@ -1156,42 +1156,57 @@
         </button>
       </div>
 
-      <!-- Modal Body (Scrollable) -->
-      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
-        
-        <!-- Explanation Banner: AI Auto-Detection from PDF -->
-        <div class="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
+      <!-- Tab Navigation -->
+      <div class="flex border-b border-slate-200 bg-slate-100/70 px-4 sm:px-6 pt-2 gap-2 select-none">
+        <button id="tabBtnPackaging" type="button" onclick="switchConfigModalTab('packaging')"
+          class="flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-extrabold text-xs sm:text-sm transition-all border-emerald-600 text-emerald-700 bg-white rounded-t-xl shadow-2xs cursor-pointer">
+          <i data-lucide="package" class="w-4 h-4 text-emerald-600"></i>
+          <span>1. Quy Cách Đóng Gói (Thùng / Hộp)</span>
+          <span id="packagingTabBadge" class="ml-1 px-2 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800">0</span>
+        </button>
+        <button id="tabBtnCombo" type="button" onclick="switchConfigModalTab('combo')"
+          class="flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-bold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer">
+          <i data-lucide="boxes" class="w-4 h-4 text-purple-600"></i>
+          <span>2. Định Nghĩa Combo (Bộ Nhiều Món)</span>
+          <span id="comboTabBadge" class="ml-1 px-2 py-0.5 text-[11px] font-black rounded-full bg-slate-200 text-slate-700">0</span>
+        </button>
+      </div>
+
+      <!-- PANEL 1: QUY CÁCH ĐÓNG GÓI (THÙNG / HỘP) -->
+      <div id="panelPackaging" class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+        <!-- Explanation Banner -->
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
           <div class="flex items-start gap-3">
             <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold mt-0.5 shadow-2xs">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <i data-lucide="package-check" class="w-4 h-4"></i>
             </div>
             <div class="space-y-0.5 min-w-0">
               <div class="font-extrabold text-emerald-900 text-xs sm:text-sm">
-                Hệ thống ĐÃ TỰ ĐỘNG nhận diện quy cách từ file PDF!
+                Quy Cách Đóng Gói (Thùng, Hộp, Cặp, Lô &rarr; Quy đổi ra Món Lẻ)
               </div>
               <p class="text-emerald-800 leading-relaxed text-[11px] sm:text-xs">
-                Mọi quy cách <strong>Thùng nguyên, Hộp, Cặp, Lô</strong> (như <em>Thùng 6 chai, Thùng 12 gói, 3 cặp...</em>) đều được bóc tách và tính toán quy đổi tự động trên bảng nhặt hàng mà không bắt buộc cài thủ công.
+                Giúp hệ thống gom đúng số lượng thực tế cần lấy: <em>Ví dụ 1 Thùng NAVETCIDE 1L = 12 Chai lẻ; 1 Thùng Calcifort = 6 Chai lẻ; Thùng 12 gói = 12 gói</em>. Hệ thống tự động nhận diện từ PDF và quy đổi.
               </p>
             </div>
           </div>
-          <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="shrink-0 w-full sm:w-auto px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Tự động quét tất cả thùng/combo trong file đã nạp và đưa vào danh sách quy tắc">
+          <button type="button" onclick="autoScanPackagingFromLoadedFiles()" class="shrink-0 w-full sm:w-auto px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Tự động quét quy cách thùng từ các file đã nạp">
             <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-            <span>Tự Động Quét Từ File</span>
+            <span>Quét Thùng Từ File</span>
           </button>
         </div>
 
-        <!-- Add / Edit Combo Form -->
+        <!-- Add / Edit Packaging Form -->
         <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-4">
-          <input type="hidden" id="editingComboId" value="" />
+          <input type="hidden" id="editingPkgId" value="" />
           <div class="flex flex-wrap items-center justify-between gap-2.5">
-            <div class="font-bold text-slate-900 text-sm flex items-center" id="formHeaderTitle">
-              <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
-              Thêm Quy Tắc Combo / Quy Cách Mới
+            <div class="font-bold text-slate-900 text-sm flex items-center" id="pkgFormHeaderTitle">
+              <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+              <span>Thêm Quy Cách Đóng Gói Mới</span>
             </div>
             <!-- Quick Picker from Loaded Files -->
             <div class="flex items-center gap-2">
               <span class="text-slate-600 font-semibold text-xs hidden sm:inline">Chọn nhanh từ file:</span>
-              <select id="quickProductSelect" onchange="onQuickProductSelected(this.value)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium max-w-[240px] focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-2xs cursor-pointer">
+              <select id="quickPackagingSelect" onchange="onQuickPackagingSelected(this.value)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium max-w-[240px] focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs cursor-pointer">
                 <option value="">-- Chọn sản phẩm trong file --</option>
               </select>
             </div>
@@ -1199,26 +1214,130 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Tên Combo / Quy cách hiển thị: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Thùng 3 cặp)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Tên quy cách hiển thị: <span class="text-rose-600">*</span></label>
+              <input type="text" id="newPkgName" placeholder="VD: NAVETCIDE (Thùng 12 chai)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa sản phẩm áp dụng:</label>
-              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi (để trống = mọi sản phẩm)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa Tên Sản Phẩm:</label>
+              <input type="text" id="newPkgProdKey" placeholder="VD: NAVETCIDE (để trống = mọi sản phẩm)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
               <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa SKU / Phân loại: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newComboSkuKey" placeholder="VD: Thùng cặp, 3 cặp, Thùng 6 chai..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <input type="text" id="newPkgSkuKey" placeholder="VD: Thùng 12, Thùng 6 chai, 3 cặp..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Số lượng lẻ: <span class="text-rose-600">*</span></label>
-                <input type="number" id="newComboPackSize" min="1" value="3" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-black text-slate-900 shadow-2xs transition-all" />
+                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Số lượng lẻ trong 1 thùng: <span class="text-rose-600">*</span></label>
+                <input type="number" id="newPkgPackSize" min="1" value="12" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-black text-slate-900 shadow-2xs transition-all" />
               </div>
               <div>
-                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Đơn vị quy đổi:</label>
-                <input type="text" id="newComboUnit" placeholder="VD: Cặp 100ml, Chai..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Đơn vị lẻ quy đổi:</label>
+                <input type="text" id="newPkgUnit" placeholder="VD: Chai 1 lít, Gói, Chai 100ml..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
               </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <div id="pkgFormMessage" class="text-xs text-slate-600 italic"></div>
+            <div class="flex items-center gap-2.5">
+              <button id="btnCancelEditPkg" onclick="cancelEditPackaging()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
+                Hủy sửa
+              </button>
+              <button id="btnSavePkg" onclick="handleSavePackagingRule()" class="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+                <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
+                <span id="btnSavePkgText">Lưu Quy Cách Này</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Packaging Rules List -->
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <span class="font-bold text-slate-900 text-sm flex items-center">
+              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-emerald-700"></i>
+              Danh Sách Quy Cách Thùng / Hộp (<span id="packagingListCount">0</span>)
+            </span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="resetDefaultPackagingRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition-all cursor-pointer shadow-2xs" title="Khôi phục 3 quy cách thùng chuẩn của shop">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+                Khôi phục 3 quy cách chuẩn
+              </button>
+              <button onclick="exportPackagingRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
+                <i data-lucide="download" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
+                Xuất JSON
+              </button>
+              <label class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
+                <i data-lucide="upload" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
+                Nhập JSON
+                <input type="file" id="importPkgInput" accept=".json" onchange="importPackagingRules(event)" class="hidden" />
+              </label>
+              <button onclick="clearAllPackagingRules()" class="text-xs text-rose-600 hover:text-rose-800 font-bold transition-all cursor-pointer px-2 py-1">
+                Xóa tất cả
+              </button>
+            </div>
+          </div>
+          <div id="packagingRulesList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: ĐỊNH NGHĨA COMBO (BỘ NHIỀU MÓN) -->
+      <div id="panelCombo" class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs hidden">
+        <!-- Explanation Banner -->
+        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 font-bold mt-0.5 shadow-2xs">
+              <i data-lucide="boxes" class="w-4 h-4"></i>
+            </div>
+            <div class="space-y-0.5 min-w-0">
+              <div class="font-extrabold text-purple-900 text-xs sm:text-sm">
+                Định Nghĩa Bộ Combo (Bộ Nhiều Món Khác Nhau)
+              </div>
+              <p class="text-purple-800 leading-relaxed text-[11px] sm:text-xs">
+                Dành cho các sản phẩm bán theo bộ gồm nhiều món khác nhau: <em>Ví dụ Combo Phục Hồi = 1 Calcifort 100ml + 1 ADE B.Complex 100ml; Combo Vỗ Béo = 1 Betazyme + 1 Vitamino</em>. Thành phần chi tiết sẽ hiện rõ trên Phiếu nhặt hàng &amp; Tem vận đơn.
+              </p>
+            </div>
+          </div>
+          <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="shrink-0 w-full sm:w-auto px-3.5 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Tự động tìm kiếm các bộ combo trong file">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+            <span>Quét Combo Từ File</span>
+          </button>
+        </div>
+
+        <!-- Add / Edit Combo Form -->
+        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-4">
+          <input type="hidden" id="editingComboId" value="" />
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="font-bold text-slate-900 text-sm flex items-center" id="comboFormHeaderTitle">
+              <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+              <span>Thêm Định Nghĩa Combo Mới</span>
+            </div>
+            <!-- Quick Picker from Loaded Files -->
+            <div class="flex items-center gap-2">
+              <span class="text-slate-600 font-semibold text-xs hidden sm:inline">Chọn nhanh từ file:</span>
+              <select id="quickComboSelect" onchange="onQuickComboSelected(this.value)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium max-w-[240px] focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-2xs cursor-pointer">
+                <option value="">-- Chọn sản phẩm trong file --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Tên Bộ Combo: <span class="text-rose-600">*</span></label>
+              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Cặp 100ml)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa Tên Sản Phẩm: <span class="text-rose-600">*</span></label>
+              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi, VỖ BÉO LITE, TIÊU CHẢY..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa SKU / Phân loại:</label>
+              <input type="text" id="newComboSkuKey" placeholder="VD: Cặp 100ml (để trống = áp dụng cho mọi phân loại)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Thành phần chi tiết trong Combo: <span class="text-rose-600">*</span></label>
+              <input type="text" id="newComboComponents" placeholder="VD: 1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
           </div>
           <div class="flex items-center justify-between pt-1">
@@ -1227,45 +1346,44 @@
               <button id="btnCancelEditCombo" onclick="cancelEditCombo()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
                 Hủy sửa
               </button>
-              <button id="btnSaveCombo" onclick="handleAddNewCombo()" class="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+              <button id="btnSaveCombo" onclick="handleSaveComboRule()" class="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
                 <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
-                <span id="btnSaveComboText">Lưu Quy Tắc Này</span>
+                <span id="btnSaveComboText">Lưu Combo Này</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Current Combo Rules List -->
+        <!-- Combo Rules List -->
         <div>
           <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
             <span class="font-bold text-slate-900 text-sm flex items-center">
-              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-slate-800"></i>
-              Danh Sách Quy Tắc Đang Áp Dụng (<span id="comboListCount">0</span>)
+              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-purple-700"></i>
+              Danh Sách Bộ Combo Đang Áp Dụng (<span id="comboListCount">0</span>)
             </span>
             <div class="flex items-center gap-2 flex-wrap">
-              <button type="button" onclick="resetDefaultCombos()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 border border-amber-200 text-amber-900 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs" title="Khôi phục 3 quy tắc combo chuẩn của shop">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1 text-amber-700"></i>
-                Khôi phục 3 quy tắc chuẩn
+              <button type="button" onclick="resetDefaultComboRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 border border-purple-200 text-purple-800 hover:bg-purple-100 transition-all cursor-pointer shadow-2xs" title="Khôi phục 3 combo chuẩn của shop">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>
+                Khôi phục 3 combo chuẩn
               </button>
-              <button onclick="exportComboRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-2xs" title="Tải file JSON dự phòng">
+              <button onclick="exportComboRulesOnly()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
                 <i data-lucide="download" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
                 Xuất JSON
               </button>
-              <label class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-2xs" title="Nạp file JSON đã lưu">
+              <label class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
                 <i data-lucide="upload" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
                 Nhập JSON
-                <input type="file" id="importComboInput" accept=".json" onchange="importComboRules(event)" class="hidden" />
+                <input type="file" id="importComboInput" accept=".json" onchange="importComboRulesOnly(event)" class="hidden" />
               </label>
-              <button onclick="clearAllComboRules()" class="text-xs text-rose-600 hover:text-rose-800 font-bold transition-all cursor-pointer px-2 py-1">
+              <button onclick="clearAllComboRulesOnly()" class="text-xs text-rose-600 hover:text-rose-800 font-bold transition-all cursor-pointer px-2 py-1">
                 Xóa tất cả
               </button>
             </div>
           </div>
-          <div id="comboRulesList" class="space-y-3 max-h-64 overflow-y-auto pr-1">
+          <div id="comboRulesList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
             <!-- Rendered by JS -->
           </div>
         </div>
-
       </div>
 
       <!-- Modal Footer -->
@@ -1318,18 +1436,20 @@
     let orderInfoMap = {};
     let currentMainTab = 'picking'; // 'picking' or 'shipping'
 
-    // Default shop combo & packaging rules
-    const DEFAULT_COMBO_RULES = [
+    // Default shop packaging & combo rules
+    const DEFAULT_PACKAGING_RULES = [
       {
-        id: "rule_combo_phuc_hoi",
-        name: "Combo Phục hồi (Thùng 3 cặp)",
-        productKeyword: "Combo Phục hồi",
-        skuKeyword: "3 cặp",
-        packSize: 3,
-        unit: "Cặp 100ml"
+        id: "pkg_navetcide_12",
+        category: "packaging",
+        name: "NAVETCIDE (Thùng 12 chai)",
+        productKeyword: "NAVETCIDE",
+        skuKeyword: "Thùng 12",
+        packSize: 12,
+        unit: "Chai 1 lít"
       },
       {
-        id: "rule_calcifort_b12_thung6",
+        id: "pkg_calcifort_6",
+        category: "packaging",
         name: "Calcifort-B12 (Thùng 6 chai)",
         productKeyword: "Calcifort-B12",
         skuKeyword: "Thùng 6 chai",
@@ -1337,7 +1457,8 @@
         unit: "Chai 100ml"
       },
       {
-        id: "rule_thung_12_goi",
+        id: "pkg_thung_12_goi",
+        category: "packaging",
         name: "Quy cách Thùng 12 gói",
         productKeyword: "",
         skuKeyword: "Thùng 12",
@@ -1346,8 +1467,50 @@
       }
     ];
 
-    // Combo & Packaging Rules (Stored on Server & local storage)
-    let comboRules = [...DEFAULT_COMBO_RULES];
+    const DEFAULT_COMBO_RULES = [
+      {
+        id: "combo_phuc_hoi",
+        category: "combo",
+        name: "Combo Phục Hồi (Cặp 100ml)",
+        productKeyword: "Combo Phục hồi",
+        skuKeyword: "",
+        components: "1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+      },
+      {
+        id: "combo_vo_beo",
+        category: "combo",
+        name: "COMBO VỖ BÉO LITE",
+        productKeyword: "VỖ BÉO LITE",
+        skuKeyword: "",
+        components: "1 Betazyme 1kg + 1 Vitamino LITE 1kg"
+      },
+      {
+        id: "combo_tieu_chay",
+        category: "combo",
+        name: "Combo Tiêu Chảy Heo Con",
+        productKeyword: "TIÊU CHẢY HEO CON",
+        skuKeyword: "",
+        components: "1 Navet-Cox 100ml + 1 Fer 200 B12 100ml"
+      }
+    ];
+
+    const DEFAULT_ALL_RULES = [...DEFAULT_PACKAGING_RULES, ...DEFAULT_COMBO_RULES];
+
+    function normalizeRule(r) {
+      if (!r) return null;
+      if (!r.category) {
+        if (r.components || (!r.packSize && (r.name || '').toLowerCase().includes('combo'))) {
+          r.category = 'combo';
+        } else {
+          r.category = 'packaging';
+        }
+      }
+      return r;
+    }
+
+    // Unified Rules Array (Both Packaging and Combo rules stored with category)
+    let comboRules = [...DEFAULT_ALL_RULES];
+    let currentConfigModalTab = 'packaging'; // 'packaging' or 'combo'
 
     // Load combo rules from server API first, with localStorage fallback
     async function loadComboRules() {
@@ -1357,7 +1520,7 @@
         if (resp.ok) {
           const serverRules = await resp.json();
           if (Array.isArray(serverRules) && serverRules.length > 0) {
-            comboRules = serverRules;
+            comboRules = serverRules.map(normalizeRule).filter(Boolean);
             loadedFromServer = true;
             try {
               localStorage.setItem('tiktok_shop_combo_rules_v3', JSON.stringify(comboRules));
@@ -1374,30 +1537,30 @@
           if (stored) {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              comboRules = parsed;
+              comboRules = parsed.map(normalizeRule).filter(Boolean);
             } else {
-              comboRules = [...DEFAULT_COMBO_RULES];
+              comboRules = [...DEFAULT_ALL_RULES];
             }
           } else {
-            comboRules = [...DEFAULT_COMBO_RULES];
+            comboRules = [...DEFAULT_ALL_RULES];
           }
         } catch (e) {
-          comboRules = [...DEFAULT_COMBO_RULES];
+          comboRules = [...DEFAULT_ALL_RULES];
         }
       }
 
       if (!comboRules || comboRules.length === 0) {
-        comboRules = [...DEFAULT_COMBO_RULES];
+        comboRules = [...DEFAULT_ALL_RULES];
       }
 
       updateComboBadge();
       updateSyncStatusText(loadedFromServer ? 'Đã đồng bộ từ máy chủ (Lưu vĩnh viễn)' : 'Đang sử dụng dữ liệu trình duyệt');
-      renderComboRulesList();
+      renderConfigRulesLists();
     }
 
     // Save combo rules to both localStorage and server API
     async function saveComboRules(rules) {
-      comboRules = Array.isArray(rules) ? rules : [];
+      comboRules = Array.isArray(rules) ? rules.map(normalizeRule).filter(Boolean) : [];
       
       // 1. Save to localStorage immediately
       try {
@@ -1407,7 +1570,7 @@
       }
 
       updateComboBadge();
-      renderComboRulesList();
+      renderConfigRulesLists();
       updateSyncStatusText('Đang lưu lên máy chủ...');
 
       // 2. Sync to Server API
@@ -1442,21 +1605,69 @@
     }
 
     function updateComboBadge() {
+      const pkgCount = comboRules.filter(r => r.category === 'packaging').length;
+      const comboCount = comboRules.filter(r => r.category === 'combo').length;
+
       const badge = document.getElementById('comboBadgeCount');
       if (badge) badge.textContent = comboRules.length;
-      const countEl = document.getElementById('comboListCount');
-      if (countEl) countEl.textContent = comboRules.length;
+
+      const pkgTabBadge = document.getElementById('packagingTabBadge');
+      if (pkgTabBadge) pkgTabBadge.textContent = pkgCount;
+      const pkgListCount = document.getElementById('packagingListCount');
+      if (pkgListCount) pkgListCount.textContent = pkgCount;
+
+      const comboTabBadge = document.getElementById('comboTabBadge');
+      if (comboTabBadge) comboTabBadge.textContent = comboCount;
+      const comboListCount = document.getElementById('comboListCount');
+      if (comboListCount) comboListCount.textContent = comboCount;
     }
 
-    function openComboModal() {
+    function switchConfigModalTab(tab) {
+      currentConfigModalTab = tab;
+      const btnPkg = document.getElementById('tabBtnPackaging');
+      const btnCombo = document.getElementById('tabBtnCombo');
+      const panelPkg = document.getElementById('panelPackaging');
+      const panelCombo = document.getElementById('panelCombo');
+
+      if (tab === 'packaging') {
+        if (panelPkg) panelPkg.classList.remove('hidden');
+        if (panelCombo) panelCombo.classList.add('hidden');
+
+        if (btnPkg) {
+          btnPkg.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-extrabold text-xs sm:text-sm transition-all border-emerald-600 text-emerald-700 bg-white rounded-t-xl shadow-2xs cursor-pointer';
+        }
+        if (btnCombo) {
+          btnCombo.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-bold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer';
+        }
+      } else {
+        if (panelPkg) panelPkg.classList.add('hidden');
+        if (panelCombo) panelCombo.classList.remove('hidden');
+
+        if (btnCombo) {
+          btnCombo.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-extrabold text-xs sm:text-sm transition-all border-purple-600 text-purple-700 bg-white rounded-t-xl shadow-2xs cursor-pointer';
+        }
+        if (btnPkg) {
+          btnPkg.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-bold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer';
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function openComboModal(initialTab = null) {
       document.getElementById('comboModal').classList.remove('hidden');
-      populateQuickProductSelect();
-      renderComboRulesList();
+      if (initialTab) {
+        switchConfigModalTab(initialTab);
+      } else {
+        switchConfigModalTab(currentConfigModalTab || 'packaging');
+      }
+      populateQuickProductSelects();
+      renderConfigRulesLists();
       lucide.createIcons();
     }
 
     function closeComboModal() {
       document.getElementById('comboModal').classList.add('hidden');
+      cancelEditPackaging();
       cancelEditCombo();
       if (lastParsedFilesData && lastParsedFilesData.length > 0) {
         processAggregatedData(lastParsedFilesData);
@@ -1472,103 +1683,122 @@
       }
     }
 
-    // Populate the quick picker dropdown from loaded files
-    function populateQuickProductSelect() {
-      const select = document.getElementById('quickProductSelect');
-      if (!select) return;
-      
-      select.innerHTML = '<option value="">-- Chọn từ sản phẩm trong file --</option>';
+    // Populate the quick picker dropdowns from loaded files
+    function populateQuickProductSelects() {
+      const selectPkg = document.getElementById('quickPackagingSelect');
+      const selectCombo = document.getElementById('quickComboSelect');
       
       const options = [];
+      const seen = new Set();
+
+      const addItem = (prodName, skuStr) => {
+        const pClean = cleanItemProductName(prodName);
+        const sClean = cleanSku(skuStr);
+        if (!pClean || pClean.includes('Order ID:') || sClean.includes('Order ID:')) return;
+        const key = pClean + '|||' + sClean;
+        if (!seen.has(key)) {
+          seen.add(key);
+          options.push({
+            productName: pClean,
+            sku: sClean,
+            label: `${pClean.slice(0, 32)}... [${sClean}]`
+          });
+        }
+      };
+
       if (groupedProducts && groupedProducts.length > 0) {
         groupedProducts.forEach(g => {
-          const pClean = cleanItemProductName(g.productName);
-          if (!pClean || pClean.includes('Order ID:')) return;
-          g.variants.forEach(v => {
-            const sClean = cleanSku(v.sku);
-            if (sClean.includes('Order ID:')) return;
-            options.push({
-              productName: pClean,
-              sku: sClean,
-              label: `${pClean.slice(0, 32)}... [${sClean}]`
-            });
-          });
+          g.variants.forEach(v => addItem(g.productName, v.sku));
         });
       } else if (shippingOrders && shippingOrders.length > 0) {
-        const seen = new Set();
         shippingOrders.forEach(o => {
-          (o.items || []).forEach(it => {
-            const pClean = cleanItemProductName(it.name);
-            const sClean = cleanSku(it.sku);
-            if (!pClean || pClean.includes('Order ID:') || sClean.includes('Order ID:')) return;
-            const key = pClean + '|||' + sClean;
-            if (!seen.has(key)) {
-              seen.add(key);
-              options.push({
-                productName: pClean,
-                sku: sClean,
-                label: `${pClean.slice(0, 32)}... [${sClean}]`
-              });
-            }
-          });
+          (o.items || []).forEach(it => addItem(it.name, it.sku));
         });
       }
 
-      options.forEach((opt, idx) => {
-        const el = document.createElement('option');
-        el.value = idx;
-        el.textContent = opt.label;
-        select.appendChild(el);
-      });
       window._quickProductOptions = options;
+
+      if (selectPkg) {
+        selectPkg.innerHTML = '<option value="">-- Chọn sản phẩm trong file --</option>';
+        options.forEach((opt, idx) => {
+          const el = document.createElement('option');
+          el.value = idx;
+          el.textContent = opt.label;
+          selectPkg.appendChild(el);
+        });
+      }
+
+      if (selectCombo) {
+        selectCombo.innerHTML = '<option value="">-- Chọn sản phẩm trong file --</option>';
+        options.forEach((opt, idx) => {
+          const el = document.createElement('option');
+          el.value = idx;
+          el.textContent = opt.label;
+          selectCombo.appendChild(el);
+        });
+      }
     }
 
-    function onQuickProductSelected(idxStr) {
+    function onQuickPackagingSelected(idxStr) {
       if (idxStr === '' || !window._quickProductOptions) return;
       const opt = window._quickProductOptions[parseInt(idxStr, 10)];
       if (!opt) return;
 
-      document.getElementById('newComboName').value = `${opt.productName.slice(0, 25)} (${opt.sku})`;
-      document.getElementById('newComboProdKey').value = opt.productName.slice(0, 30);
-      document.getElementById('newComboSkuKey').value = opt.sku;
+      document.getElementById('newPkgName').value = `${opt.productName.slice(0, 25)} (${opt.sku})`;
+      document.getElementById('newPkgProdKey').value = opt.productName.slice(0, 30);
+      document.getElementById('newPkgSkuKey').value = opt.sku;
 
-      // Guess pack size if sku has numbers
       const numMatch = opt.sku.match(/\d+/);
       if (numMatch) {
         const num = parseInt(numMatch[0], 10);
         if (num > 1 && num <= 100) {
-          document.getElementById('newComboPackSize').value = num;
+          document.getElementById('newPkgPackSize').value = num;
         }
       }
-      document.getElementById('newComboUnit').value = 'Món lẻ';
-      document.getElementById('newComboPackSize').focus();
+      document.getElementById('newPkgUnit').value = 'Món lẻ';
+      document.getElementById('newPkgPackSize').focus();
     }
 
-    function handleAddNewCombo() {
-      const editId = (document.getElementById('editingComboId').value || '').trim();
-      const name = (document.getElementById('newComboName').value || '').trim();
-      const prodKey = (document.getElementById('newComboProdKey').value || '').trim();
-      const skuKey = (document.getElementById('newComboSkuKey').value || '').trim();
-      const packSize = parseInt(document.getElementById('newComboPackSize').value, 10) || 1;
-      const unit = (document.getElementById('newComboUnit').value || '').trim() || 'Món lẻ';
+    function onQuickComboSelected(idxStr) {
+      if (idxStr === '' || !window._quickProductOptions) return;
+      const opt = window._quickProductOptions[parseInt(idxStr, 10)];
+      if (!opt) return;
+
+      document.getElementById('newComboName').value = `${opt.productName.slice(0, 32)} (${opt.sku})`;
+      document.getElementById('newComboProdKey').value = opt.productName.slice(0, 30);
+      document.getElementById('newComboSkuKey').value = opt.sku === 'Mặc định' ? '' : opt.sku;
+      document.getElementById('newComboComponents').value = `1 ${opt.productName.slice(0, 25)} + 1 Món kèm`;
+      document.getElementById('newComboComponents').focus();
+    }
+
+    // ==========================================
+    // 1. PACKAGING SPEC CRUD (THÙNG / HỘP)
+    // ==========================================
+    function handleSavePackagingRule() {
+      const editId = (document.getElementById('editingPkgId').value || '').trim();
+      const name = (document.getElementById('newPkgName').value || '').trim();
+      const prodKey = (document.getElementById('newPkgProdKey').value || '').trim();
+      const skuKey = (document.getElementById('newPkgSkuKey').value || '').trim();
+      const packSize = parseInt(document.getElementById('newPkgPackSize').value, 10) || 1;
+      const unit = (document.getElementById('newPkgUnit').value || '').trim() || 'Món lẻ';
 
       if (!name) {
-        alert('Vui lòng nhập tên Combo / Quy cách!');
-        document.getElementById('newComboName').focus();
+        alert('Vui lòng nhập tên quy cách!');
+        document.getElementById('newPkgName').focus();
         return;
       }
       if (!skuKey) {
-        alert('Vui lòng nhập từ khóa SKU / Phân loại (ví dụ: 3 cặp, Thùng 6 chai...)!');
-        document.getElementById('newComboSkuKey').focus();
+        alert('Vui lòng nhập từ khóa SKU / Phân loại (ví dụ: Thùng 12, Thùng 6 chai...)!');
+        document.getElementById('newPkgSkuKey').focus();
         return;
       }
 
       if (editId) {
-        // Edit existing rule
         const idx = comboRules.findIndex(r => r.id === editId);
         if (idx >= 0) {
           comboRules[idx] = {
             ...comboRules[idx],
+            category: 'packaging',
             name,
             productKeyword: prodKey,
             skuKeyword: skuKey,
@@ -1576,13 +1806,13 @@
             unit,
             updatedAt: Date.now()
           };
-          showToast('Đã cập nhật quy tắc combo thành công!');
+          showToast('Đã cập nhật quy cách đóng gói!');
         }
-        cancelEditCombo();
+        cancelEditPackaging();
       } else {
-        // Add new rule
         const newRule = {
-          id: 'rule_' + Date.now(),
+          id: 'pkg_' + Date.now(),
+          category: 'packaging',
           name,
           productKeyword: prodKey,
           skuKeyword: skuKey,
@@ -1591,96 +1821,102 @@
           createdAt: Date.now()
         };
         comboRules.unshift(newRule);
-        showToast('Đã lưu quy tắc Combo mới thành công!');
+        showToast('Đã thêm quy cách đóng gói mới!');
       }
 
       saveComboRules(comboRules);
-
-      // Reset form
-      document.getElementById('newComboName').value = '';
-      document.getElementById('newComboProdKey').value = '';
-      document.getElementById('newComboSkuKey').value = '';
-      document.getElementById('newComboPackSize').value = '3';
-      document.getElementById('newComboUnit').value = '';
-      document.getElementById('quickProductSelect').value = '';
+      cancelEditPackaging();
     }
 
-    function editComboRule(id) {
+    function editPackagingRule(id) {
       const rule = comboRules.find(r => r.id === id);
       if (!rule) return;
 
-      document.getElementById('editingComboId').value = rule.id;
-      document.getElementById('newComboName').value = rule.name || '';
-      document.getElementById('newComboProdKey').value = rule.productKeyword || '';
-      document.getElementById('newComboSkuKey').value = rule.skuKeyword || '';
-      document.getElementById('newComboPackSize').value = rule.packSize || 1;
-      document.getElementById('newComboUnit').value = rule.unit || '';
+      document.getElementById('editingPkgId').value = rule.id;
+      document.getElementById('newPkgName').value = rule.name || '';
+      document.getElementById('newPkgProdKey').value = rule.productKeyword || '';
+      document.getElementById('newPkgSkuKey').value = rule.skuKeyword || '';
+      document.getElementById('newPkgPackSize').value = rule.packSize || 1;
+      document.getElementById('newPkgUnit').value = rule.unit || '';
 
-      document.getElementById('formHeaderTitle').innerHTML = `
-        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-rose-600"></i>
-        <span>Đang Chỉnh Sửa: <strong class="text-rose-700">${escapeHtml(rule.name)}</strong></span>
+      document.getElementById('pkgFormHeaderTitle').innerHTML = `
+        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+        <span>Đang Sửa Quy Cách: <strong class="text-emerald-700">${escapeHtml(rule.name)}</strong></span>
       `;
-      document.getElementById('btnSaveComboText').textContent = 'Cập Nhật Quy Tắc';
-      document.getElementById('btnCancelEditCombo').classList.remove('hidden');
+      document.getElementById('btnSavePkgText').textContent = 'Cập Nhật Quy Cách';
+      document.getElementById('btnCancelEditPkg').classList.remove('hidden');
 
       lucide.createIcons();
-      document.getElementById('newComboName').focus();
+      document.getElementById('newPkgName').focus();
     }
 
-    function cancelEditCombo() {
-      document.getElementById('editingComboId').value = '';
-      document.getElementById('newComboName').value = '';
-      document.getElementById('newComboProdKey').value = '';
-      document.getElementById('newComboSkuKey').value = '';
-      document.getElementById('newComboPackSize').value = '3';
-      document.getElementById('newComboUnit').value = '';
-      document.getElementById('quickProductSelect').value = '';
+    function cancelEditPackaging() {
+      document.getElementById('editingPkgId').value = '';
+      document.getElementById('newPkgName').value = '';
+      document.getElementById('newPkgProdKey').value = '';
+      document.getElementById('newPkgSkuKey').value = '';
+      document.getElementById('newPkgPackSize').value = '12';
+      document.getElementById('newPkgUnit').value = '';
+      const quickSel = document.getElementById('quickPackagingSelect');
+      if (quickSel) quickSel.value = '';
 
-      document.getElementById('formHeaderTitle').innerHTML = `
-        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
-        <span>Thêm Quy Tắc Combo / Quy Cách Mới</span>
+      document.getElementById('pkgFormHeaderTitle').innerHTML = `
+        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+        <span>Thêm Quy Cách Đóng Gói Mới</span>
       `;
-      document.getElementById('btnSaveComboText').textContent = 'Lưu Quy Tắc Này';
-      document.getElementById('btnCancelEditCombo').classList.add('hidden');
+      document.getElementById('btnSavePkgText').textContent = 'Lưu Quy Cách Này';
+      document.getElementById('btnCancelEditPkg').classList.add('hidden');
       lucide.createIcons();
     }
 
-    function deleteComboRule(id) {
+    function deletePackagingRule(id) {
       const rule = comboRules.find(r => r.id === id);
-      const name = rule ? rule.name : 'quy tắc này';
+      const name = rule ? rule.name : 'quy cách này';
       if (!confirm(`Bạn có chắc muốn xóa "${name}"?`)) return;
       comboRules = comboRules.filter(r => r.id !== id);
       saveComboRules(comboRules);
-      showToast('Đã xóa quy tắc combo!');
+      showToast('Đã xóa quy cách đóng gói!');
     }
 
-    function clearAllComboRules() {
-      if (!comboRules.length) {
-        showToast('Danh sách combo đang trống!');
+    function clearAllPackagingRules() {
+      const count = comboRules.filter(r => r.category === 'packaging').length;
+      if (!count) {
+        showToast('Danh sách quy cách đang trống!');
         return;
       }
-      if (!confirm(`Bạn có chắc muốn XÓA TẤT CẢ ${comboRules.length} quy tắc combo? Hành động này sẽ xóa dữ liệu trên cả máy chủ!`)) return;
-      saveComboRules([]);
-      cancelEditCombo();
-      showToast('Đã xóa toàn bộ danh sách quy tắc combo!');
+      if (!confirm(`Bạn có chắc muốn xóa TẤT CẢ ${count} quy cách đóng gói? (Các combo vẫn được giữ nguyên)`)) return;
+      comboRules = comboRules.filter(r => r.category === 'combo');
+      saveComboRules(comboRules);
+      cancelEditPackaging();
+      showToast('Đã xóa danh sách quy cách đóng gói!');
     }
 
-    function exportComboRules() {
-      if (!comboRules.length) {
-        alert('Danh sách combo đang trống! Hãy thêm ít nhất 1 quy tắc trước khi xuất.');
+    function resetDefaultPackagingRules() {
+      if (!confirm('Khôi phục 3 quy cách thùng/hộp chuẩn của shop? (Các combo của bạn vẫn được giữ nguyên)')) return;
+      const userCombos = comboRules.filter(r => r.category === 'combo');
+      comboRules = [...DEFAULT_PACKAGING_RULES, ...userCombos];
+      saveComboRules(comboRules);
+      cancelEditPackaging();
+      showToast('Đã khôi phục 3 quy cách thùng chuẩn shop!');
+    }
+
+    function exportPackagingRules() {
+      const pkgs = comboRules.filter(r => r.category === 'packaging');
+      if (!pkgs.length) {
+        alert('Danh sách quy cách đang trống!');
         return;
       }
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(comboRules, null, 2));
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(pkgs, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute('href', dataStr);
-      downloadAnchor.setAttribute('download', `tiktok_shop_combos_${new Date().toISOString().slice(0, 10)}.json`);
+      downloadAnchor.setAttribute('download', `tiktok_shop_packaging_${new Date().toISOString().slice(0, 10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-      showToast(`Đã xuất ${comboRules.length} quy tắc combo thành file JSON!`);
+      showToast(`Đã xuất ${pkgs.length} quy cách thành file JSON!`);
     }
 
-    function importComboRules(event) {
+    function importPackagingRules(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -1688,31 +1924,24 @@
         try {
           const imported = JSON.parse(e.target.result);
           if (!Array.isArray(imported)) {
-            alert('File JSON không hợp lệ (phải là danh sách mảng các quy tắc)!');
+            alert('File JSON không hợp lệ!');
             return;
           }
-          const valid = imported.filter(r => r && r.skuKeyword);
+          const valid = imported.filter(r => r && r.skuKeyword).map(r => ({ ...r, category: 'packaging' }));
           if (valid.length === 0) {
-            alert('Không tìm thấy quy tắc hợp lệ trong file JSON!');
+            alert('Không tìm thấy quy cách hợp lệ trong file!');
             return;
           }
-          if (confirm(`Tìm thấy ${valid.length} quy tắc trong file. Bạn muốn GỘP THÊM vào danh sách hiện tại (Chọn OK) hay THAY THẾ TOÀN BỘ (Chọn Cancel)?`)) {
-            const existingKeys = new Set(comboRules.map(r => (r.productKeyword || '') + '|||' + r.skuKeyword));
-            valid.forEach(r => {
-              const k = (r.productKeyword || '') + '|||' + r.skuKeyword;
-              if (!existingKeys.has(k)) {
-                r.id = r.id || ('rule_' + Date.now() + Math.random().toString(36).substr(2, 4));
-                comboRules.push(r);
-              }
-            });
-          } else {
-            valid.forEach((r, idx) => {
-              r.id = r.id || ('rule_' + Date.now() + '_' + idx);
-            });
-            comboRules = valid;
-          }
+          const existingKeys = new Set(comboRules.filter(r => r.category === 'packaging').map(r => (r.productKeyword || '') + '|||' + r.skuKeyword));
+          valid.forEach(r => {
+            const k = (r.productKeyword || '') + '|||' + r.skuKeyword;
+            if (!existingKeys.has(k)) {
+              r.id = r.id || ('pkg_' + Date.now() + Math.random().toString(36).substr(2, 4));
+              comboRules.unshift(r);
+            }
+          });
           saveComboRules(comboRules);
-          showToast(`Đã nạp thành công ${valid.length} quy tắc combo!`);
+          showToast(`Đã nạp ${valid.length} quy cách từ file JSON!`);
         } catch (err) {
           alert('Lỗi đọc file JSON: ' + err.message);
         }
@@ -1721,57 +1950,9 @@
       event.target.value = '';
     }
 
-    function renderComboRulesList() {
-      const container = document.getElementById('comboRulesList');
-      if (!container) return;
-      if (comboRules.length === 0) {
-        container.innerHTML = `
-          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
-            <i data-lucide="sparkles" class="w-7 h-7 mx-auto text-slate-400"></i>
-            <div class="font-bold text-slate-700 text-sm">Chưa có quy tắc combo nào được lưu</div>
-            <div class="text-xs text-slate-500">Hãy thêm quy tắc ở form phía trên hoặc bấm "Chọn nhanh" từ file PDF đã nạp.</div>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
-      }
-
-      container.innerHTML = comboRules.map(rule => `
-        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex items-center justify-between gap-4">
-          <div class="space-y-1 min-w-0 flex-1">
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(rule.name)}</span>
-              <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-rose-50 text-rose-800 border border-rose-200/80">
-                1 quy cách = ${rule.packSize} ${escapeHtml(rule.unit || 'món lẻ')}
-              </span>
-            </div>
-            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-2">
-              ${rule.productKeyword ? `<span class="font-semibold text-slate-700">Sản phẩm:</span> <span class="bg-slate-100 border border-slate-200/70 px-1.5 py-0.2 rounded text-slate-900 font-medium">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-500 font-medium">Mọi sản phẩm &bull; </span>'}
-              <span class="font-semibold text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-900 font-mono text-xs font-bold">${escapeHtml(rule.skuKeyword)}</code>
-            </div>
-          </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button onclick="editComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa quy tắc này">
-              <i data-lucide="edit-3" class="w-4 h-4"></i>
-            </button>
-            <button onclick="deleteComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa quy tắc này">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    function resetDefaultCombos() {
-      if (!confirm('Khôi phục lại 3 quy tắc combo & quy cách chuẩn của shop?')) return;
-      saveComboRules([...DEFAULT_COMBO_RULES]);
-      showToast('Đã khôi phục 3 combo chuẩn shop!');
-    }
-
-    function autoScanCombosFromLoadedFiles() {
+    function autoScanPackagingFromLoadedFiles() {
       const candidates = [];
-      const seenKeys = new Set(comboRules.map(r => ((r.productKeyword || '').toLowerCase() + '|||' + (r.skuKeyword || '').toLowerCase())));
+      const seenKeys = new Set(comboRules.filter(r => r.category === 'packaging').map(r => ((r.productKeyword || '').toLowerCase() + '|||' + (r.skuKeyword || '').toLowerCase())));
 
       const examineItem = (productName, sku) => {
         const pClean = cleanItemProductName(productName);
@@ -1786,7 +1967,7 @@
         let detected = null;
         if (thungM) {
           const packSize = parseInt(thungM[1], 10);
-          const unit = (thungM[2] || 'món').trim();
+          const unit = (thungM[2] || 'chai').trim();
           detected = {
             name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(Thùng ${packSize} ${unit})`,
             productKeyword: pClean.slice(0, 30),
@@ -1796,7 +1977,7 @@
           };
         } else if (hopM) {
           const packSize = parseInt(hopM[1], 10);
-          const unit = (hopM[2] || 'món').trim();
+          const unit = (hopM[2] || 'hộp').trim();
           detected = {
             name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(Hộp ${packSize} ${unit})`,
             productKeyword: pClean.slice(0, 30),
@@ -1806,7 +1987,6 @@
           };
         } else if (capM && parseInt(capM[1], 10) > 1) {
           const packSize = parseInt(capM[1], 10);
-          const unit = (capM[2] || 'Cặp').trim();
           detected = {
             name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(${packSize} cặp)`,
             productKeyword: pClean.slice(0, 30),
@@ -1831,7 +2011,8 @@
           if (!seenKeys.has(k)) {
             seenKeys.add(k);
             candidates.push({
-              id: 'rule_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              id: 'pkg_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              category: 'packaging',
               ...detected
             });
           }
@@ -1850,50 +2031,411 @@
       }
 
       if (candidates.length === 0) {
-        showToast('Chưa tìm thấy thêm combo / quy cách mới nào từ các file đã nạp.');
+        showToast('Không tìm thấy thêm quy cách thùng/hộp mới nào từ các file đã nạp.');
         return;
       }
 
       comboRules = [...candidates, ...comboRules];
       saveComboRules(comboRules);
-      showToast(`Đã tự động nhận diện & nạp thêm ${candidates.length} quy tắc combo từ file!`);
+      showToast(`Đã tự động nhận diện & nạp thêm ${candidates.length} quy cách đóng gói từ file!`);
     }
 
-    // Expose all modal and combo functions to window
+    // ==========================================
+    // 2. COMBO BUNDLE DEFINITION CRUD (BỘ NHIỀU MÓN)
+    // ==========================================
+    function handleSaveComboRule() {
+      const editId = (document.getElementById('editingComboId').value || '').trim();
+      const name = (document.getElementById('newComboName').value || '').trim();
+      const prodKey = (document.getElementById('newComboProdKey').value || '').trim();
+      const skuKey = (document.getElementById('newComboSkuKey').value || '').trim();
+      const components = (document.getElementById('newComboComponents').value || '').trim();
+
+      if (!name) {
+        alert('Vui lòng nhập tên Bộ Combo!');
+        document.getElementById('newComboName').focus();
+        return;
+      }
+      if (!prodKey) {
+        alert('Vui lòng nhập từ khóa Tên Sản Phẩm áp dụng (ví dụ: Combo Phục Hồi, VỖ BÉO LITE)!');
+        document.getElementById('newComboProdKey').focus();
+        return;
+      }
+      if (!components) {
+        alert('Vui lòng nhập thành phần chi tiết trong Combo (ví dụ: 1 Betazyme + 1 Vitamino)!');
+        document.getElementById('newComboComponents').focus();
+        return;
+      }
+
+      if (editId) {
+        const idx = comboRules.findIndex(r => r.id === editId);
+        if (idx >= 0) {
+          comboRules[idx] = {
+            ...comboRules[idx],
+            category: 'combo',
+            name,
+            productKeyword: prodKey,
+            skuKeyword: skuKey,
+            components,
+            updatedAt: Date.now()
+          };
+          showToast('Đã cập nhật định nghĩa combo thành công!');
+        }
+        cancelEditCombo();
+      } else {
+        const newRule = {
+          id: 'combo_' + Date.now(),
+          category: 'combo',
+          name,
+          productKeyword: prodKey,
+          skuKeyword: skuKey,
+          components,
+          createdAt: Date.now()
+        };
+        comboRules.push(newRule);
+        showToast('Đã lưu định nghĩa Combo mới thành công!');
+      }
+
+      saveComboRules(comboRules);
+      cancelEditCombo();
+    }
+
+    function editComboRule(id) {
+      const rule = comboRules.find(r => r.id === id);
+      if (!rule) return;
+
+      document.getElementById('editingComboId').value = rule.id;
+      document.getElementById('newComboName').value = rule.name || '';
+      document.getElementById('newComboProdKey').value = rule.productKeyword || '';
+      document.getElementById('newComboSkuKey').value = rule.skuKeyword || '';
+      document.getElementById('newComboComponents').value = rule.components || '';
+
+      document.getElementById('comboFormHeaderTitle').innerHTML = `
+        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+        <span>Đang Sửa Combo: <strong class="text-purple-700">${escapeHtml(rule.name)}</strong></span>
+      `;
+      document.getElementById('btnSaveComboText').textContent = 'Cập Nhật Combo';
+      document.getElementById('btnCancelEditCombo').classList.remove('hidden');
+
+      lucide.createIcons();
+      document.getElementById('newComboName').focus();
+    }
+
+    function cancelEditCombo() {
+      document.getElementById('editingComboId').value = '';
+      document.getElementById('newComboName').value = '';
+      document.getElementById('newComboProdKey').value = '';
+      document.getElementById('newComboSkuKey').value = '';
+      document.getElementById('newComboComponents').value = '';
+      const quickSel = document.getElementById('quickComboSelect');
+      if (quickSel) quickSel.value = '';
+
+      document.getElementById('comboFormHeaderTitle').innerHTML = `
+        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+        <span>Thêm Định Nghĩa Combo Mới</span>
+      `;
+      document.getElementById('btnSaveComboText').textContent = 'Lưu Combo Này';
+      document.getElementById('btnCancelEditCombo').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    function deleteComboRule(id) {
+      const rule = comboRules.find(r => r.id === id);
+      const name = rule ? rule.name : 'combo này';
+      if (!confirm(`Bạn có chắc muốn xóa "${name}"?`)) return;
+      comboRules = comboRules.filter(r => r.id !== id);
+      saveComboRules(comboRules);
+      showToast('Đã xóa định nghĩa combo!');
+    }
+
+    function clearAllComboRulesOnly() {
+      const count = comboRules.filter(r => r.category === 'combo').length;
+      if (!count) {
+        showToast('Danh sách combo đang trống!');
+        return;
+      }
+      if (!confirm(`Bạn có chắc muốn xóa TẤT CẢ ${count} bộ combo? (Các quy cách thùng vẫn được giữ nguyên)`)) return;
+      comboRules = comboRules.filter(r => r.category !== 'combo');
+      saveComboRules(comboRules);
+      cancelEditCombo();
+      showToast('Đã xóa danh sách combo!');
+    }
+
+    function resetDefaultComboRules() {
+      if (!confirm('Khôi phục 3 combo chuẩn của shop? (Các quy cách thùng của bạn vẫn được giữ nguyên)')) return;
+      const userPkgs = comboRules.filter(r => r.category === 'packaging');
+      comboRules = [...userPkgs, ...DEFAULT_COMBO_RULES];
+      saveComboRules(comboRules);
+      cancelEditCombo();
+      showToast('Đã khôi phục 3 combo chuẩn shop!');
+    }
+
+    function exportComboRulesOnly() {
+      const combos = comboRules.filter(r => r.category === 'combo');
+      if (!combos.length) {
+        alert('Danh sách combo đang trống!');
+        return;
+      }
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(combos, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `tiktok_shop_combos_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast(`Đã xuất ${combos.length} combo thành file JSON!`);
+    }
+
+    function importComboRulesOnly(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) {
+            alert('File JSON không hợp lệ!');
+            return;
+          }
+          const valid = imported.filter(r => r && (r.components || r.productKeyword)).map(r => ({ ...r, category: 'combo' }));
+          if (valid.length === 0) {
+            alert('Không tìm thấy combo hợp lệ trong file!');
+            return;
+          }
+          const existingKeys = new Set(comboRules.filter(r => r.category === 'combo').map(r => (r.productKeyword || '').toLowerCase()));
+          valid.forEach(r => {
+            const k = (r.productKeyword || '').toLowerCase();
+            if (!existingKeys.has(k)) {
+              r.id = r.id || ('combo_' + Date.now() + Math.random().toString(36).substr(2, 4));
+              comboRules.push(r);
+            }
+          });
+          saveComboRules(comboRules);
+          showToast(`Đã nạp ${valid.length} combo từ file JSON!`);
+        } catch (err) {
+          alert('Lỗi đọc file JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function autoScanCombosFromLoadedFiles() {
+      const candidates = [];
+      const seenKeys = new Set(comboRules.filter(r => r.category === 'combo').map(r => (r.productKeyword || '').toLowerCase()));
+
+      const checkComboName = (prodName, sku) => {
+        const pClean = cleanItemProductName(prodName);
+        const sClean = cleanSku(sku);
+        const text = `${pClean} ${sClean}`.toLowerCase();
+        if (text.includes('combo') || text.includes('bộ đôi') || text.includes('cặp đôi') || text.includes('combo vỗ béo') || text.includes('combo phục hồi')) {
+          const k = pClean.toLowerCase();
+          if (!seenKeys.has(k)) {
+            seenKeys.add(k);
+            candidates.push({
+              id: 'combo_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              category: 'combo',
+              name: pClean.slice(0, 32),
+              productKeyword: pClean.slice(0, 30),
+              skuKeyword: sClean === 'Mặc định' ? '' : sClean,
+              components: `Gồm các món theo mô tả: ${pClean.slice(0, 30)}`
+            });
+          }
+        }
+      };
+
+      if (groupedProducts && groupedProducts.length > 0) {
+        groupedProducts.forEach(g => {
+          g.variants.forEach(v => checkComboName(g.productName, v.sku));
+        });
+      }
+      if (shippingOrders && shippingOrders.length > 0) {
+        shippingOrders.forEach(o => {
+          (o.items || []).forEach(it => checkComboName(it.name, it.sku));
+        });
+      }
+
+      if (candidates.length === 0) {
+        showToast('Không tìm thấy thêm tên combo nào từ các file đã nạp.');
+        return;
+      }
+
+      comboRules = [...comboRules, ...candidates];
+      saveComboRules(comboRules);
+      showToast(`Đã tự động tìm thấy và thêm ${candidates.length} bộ combo từ file!`);
+    }
+
+    // ==========================================
+    // 3. RENDER MODAL RULES LISTS
+    // ==========================================
+    function renderConfigRulesLists() {
+      renderPackagingRulesList();
+      renderComboRulesList();
+      updateComboBadge();
+    }
+
+    function renderPackagingRulesList() {
+      const container = document.getElementById('packagingRulesList');
+      if (!container) return;
+      const list = comboRules.filter(r => r.category === 'packaging');
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
+            <i data-lucide="package" class="w-7 h-7 mx-auto text-slate-400"></i>
+            <div class="font-bold text-slate-700 text-sm">Chưa có quy cách đóng gói nào</div>
+            <div class="text-xs text-slate-500">Hãy thêm quy cách thùng/hộp ở form phía trên hoặc bấm "Quét Thùng Từ File".</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = list.map(rule => `
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all flex items-center justify-between gap-4">
+          <div class="space-y-1.5 min-w-0 flex-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(rule.name)}</span>
+              <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+                1 THÙNG = ${rule.packSize} ${escapeHtml(rule.unit || 'món lẻ')}
+              </span>
+            </div>
+            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-2">
+              ${rule.productKeyword ? `<span class="font-semibold text-slate-700">Sản phẩm:</span> <span class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-900 font-medium">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-500 font-medium">Mọi sản phẩm &bull; </span>'}
+              <span class="font-semibold text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-900 font-mono text-xs font-bold">${escapeHtml(rule.skuKeyword)}</code>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="editPackagingRule('${rule.id}')" class="p-2 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa quy cách này">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+            </button>
+            <button onclick="deletePackagingRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa quy cách này">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderComboRulesList() {
+      const container = document.getElementById('comboRulesList');
+      if (!container) return;
+      const list = comboRules.filter(r => r.category === 'combo');
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
+            <i data-lucide="boxes" class="w-7 h-7 mx-auto text-slate-400"></i>
+            <div class="font-bold text-slate-700 text-sm">Chưa có định nghĩa combo nào</div>
+            <div class="text-xs text-slate-500">Hãy thêm bộ combo ở form phía trên để công nhân biết rõ các món cần nhặt.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = list.map(rule => `
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-purple-300 hover:shadow-xs transition-all flex items-center justify-between gap-4">
+          <div class="space-y-1.5 min-w-0 flex-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(rule.name)}</span>
+              <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-purple-50 text-purple-800 border border-purple-200/80 flex items-center gap-1">
+                <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600"></i>
+                <span>GỒM: <strong>${escapeHtml(rule.components || 'Chi tiết món')}</strong></span>
+              </span>
+            </div>
+            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-2">
+              <span class="font-semibold text-slate-700">Khớp SP:</span> <span class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-900 font-medium">"${escapeHtml(rule.productKeyword)}"</span>
+              ${rule.skuKeyword ? `&bull; <span class="font-semibold text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-900 font-mono text-xs font-bold">${escapeHtml(rule.skuKeyword)}</code>` : ''}
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="editComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-purple-700 hover:bg-purple-50 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa combo này">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+            </button>
+            <button onclick="deleteComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa combo này">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 4. MATCHING HELPERS & EXPORTS TO WINDOW
+    // ==========================================
+    function findMatchingPackagingRule(productName = '', skuStr = '') {
+      const p = (productName || '').toLowerCase();
+      const s = (skuStr || '').toLowerCase();
+      for (const rule of comboRules) {
+        if (rule.category !== 'packaging') continue;
+        const matchProduct = !rule.productKeyword || p.includes(rule.productKeyword.toLowerCase());
+        const matchSku = rule.skuKeyword && s.includes(rule.skuKeyword.toLowerCase());
+        if (matchProduct && matchSku) return rule;
+      }
+      return null;
+    }
+
+    function findMatchingComboRule(productName = '', skuStr = '') {
+      const p = (productName || '').toLowerCase();
+      const s = (skuStr || '').toLowerCase();
+      if (!p && !s) return null;
+
+      for (const rule of comboRules) {
+        if (rule.category !== 'combo') continue;
+        const matchProd = !rule.productKeyword || p.includes(rule.productKeyword.toLowerCase());
+        const matchSku = !rule.skuKeyword || (s && s.includes(rule.skuKeyword.toLowerCase()));
+        if (matchProd && matchSku) return rule;
+      }
+      return null;
+    }
+
+    // Expose all modal and rule functions to window
     window.openComboModal = openComboModal;
     window.closeComboModal = closeComboModal;
-    window.handleAddNewCombo = handleAddNewCombo;
+    window.switchConfigModalTab = switchConfigModalTab;
+    window.handleSavePackagingRule = handleSavePackagingRule;
+    window.editPackagingRule = editPackagingRule;
+    window.cancelEditPackaging = cancelEditPackaging;
+    window.deletePackagingRule = deletePackagingRule;
+    window.clearAllPackagingRules = clearAllPackagingRules;
+    window.resetDefaultPackagingRules = resetDefaultPackagingRules;
+    window.exportPackagingRules = exportPackagingRules;
+    window.importPackagingRules = importPackagingRules;
+    window.autoScanPackagingFromLoadedFiles = autoScanPackagingFromLoadedFiles;
+    window.onQuickPackagingSelected = onQuickPackagingSelected;
+
+    window.handleSaveComboRule = handleSaveComboRule;
     window.editComboRule = editComboRule;
     window.cancelEditCombo = cancelEditCombo;
     window.deleteComboRule = deleteComboRule;
-    window.clearAllComboRules = clearAllComboRules;
-    window.exportComboRules = exportComboRules;
-    window.importComboRules = importComboRules;
-    window.onQuickProductSelected = onQuickProductSelected;
-    window.populateQuickProductSelect = populateQuickProductSelect;
-    window.resetDefaultCombos = resetDefaultCombos;
+    window.clearAllComboRulesOnly = clearAllComboRulesOnly;
+    window.resetDefaultComboRules = resetDefaultComboRules;
+    window.exportComboRulesOnly = exportComboRulesOnly;
+    window.importComboRulesOnly = importComboRulesOnly;
     window.autoScanCombosFromLoadedFiles = autoScanCombosFromLoadedFiles;
+    window.onQuickComboSelected = onQuickComboSelected;
+
+    window.findMatchingPackagingRule = findMatchingPackagingRule;
+    window.findMatchingComboRule = findMatchingComboRule;
 
     // Packaging Parsing & Smart Conversion Utilities
     function parseSkuPackagingType(skuStr, productName = '') {
       const s = (skuStr || '').trim();
       const p = (productName || '').toLowerCase();
-      const sLower = s.toLowerCase();
 
-      // Priority 1: User-configured Combo Rules
-      for (const rule of comboRules) {
-        const matchProduct = !rule.productKeyword || p.includes(rule.productKeyword.toLowerCase());
-        const matchSku = rule.skuKeyword && sLower.includes(rule.skuKeyword.toLowerCase());
-        if (matchProduct && matchSku) {
-          return {
-            isBulk: true,
-            type: 'combo',
-            packSize: rule.packSize,
-            rest: rule.unit,
-            label: `${rule.name} (${rule.packSize} ${rule.unit})`,
-            matchedRule: rule
-          };
-        }
+      // Priority 1: User-configured Packaging Rules (category === 'packaging')
+      const matchedPkg = findMatchingPackagingRule(productName, skuStr);
+      if (matchedPkg) {
+        return {
+          isBulk: true,
+          type: 'thùng',
+          packSize: matchedPkg.packSize || 1,
+          rest: matchedPkg.unit || 'món',
+          label: `${matchedPkg.name} (${matchedPkg.packSize} ${matchedPkg.unit || 'món lẻ'})`,
+          matchedRule: matchedPkg
+        };
       }
 
       // Priority 2: Standard regex for Thùng / Hộp
@@ -2912,6 +3454,12 @@
                       ${ordersInGrp.length} đơn hàng
                     </span>
                   </div>
+                  ${(!isMultiGroup && findMatchingComboRule(cleanedProdName, '')) ? `
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs">
+                      <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
+                      <span><strong>🧩 Combo gồm:</strong> ${escapeHtml(findMatchingComboRule(cleanedProdName, '').components)}</span>
+                    </div>
+                  ` : ''}
                   <div class="text-xs text-slate-600 font-medium flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-0.5">
                     ${skuPillsHtml}
                     <span>&bull;</span>
@@ -3033,6 +3581,18 @@
                                   ${escapeHtml(cleanSku(o.primarySku))}
                                 </span>
                               </div>
+                              ${(!isMultiGroup && findMatchingComboRule(rowProdName, rowSku)) ? `
+                                <div class="text-[11px] text-purple-900 font-bold flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded border border-purple-200/80">
+                                  <i data-lucide="boxes" class="w-3 h-3 text-purple-600 shrink-0"></i>
+                                  <span>Gồm: ${escapeHtml(findMatchingComboRule(rowProdName, rowSku).components)}</span>
+                                </div>
+                              ` : ''}
+                              ${(!isMultiGroup && parseSkuPackagingType(rowSku, rowProdName).isBulk) ? `
+                                <div class="text-[11px] text-emerald-900 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
+                                  <i data-lucide="package-check" class="w-3 h-3 text-emerald-600 shrink-0"></i>
+                                  <span>Quy cách: ${escapeHtml(parseSkuPackagingType(rowSku, rowProdName).label)}</span>
+                                </div>
+                              ` : ''}
                               <div class="text-[11px] text-slate-500 font-medium flex items-center gap-1">
                                 <span>Số lượng:</span>
                                 <strong class="text-slate-900 font-bold">${o.totalQty} món</strong>
@@ -4078,6 +4638,7 @@
           const v = group.variants[0];
           const isDone = checkedItemKeys.has(v.key);
           const pack = parseSkuPackagingType(v.sku, group.productName);
+          const comboRule = findMatchingComboRule(group.productName, v.sku);
 
           return `
             <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
@@ -4097,6 +4658,18 @@
               <td class="py-3.5 px-5 font-semibold text-slate-900 leading-snug">
                 <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</div>
                 ${v.sellerSku && v.sellerSku !== '-' ? `<div class="text-[11px] text-slate-400 font-normal mt-0.5">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
+                ${comboRule ? `
+                  <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs">
+                    <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
+                    <span><strong>🧩 Combo gồm:</strong> ${escapeHtml(comboRule.components)}</span>
+                  </div>
+                ` : ''}
+                ${pack.isBulk ? `
+                  <div class="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-[11px]">
+                    <i data-lucide="package-check" class="w-3 h-3 text-emerald-600 shrink-0"></i>
+                    <span><strong>📦 Lấy thực tế:</strong> ${group.totalQty} thùng ➔ <strong>Quy đổi:</strong> ${group.totalQty * pack.packSize} ${escapeHtml(pack.rest || 'món lẻ')}</span>
+                  </div>
+                ` : ''}
               </td>
               <td class="py-3.5 px-5">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
@@ -4130,6 +4703,7 @@
 
         // Case B: Multi-Variant Product (Collapsible Tree Card View)
         const isCollapsed = collapsedGroupKeys.has(group.productName);
+        const multiComboRule = findMatchingComboRule(group.productName, '');
 
         const parentRow = `
           <tr 
@@ -4162,6 +4736,18 @@
               <div class="flex items-center space-x-2">
                 <span class="${isAllDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</span>
               </div>
+              ${multiComboRule ? `
+                <div class="mt-2 inline-flex flex-wrap items-center gap-2 p-2 px-3 rounded-xl bg-purple-50/90 border border-purple-200 text-xs" onclick="event.stopPropagation()">
+                  <span class="font-extrabold text-purple-900 flex items-center">
+                    <i data-lucide="boxes" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>
+                    🧩 Combo gồm:
+                  </span>
+                  <span class="font-bold text-purple-900 bg-white px-2.5 py-0.5 rounded-lg border border-purple-300 shadow-2xs">
+                    ${escapeHtml(multiComboRule.components)}
+                  </span>
+                  <span class="text-purple-600 font-medium text-[11px]">(Tổng: ${group.totalQty} bộ &bull; Nhặt đủ các món thành phần trên)</span>
+                </div>
+              ` : ''}
               ${group.packagingInfo ? `
                 <div class="mt-2.5 inline-flex flex-wrap items-center gap-2.5 p-2 px-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs" onclick="event.stopPropagation()">
                   <span class="font-semibold text-emerald-800 flex items-center">
@@ -4359,6 +4945,7 @@
     function renderGroupedCards(groups) {
       cardViewWrapper.innerHTML = groups.map((group, idx) => {
         const isAllDone = group.variants.every(v => checkedItemKeys.has(v.key));
+        const comboRule = findMatchingComboRule(group.productName, '');
 
         const imageThumb = group.imageUrl ? `
           <img 
@@ -4400,6 +4987,19 @@
                 <span class="text-2xl font-black text-rose-700 leading-none tabular-nums">${group.totalQty}</span>
               </div>
             </div>
+
+            <!-- Combo Definition Breakdown -->
+            ${comboRule ? `
+              <div class="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-xs space-y-1.5">
+                <div class="font-extrabold text-purple-900 flex items-center">
+                  <i data-lucide="boxes" class="w-4 h-4 mr-1.5 text-purple-600 flex-shrink-0"></i>
+                  <span>🧩 Combo gồm các món thành phần:</span>
+                </div>
+                <div class="text-purple-900 font-bold bg-white p-2.5 rounded-xl border border-purple-300 shadow-2xs leading-relaxed">
+                  ${escapeHtml(comboRule.components)}
+                </div>
+              </div>
+            ` : ''}
 
             <!-- Smart Packaging Conversion Banner -->
             ${group.packagingInfo ? `
