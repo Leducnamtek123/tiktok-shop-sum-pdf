@@ -562,9 +562,9 @@
                 class="bg-white border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-rose-500 font-semibold cursor-pointer shadow-2xs"
                 onchange="handleSortChange(this.value)"
               >
+                <option value="name-asc" selected>Tên sản phẩm: A → Z (Chuẩn TikTok Shop)</option>
                 <option value="qty-desc">Số lượng: Cao → Thấp</option>
                 <option value="qty-asc">Số lượng: Thấp → Cao</option>
-                <option value="name-asc">Tên sản phẩm: A → Z</option>
               </select>
             </div>
 
@@ -640,11 +640,12 @@
                 <th scope="col" class="py-3 px-3 text-center w-12 print-only">Kiểm</th>
                 <th scope="col" class="py-3 px-3 text-center w-14">STT</th>
                 <th scope="col" class="py-3 px-3 text-center w-16 no-print">Ảnh</th>
-                <th scope="col" class="py-3 px-4 min-w-[300px]">Tên sản phẩm</th>
-                <th scope="col" class="py-3 px-4 min-w-[160px]">Quy cách / Phân loại</th>
-                <th scope="col" class="py-3 px-4 text-center min-w-[130px] font-bold text-slate-800">TỔNG SỐ LƯỢNG</th>
+                <th scope="col" class="py-3 px-4 min-w-[280px]">Tên sản phẩm</th>
+                <th scope="col" class="py-3 px-4 min-w-[150px]">Quy cách / Phân loại</th>
+                <th scope="col" class="py-3 px-4 text-center min-w-[120px] font-bold text-slate-800">TỔNG SỐ LƯỢNG</th>
+                <th scope="col" class="py-3 px-3 min-w-[145px]">Mã vận đơn</th>
                 <th scope="col" class="py-3 px-3 text-center min-w-[95px] no-print">Xem đơn</th>
-                <th scope="col" class="py-3 px-4 min-w-[180px] no-print">Nguồn từng file PDF</th>
+                <th scope="col" class="py-3 px-4 min-w-[160px] no-print">Nguồn từng file PDF</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-800">
@@ -799,32 +800,42 @@
   </main>
 
   <!-- Order IDs Modal (no-print) -->
-  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="if(event.target === this) closeModal()">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
       <div class="flex justify-between items-start">
         <div>
-          <h3 class="font-bold text-base text-slate-900" id="modalTitle">Danh sách mã đơn hàng</h3>
+          <h3 class="font-bold text-base text-slate-900" id="modalTitle">Danh sách mã đơn &amp; mã vận đơn</h3>
           <p class="text-xs text-slate-500 mt-0.5" id="modalSubTitle">Sản phẩm: ...</p>
         </div>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 p-1">
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 p-1 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-        <span id="modalOrderCount">Tổng cộng: 0 mã đơn</span>
-        <button 
-          onclick="copyOrderIds()" 
-          id="copyBtn" 
-          class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] transition-all"
-        >
-          <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
-          Sao chép tất cả mã đơn
-        </button>
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+        <span id="modalOrderCount" class="font-bold text-slate-800">Tổng cộng: 0 đơn hàng</span>
+        <div class="flex items-center gap-2">
+          <button 
+            onclick="copyTrackings()" 
+            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
+            title="Sao chép toàn bộ danh sách mã vận đơn để đối soát"
+          >
+            <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
+            Chép Mã Vận Đơn
+          </button>
+          <button 
+            onclick="copyOrderIds()" 
+            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 text-slate-800 hover:bg-slate-300 active:scale-[0.98] transition-all cursor-pointer"
+            title="Sao chép toàn bộ danh sách Order ID"
+          >
+            <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
+            Chép Order ID
+          </button>
+        </div>
       </div>
 
-      <div class="max-h-60 overflow-y-auto rounded-xl border border-slate-200 p-3 bg-slate-50">
-        <div id="modalOrderList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs font-mono text-slate-700">
+      <div class="max-h-72 overflow-y-auto rounded-xl border border-slate-200 p-3 bg-slate-50">
+        <div id="modalOrderList" class="space-y-1.5 text-xs text-slate-700">
           <!-- Rendered by JS -->
         </div>
       </div>
@@ -969,8 +980,11 @@
     let currentFilter = 'all'; // 'all', 'pending', 'done', 'bulk'
     let currentView = 'table'; // 'table', 'card'
     let groupViewMode = 'grouped'; // 'grouped' (Parent-Child) or 'flat' (Individual SKUs)
-    let currentSort = 'qty-desc';
+    let currentSort = 'name-asc';
     let currentModalOrders = [];
+    let currentModalTrackings = [];
+    let orderToTrackingMap = {};
+    let orderInfoMap = {};
     let currentMainTab = 'picking'; // 'picking' or 'shipping'
 
     // Combo & Packaging Rules (Persisted in localStorage)
@@ -1446,25 +1460,33 @@
     };
 
     function sortAggregatedItems() {
-      if (currentSort === 'qty-desc') {
+      if (currentSort === 'name-asc') {
+        aggregatedItems.sort((a, b) => a.productName.localeCompare(b.productName, 'vi'));
+        groupedProducts.sort((a, b) => a.productName.localeCompare(b.productName, 'vi'));
+      } else if (currentSort === 'qty-desc') {
         aggregatedItems.sort((a, b) => b.totalQty - a.totalQty);
         groupedProducts.sort((a, b) => b.totalQty - a.totalQty);
       } else if (currentSort === 'qty-asc') {
         aggregatedItems.sort((a, b) => a.totalQty - b.totalQty);
         groupedProducts.sort((a, b) => a.totalQty - b.totalQty);
-      } else if (currentSort === 'name-asc') {
-        aggregatedItems.sort((a, b) => a.productName.localeCompare(b.productName, 'vi'));
-        groupedProducts.sort((a, b) => a.productName.localeCompare(b.productName, 'vi'));
       }
 
-      // Sort variants within each group: Bulk items (Thùng/Hộp) first, then loose items
+      // Sort variants within each group:
+      // Regular / loose items FIRST (e.g. 1 Cặp), bulk / thùng packs SECOND (e.g. Thùng 3 cặp),
+      // Pack size ascending (1 cặp < 3 cặp), total quantity ascending, then SKU name
       groupedProducts.forEach(grp => {
         grp.variants.sort((a, b) => {
-          const aPack = parseSkuPackagingType(a.sku, a.productName);
-          const bPack = parseSkuPackagingType(b.sku, b.productName);
-          if (aPack.isBulk && !bPack.isBulk) return -1;
-          if (!aPack.isBulk && bPack.isBulk) return 1;
-          return b.totalQty - a.totalQty;
+          const aPack = parseSkuPackagingType(a.sku, grp.productName);
+          const bPack = parseSkuPackagingType(b.sku, grp.productName);
+          // 1. Loose items before bulk/thùng
+          if (!aPack.isBulk && bPack.isBulk) return -1;
+          if (aPack.isBulk && !bPack.isBulk) return 1;
+          // 2. Pack size ascending (e.g. 1 cặp before 3 cặp)
+          if (aPack.packSize !== bPack.packSize) return aPack.packSize - bPack.packSize;
+          // 3. Total qty ascending
+          if (a.totalQty !== b.totalQty) return a.totalQty - b.totalQty;
+          // 4. SKU name
+          return a.sku.localeCompare(b.sku, 'vi');
         });
       });
     }
@@ -1674,13 +1696,58 @@
         shippingOrders = parsedOrders;
         sortAndRenderShippingOrders();
 
-        fileChipsContainer.classList.remove('hidden');
-        fileChipsList.innerHTML = `
-          <div class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-            <i data-lucide="tags" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
-            <span>${escapeHtml(file.name)} (${shippingOrders.length} đơn, ${numPages} trang in)</span>
-          </div>
-        `;
+        // Populate order-to-tracking maps
+        parsedOrders.forEach(ord => {
+          if (ord.orderId && ord.tracking && ord.tracking !== '-') {
+            orderToTrackingMap[ord.orderId] = ord.tracking;
+          }
+          orderInfoMap[ord.orderId] = {
+            tracking: ord.tracking,
+            receiver: ord.receiver,
+            weight: ord.weight,
+            items: ord.items
+          };
+        });
+
+        // Convert parsedOrders into picking list structure
+        const shippingItems = [];
+        parsedOrders.forEach(ord => {
+          ord.items.forEach(it => {
+            shippingItems.push({
+              sourceFile: file.name,
+              no: null,
+              qty: it.qty,
+              productName: it.name,
+              sku: it.sku,
+              sellerSku: '-',
+              orderIds: [ord.orderId],
+              trackingNumbers: (ord.tracking && ord.tracking !== '-') ? [ord.tracking] : []
+            });
+          });
+        });
+
+        const shippingFileAsPickingData = {
+          metadata: {
+            filename: file.name,
+            orderQty: parsedOrders.length,
+            fileType: 'shipping'
+          },
+          items: shippingItems
+        };
+
+        // Add to lastParsedFilesData
+        const existingIdx = lastParsedFilesData.findIndex(d => d.metadata.filename === file.name);
+        if (existingIdx >= 0) {
+          lastParsedFilesData[existingIdx] = shippingFileAsPickingData;
+        } else {
+          lastParsedFilesData.push(shippingFileAsPickingData);
+        }
+
+        if (!loadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+          loadedFiles.push(file);
+        }
+
+        updateFileChips();
 
         const badge = document.getElementById('shippingBadge');
         if (badge) {
@@ -1688,11 +1755,19 @@
           badge.textContent = `${shippingOrders.length} đơn`;
         }
 
-        switchMainTab('shipping');
+        // Process aggregated data for Picking List!
+        processAggregatedData(lastParsedFilesData);
+
+        if (currentMainTab === 'shipping') {
+          switchMainTab('shipping');
+        } else {
+          switchMainTab('picking');
+        }
+
         progressBar.style.width = '100%';
         progressPercent.textContent = '100%';
         setTimeout(() => progressContainer.classList.add('hidden'), 400);
-        showToast(`Đã bóc tách thành công ${shippingOrders.length} mã vận đơn!`);
+        showToast(`Đã quét ${parsedOrders.length} mã vận đơn và cập nhật vào Phiếu nhặt hàng!`);
 
       } catch (err) {
         console.error('Lỗi xử lý file mã vận đơn:', err);
@@ -2066,51 +2141,66 @@
         return;
       }
 
-      // Check if any file is a Shipping Label + Packing Slip
-      const shippingFile = pdfFiles.find(f => {
+      const shippingFiles = [];
+      const pickingFiles = [];
+
+      pdfFiles.forEach(f => {
         const n = f.name.toLowerCase();
-        return n.includes('shipping label') || n.includes('packing slip') || n.includes('van_don') || n.includes('vandon');
+        if (n.includes('shipping label') || n.includes('packing slip') || n.includes('van_don') || n.includes('vandon')) {
+          shippingFiles.push(f);
+        } else {
+          pickingFiles.push(f);
+        }
       });
 
-      if (shippingFile || currentMainTab === 'shipping') {
-        const targetFile = shippingFile || pdfFiles[0];
-        await processShippingLabelFile(targetFile);
-        return;
+      // 1. Process shipping label files first (extracts tracking numbers & orders)
+      for (const sf of shippingFiles) {
+        await processShippingLabelFile(sf);
       }
 
-      // Otherwise, process as Picking List files
-      switchMainTab('picking');
-      for (const file of pdfFiles) {
-        if (!loadedFiles.some(f => f.name === file.name && f.size === file.size)) {
-          loadedFiles.push(file);
+      // 2. Process picking list files
+      for (const pf of pickingFiles) {
+        if (!loadedFiles.some(f => f.name === pf.name && f.size === pf.size)) {
+          loadedFiles.push(pf);
         }
       }
 
-      updateFileChips();
-      progressContainer.classList.remove('hidden');
+      if (pickingFiles.length > 0) {
+        updateFileChips();
+        progressContainer.classList.remove('hidden');
 
-      let parsedFilesData = [];
-      for (let i = 0; i < loadedFiles.length; i++) {
-        const file = loadedFiles[i];
-        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang đọc file: ${file.name} (${i + 1}/${loadedFiles.length})...`;
-        lucide.createIcons();
-        const pct = Math.round(((i + 1) / loadedFiles.length) * 100);
-        progressBar.style.width = `${pct}%`;
-        progressPercent.textContent = `${pct}%`;
+        for (let i = 0; i < loadedFiles.length; i++) {
+          const file = loadedFiles[i];
+          const isShip = shippingFiles.some(sf => sf.name === file.name);
+          if (isShip) continue; // already parsed by processShippingLabelFile
 
-        try {
-          const fileData = await parsePdfFileWithThumbnails(file);
-          parsedFilesData.push(fileData);
-        } catch (err) {
-          console.error("Lỗi khi đọc file " + file.name, err);
+          progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang đọc file: ${file.name} (${i + 1}/${loadedFiles.length})...`;
+          lucide.createIcons();
+          const pct = Math.round(((i + 1) / loadedFiles.length) * 100);
+          progressBar.style.width = `${pct}%`;
+          progressPercent.textContent = `${pct}%`;
+
+          try {
+            const fileData = await parsePdfFileWithThumbnails(file);
+            const existingIdx = lastParsedFilesData.findIndex(d => d.metadata.filename === file.name);
+            if (existingIdx >= 0) {
+              lastParsedFilesData[existingIdx] = fileData;
+            } else {
+              lastParsedFilesData.push(fileData);
+            }
+          } catch (err) {
+            console.error("Lỗi khi đọc file " + file.name, err);
+          }
         }
-      }
 
-      setTimeout(() => {
-        progressContainer.classList.add('hidden');
-        lastParsedFilesData = parsedFilesData;
-        processAggregatedData(parsedFilesData);
-      }, 300);
+        setTimeout(() => {
+          progressContainer.classList.add('hidden');
+          processAggregatedData(lastParsedFilesData);
+          switchMainTab('picking');
+        }, 300);
+      } else {
+        switchMainTab('picking');
+      }
     }
 
     function updateFileChips() {
@@ -2345,6 +2435,7 @@
               imageUrl: it.imageUrl || null,
               totalQty: 0,
               orderIds: new Set(),
+              trackingNumbers: new Set(),
               byFile: {}
             });
           }
@@ -2354,14 +2445,24 @@
           it.orderIds.forEach(id => {
             record.orderIds.add(id);
             allOrdersGlobal.add(id);
+            const trk = orderToTrackingMap[id];
+            if (trk && trk !== '-') {
+              record.trackingNumbers.add(trk);
+            }
           });
+          if (it.trackingNumbers) {
+            it.trackingNumbers.forEach(t => {
+              if (t && t !== '-') record.trackingNumbers.add(t);
+            });
+          }
           record.byFile[it.sourceFile] = (record.byFile[it.sourceFile] || 0) + it.qty;
         });
       });
 
       aggregatedItems = Array.from(map.values()).map(it => ({
         ...it,
-        orderIds: Array.from(it.orderIds)
+        orderIds: Array.from(it.orderIds).sort(),
+        trackingNumbers: Array.from(it.trackingNumbers).sort()
       }));
 
       // Group items by Parent Product Name
@@ -2374,6 +2475,7 @@
             imageUrl: item.imageUrl || null,
             totalQty: 0,
             orderIds: new Set(),
+            trackingNumbers: new Set(),
             variants: [],
             byFile: {}
           });
@@ -2382,6 +2484,7 @@
         grp.totalQty += item.totalQty;
         if (item.imageUrl && !grp.imageUrl) grp.imageUrl = item.imageUrl;
         item.orderIds.forEach(id => grp.orderIds.add(id));
+        item.trackingNumbers.forEach(t => grp.trackingNumbers.add(t));
         grp.variants.push(item);
         Object.entries(item.byFile).forEach(([f, q]) => {
           grp.byFile[f] = (grp.byFile[f] || 0) + q;
@@ -2392,7 +2495,8 @@
         const packInfo = analyzeProductPackaging(grp.variants);
         return {
           ...grp,
-          orderIds: Array.from(grp.orderIds),
+          orderIds: Array.from(grp.orderIds).sort(),
+          trackingNumbers: Array.from(grp.trackingNumbers).sort(),
           packagingInfo: packInfo,
           isSingleVariant: grp.variants.length === 1,
           hasBulk: packInfo ? packInfo.hasBulk : false
@@ -2525,6 +2629,32 @@
       `).join('');
     }
 
+    function renderWebTrackingBadges(trackingNumbers, orderIds, productName, sku) {
+      if (!trackingNumbers || trackingNumbers.length === 0) {
+        return `<span class="text-slate-400 text-xs font-mono">-</span>`;
+      }
+      const count = trackingNumbers.length;
+      if (count === 1) {
+        const trk = trackingNumbers[0];
+        return `
+          <div class="inline-flex items-center gap-1 bg-sky-50 text-sky-800 border border-sky-200 px-2 py-0.5 rounded text-xs font-mono font-medium max-w-[140px]" title="Mã vận đơn: ${escapeHtml(trk)}">
+            <i data-lucide="truck" class="w-3 h-3 flex-shrink-0 text-sky-600"></i>
+            <span class="truncate select-all">${escapeHtml(trk)}</span>
+          </div>
+        `;
+      }
+      return `
+        <button 
+          onclick='showOrderListModal("${escapeQuotes(productName)}", "Mã vận đơn (${count} đơn) • Phân loại: ${escapeQuotes(sku)}", ${JSON.stringify(orderIds || [])}, ${JSON.stringify(trackingNumbers)})'
+          class="inline-flex items-center gap-1 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 px-2 py-0.5 rounded text-xs font-mono font-semibold transition-colors shadow-2xs cursor-pointer"
+          title="Xem chi tiết ${count} mã vận đơn"
+        >
+          <i data-lucide="truck" class="w-3 h-3 text-sky-600"></i>
+          <span>${count} mã VĐ</span>
+        </button>
+      `;
+    }
+
     // Render Current View
     function renderCurrentView() {
       if (groupViewMode === 'grouped') {
@@ -2629,9 +2759,12 @@
                   ${group.totalQty}
                 </span>
               </td>
+              <td class="py-3 px-3">
+                ${renderWebTrackingBadges(v.trackingNumbers, v.orderIds, group.productName, v.sku)}
+              </td>
               <td class="py-3 px-3 text-center no-print">
                 <button 
-                  onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(group.orderIds)})'
+                  onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(group.orderIds)}, ${JSON.stringify(v.trackingNumbers)})'
                   class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
                 >
                   ${group.orderIds.length} đơn
@@ -2705,9 +2838,12 @@
                 ${group.totalQty}
               </span>
             </td>
+            <td class="py-3 px-3" onclick="event.stopPropagation()">
+              ${renderWebTrackingBadges(group.trackingNumbers, group.orderIds, group.productName, 'Tất cả phân loại')}
+            </td>
             <td class="py-3 px-3 text-center no-print" onclick="event.stopPropagation()">
               <button 
-                onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ đơn hàng (${group.variants.length} phân loại)", ${JSON.stringify(group.orderIds)})'
+                onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ đơn hàng (${group.variants.length} phân loại)", ${JSON.stringify(group.orderIds)}, ${JSON.stringify(group.trackingNumbers)})'
                 class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
               >
                 ${group.orderIds.length} đơn
@@ -2727,7 +2863,7 @@
 
         const childPanel = `
           <tr class="bg-slate-50/50 border-b border-slate-200 no-print">
-            <td colspan="9" class="p-0">
+            <td colspan="10" class="p-0">
               <div class="py-3 px-3 sm:px-6 bg-slate-50/70 flex items-start">
                 <!-- Visual Tree Branch L-Connector Line -->
                 <div class="flex-shrink-0 w-8 flex justify-center pt-2 select-none" aria-hidden="true">
@@ -2759,6 +2895,7 @@
                           <th scope="col" class="py-2 px-3 min-w-[220px]">Phân loại chi tiết (SKU)</th>
                           <th scope="col" class="py-2 px-3 min-w-[150px]">Quy cách đóng gói</th>
                           <th scope="col" class="py-2 px-3 text-center min-w-[110px] font-bold text-slate-800">SL CẦN LẤY</th>
+                          <th scope="col" class="py-2 px-3 min-w-[145px]">Mã vận đơn</th>
                           <th scope="col" class="py-2 px-3 text-center min-w-[90px]">Xem đơn</th>
                           <th scope="col" class="py-2 px-3 min-w-[160px]">Nguồn từng file PDF</th>
                         </tr>
@@ -2808,9 +2945,12 @@
                                   ${v.totalQty}
                                 </span>
                               </td>
+                              <td class="py-2.5 px-3">
+                                ${renderWebTrackingBadges(v.trackingNumbers, v.orderIds, group.productName, v.sku)}
+                              </td>
                               <td class="py-2.5 px-3 text-center">
                                 <button 
-                                  onclick='showOrderListModal("${escapeQuotes(v.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(v.orderIds)})' 
+                                  onclick='showOrderListModal("${escapeQuotes(v.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(v.orderIds)}, ${JSON.stringify(v.trackingNumbers)})' 
                                   class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
                                 >
                                   ${v.orderIds.length} đơn
@@ -2846,7 +2986,7 @@
 
         const orderBtn = item.orderIds.length > 0 ? `
           <button 
-            onclick='showOrderListModal("${escapeQuotes(item.productName)}", "Phân loại: ${escapeQuotes(item.sku)} • Tổng: ${item.totalQty} cái", ${JSON.stringify(item.orderIds)})'
+            onclick='showOrderListModal("${escapeQuotes(item.productName)}", "Phân loại: ${escapeQuotes(item.sku)} • Tổng: ${item.totalQty} cái", ${JSON.stringify(item.orderIds)}, ${JSON.stringify(item.trackingNumbers)})'
             class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
           >
             ${item.orderIds.length} đơn
@@ -2895,6 +3035,9 @@
                 ${item.totalQty}
               </span>
             </td>
+            <td class="py-3 px-3">
+              ${renderWebTrackingBadges(item.trackingNumbers, item.orderIds, item.productName, item.sku)}
+            </td>
             <td class="py-3 px-3 text-center no-print">
               ${orderBtn}
             </td>
@@ -2936,7 +3079,7 @@
                 <div class="flex items-center justify-between">
                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#${idx + 1}</span>
                   <button 
-                    onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ ${group.orderIds.length} đơn hàng", ${JSON.stringify(group.orderIds)})' 
+                    onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ ${group.orderIds.length} đơn hàng", ${JSON.stringify(group.orderIds)}, ${JSON.stringify(group.trackingNumbers)})' 
                     class="text-xs font-semibold text-slate-500 hover:text-slate-800 underline"
                   >
                     ${group.orderIds.length} đơn
@@ -3049,7 +3192,12 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between">
                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#${idx + 1}</span>
-                  <span class="text-xs font-semibold text-slate-500">${item.orderIds.length} đơn</span>
+                  <button 
+                    onclick='showOrderListModal("${escapeQuotes(item.productName)}", "Phân loại: ${escapeQuotes(item.sku)} • Tổng: ${item.totalQty} cái", ${JSON.stringify(item.orderIds)}, ${JSON.stringify(item.trackingNumbers)})' 
+                    class="text-xs font-semibold text-slate-500 hover:text-slate-800 underline"
+                  >
+                    ${item.orderIds.length} đơn
+                  </button>
                 </div>
                 <h4 class="text-sm font-bold text-slate-900 leading-snug mt-0.5 line-clamp-2 ${isDone ? 'line-through text-slate-400' : ''}">
                   ${escapeHtml(item.productName)}
@@ -3088,19 +3236,64 @@
     }
 
     // Modal Handlers
-    window.showOrderListModal = function(title, subtitle, orderIds) {
-      currentModalOrders = orderIds;
+    window.showOrderListModal = function(title, subtitle, orderIds = [], trackingNumbers = []) {
+      currentModalOrders = Array.isArray(orderIds) ? orderIds : [];
+      
+      // If trackingNumbers wasn't passed or is empty, resolve from orderToTrackingMap
+      if (!trackingNumbers || trackingNumbers.length === 0) {
+        const trkSet = new Set();
+        currentModalOrders.forEach(id => {
+          const trk = orderToTrackingMap[id];
+          if (trk && trk !== '-') trkSet.add(trk);
+        });
+        currentModalTrackings = Array.from(trkSet);
+      } else {
+        currentModalTrackings = Array.from(new Set(trackingNumbers.filter(t => t && t !== '-')));
+      }
+
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalSubTitle').textContent = subtitle;
-      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${orderIds.length} mã đơn hàng`;
+      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${currentModalOrders.length} đơn (${currentModalTrackings.length} mã vận đơn)`;
 
       const listContainer = document.getElementById('modalOrderList');
-      listContainer.innerHTML = orderIds.map((id, i) => `
-        <div class="flex items-center justify-between p-1.5 rounded-lg bg-white border border-slate-200">
-          <span class="font-bold text-slate-400 mr-1.5 font-mono">${i + 1}.</span>
-          <span class="text-slate-800 font-medium select-all font-mono">${id}</span>
-        </div>
-      `).join('');
+      if (currentModalOrders.length === 0 && currentModalTrackings.length === 0) {
+        listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">Không có dữ liệu đơn hàng</div>`;
+      } else {
+        listContainer.innerHTML = currentModalOrders.map((id, i) => {
+          const trk = orderToTrackingMap[id] || (currentModalTrackings[i] || '-');
+          return `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="font-bold text-slate-400 font-mono text-[11px] w-6">${i + 1}.</span>
+                <div class="min-w-0">
+                  <div class="text-slate-800 font-bold font-mono text-xs select-all flex items-center gap-1.5">
+                    <span>${escapeHtml(id)}</span>
+                    <button onclick="navigator.clipboard.writeText('${escapeQuotes(id)}'); showToast('Đã chép Order ID: ${escapeQuotes(id)}');" class="text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer" title="Chép Order ID">
+                      <i data-lucide="copy" class="w-3 h-3"></i>
+                    </button>
+                  </div>
+                  ${trk && trk !== '-' ? `
+                    <div class="text-sky-700 font-mono text-[11px] font-semibold flex items-center gap-1 mt-0.5 select-all">
+                      <i data-lucide="truck" class="w-3 h-3 text-sky-500"></i>
+                      <span>${escapeHtml(trk)}</span>
+                      <button onclick="navigator.clipboard.writeText('${escapeQuotes(trk)}'); showToast('Đã chép Mã vận đơn: ${escapeQuotes(trk)}');" class="text-sky-400 hover:text-sky-600 p-0.5 cursor-pointer" title="Chép Mã vận đơn">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                      </button>
+                    </div>
+                  ` : `
+                    <div class="text-slate-400 text-[10px]">Chưa có mã vận đơn</div>
+                  `}
+                </div>
+              </div>
+              ${trk && trk !== '-' ? `
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 flex-shrink-0">
+                  Có tem VĐ
+                </span>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
 
       orderModal.classList.remove('hidden');
       lucide.createIcons();
@@ -3109,7 +3302,7 @@
     window.showOrderModal = function(productName, sku, itemIndex) {
       const item = getFilteredFlatItems()[itemIndex];
       if (!item) return;
-      showOrderListModal(productName, `Phân loại: ${sku} • Tổng: ${item.totalQty} cái`, item.orderIds);
+      showOrderListModal(productName, `Phân loại: ${sku} • Tổng: ${item.totalQty} cái`, item.orderIds, item.trackingNumbers);
     };
 
     window.closeModal = function() {
@@ -3121,6 +3314,21 @@
       const text = currentModalOrders.join('\n');
       navigator.clipboard.writeText(text).then(() => {
         showToast(`Đã sao chép ${currentModalOrders.length} mã đơn hàng!`);
+      });
+    };
+
+    window.copyTrackings = function() {
+      if (!currentModalTrackings.length) {
+        const trks = currentModalOrders.map(id => orderToTrackingMap[id]).filter(t => t && t !== '-');
+        if (trks.length === 0) {
+          showToast('Không có mã vận đơn nào để sao chép!');
+          return;
+        }
+        currentModalTrackings = trks;
+      }
+      const text = currentModalTrackings.join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Đã sao chép ${currentModalTrackings.length} mã vận đơn!`);
       });
     };
 
@@ -3155,6 +3363,8 @@
         "Loại quy cách",
         "Mã SKU Shop", 
         "TỔNG SỐ LƯỢNG", 
+        "MÃ VẬN ĐƠN",
+        "MÃ ĐƠN HÀNG (ORDER ID)",
         "Gợi ý quy đổi thông minh (Thùng / Lẻ)", 
         "Đã nhặt (Kho kiểm)"
       ];
@@ -3178,6 +3388,9 @@
             `Lấy: ${group.packagingInfo.actualPickText} => Tương đương: ${group.packagingInfo.equivalentText}` : 
             "-";
 
+          const trackingStr = (v.trackingNumbers && v.trackingNumbers.length > 0) ? v.trackingNumbers.join(', ') : "-";
+          const orderIdStr = (v.orderIds && v.orderIds.length > 0) ? v.orderIds.join(', ') : "-";
+
           const row = [
             group.variants.length > 1 ? `${currentStt}.${vIdx + 1}` : currentStt,
             vIdx === 0 ? group.productName : `(↳ ${group.productName})`,
@@ -3185,6 +3398,8 @@
             packTypeLabel,
             v.sellerSku,
             v.totalQty,
+            trackingStr,
+            orderIdStr,
             vIdx === 0 ? conversionNote : `(Cùng sản phẩm: ${conversionNote})`,
             isDone ? "[ x ]" : "[   ]"
           ];
@@ -3199,7 +3414,7 @@
       });
 
       // Total row
-      const totalRow = ["", "TỔNG CỘNG", "", "", "", globalStats.totalQty, "", ""];
+      const totalRow = ["", "TỔNG CỘNG", "", "", "", globalStats.totalQty, "", "", "", ""];
       if (fileCols.length > 1) {
         fileCols.forEach(f => {
           const colSum = aggregatedItems.reduce((acc, it) => acc + (it.byFile[f] || 0), 0);
@@ -3217,6 +3432,8 @@
         { wch: 18 },
         { wch: 15 },
         { wch: 16 },
+        { wch: 25 },
+        { wch: 25 },
         { wch: 42 },
         { wch: 18 },
       ];
@@ -3264,7 +3481,25 @@
       `;
     }
 
-    // Prepare 1:1 TikTok Shop Print Layout (Header, Images, Packaging, Order IDs, Footer)
+    // Render Compact Tracking Numbers for TikTok Shop Print Layout (1:1 aligned with Order IDs)
+    function renderPrintTrackingNumbers(trackings, orderIds = []) {
+      let displayTrackings = [];
+      if (orderIds && orderIds.length > 0) {
+        displayTrackings = orderIds.map(id => orderToTrackingMap[id] || '-');
+      } else if (trackings && trackings.length > 0) {
+        displayTrackings = trackings;
+      }
+      const hasAny = displayTrackings.some(t => t && t !== '-');
+      if (!hasAny) return '<span style="color: #94a3b8;">-</span>';
+
+      return `
+        <div class="tiktok-order-id" style="color: #0369a1; font-weight: 600;">
+          ${displayTrackings.map(t => `<div>${escapeHtml(t)}</div>`).join('')}
+        </div>
+      `;
+    }
+
+    // Prepare 1:1 TikTok Shop Print Layout (Header, Images, Packaging, Tracking, Order IDs, Footer)
     function preparePrintContent() {
       const printContainer = document.getElementById('printContainer');
       if (!printContainer) return;
@@ -3290,23 +3525,27 @@
             const v = group.variants[0];
             const pack = parseSkuPackagingType(v.sku, group.productName);
             const orderIdsHtml = renderPrintOrderIds(v.orderIds);
+            const trackingsHtml = renderPrintTrackingNumbers(v.trackingNumbers, v.orderIds);
 
             return `
               <tr class="group-border-bottom">
                 <td style="text-align: center; font-weight: 700; color: #475569; width: 28px;">${idx + 1}</td>
-                <td style="text-align: center; width: 50px;">${imgHtml}</td>
+                <td style="text-align: center; width: 46px;">${imgHtml}</td>
                 <td style="vertical-align: top; padding-right: 8px;">
                   <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
                   ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
                 </td>
-                <td style="vertical-align: top; width: 130px; color: #1e293b; font-weight: 500; font-size: 8pt;">
+                <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt;">
                   <div>${escapeHtml(v.sku)}</div>
                   ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
                 </td>
-                <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 52px; vertical-align: top;">
+                <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top;">
                   ${group.totalQty}
                 </td>
-                <td style="vertical-align: top; width: 145px;">
+                <td style="vertical-align: top; width: 115px;">
+                  ${trackingsHtml}
+                </td>
+                <td style="vertical-align: top; width: 125px;">
                   ${orderIdsHtml}
                 </td>
               </tr>
@@ -3328,25 +3567,29 @@
             const isLastVar = (vIdx === varCount - 1);
             const pack = parseSkuPackagingType(v.sku, group.productName);
             const orderIdsHtml = renderPrintOrderIds(v.orderIds);
+            const trackingsHtml = renderPrintTrackingNumbers(v.trackingNumbers, v.orderIds);
             const trClass = isLastVar ? 'group-border-bottom' : '';
 
             if (isFirstVar) {
               groupHtml += `
                 <tr class="${trClass}">
                   <td rowspan="${varCount}" style="text-align: center; font-weight: 700; color: #475569; width: 28px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${idx + 1}</td>
-                  <td rowspan="${varCount}" style="text-align: center; width: 50px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${imgHtml}</td>
+                  <td rowspan="${varCount}" style="text-align: center; width: 46px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${imgHtml}</td>
                   <td rowspan="${varCount}" style="vertical-align: top; border-bottom: 1.25pt solid #94a3b8; padding-right: 8px;">
                     <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
                     ${conversionBadge}
                   </td>
-                  <td style="vertical-align: top; width: 130px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     <div>${escapeHtml(v.sku)}</div>
                     ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
                   </td>
-                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 52px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
                   </td>
-                  <td style="vertical-align: top; width: 145px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 115px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${trackingsHtml}
+                  </td>
+                  <td style="vertical-align: top; width: 125px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${orderIdsHtml}
                   </td>
                 </tr>
@@ -3354,14 +3597,17 @@
             } else {
               groupHtml += `
                 <tr class="${trClass}">
-                  <td style="vertical-align: top; width: 130px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     <div>${escapeHtml(v.sku)}</div>
                     ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
                   </td>
-                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 52px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
                   </td>
-                  <td style="vertical-align: top; width: 145px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 115px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${trackingsHtml}
+                  </td>
+                  <td style="vertical-align: top; width: 125px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${orderIdsHtml}
                   </td>
                 </tr>
@@ -3380,23 +3626,27 @@
             ? `<img src="${item.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
           const orderIdsHtml = renderPrintOrderIds(item.orderIds);
+          const trackingsHtml = renderPrintTrackingNumbers(item.trackingNumbers, item.orderIds);
 
           return `
             <tr class="group-border-bottom">
               <td style="text-align: center; font-weight: 700; color: #475569; width: 28px;">${idx + 1}</td>
-              <td style="text-align: center; width: 50px;">${imgHtml}</td>
+              <td style="text-align: center; width: 46px;">${imgHtml}</td>
               <td style="vertical-align: top; padding-right: 8px;">
                 <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(item.productName)}</div>
                 ${item.sellerSku && item.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(item.sellerSku)}</div>` : ''}
               </td>
-              <td style="vertical-align: top; width: 130px; color: #1e293b; font-weight: 500; font-size: 8pt;">
+              <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt;">
                 <div>${escapeHtml(item.sku)}</div>
                 ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
               </td>
-              <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 52px; vertical-align: top;">
+              <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top;">
                 ${item.totalQty}
               </td>
-              <td style="vertical-align: top; width: 145px;">
+              <td style="vertical-align: top; width: 115px;">
+                ${trackingsHtml}
+              </td>
+              <td style="vertical-align: top; width: 125px;">
                 ${orderIdsHtml}
               </td>
             </tr>
@@ -3428,16 +3678,17 @@
           </div>
         </div>
 
-        <!-- Table (1:1 TikTok Shop Layout with Images and Order IDs) -->
+        <!-- Table (1:1 TikTok Shop Layout with Images, Tracking Numbers and Order IDs) -->
         <table class="tiktok-print-table">
           <thead>
             <tr>
               <th style="width: 28px; text-align: center;">No</th>
-              <th style="width: 50px; text-align: center;">Ảnh</th>
+              <th style="width: 46px; text-align: center;">Ảnh</th>
               <th style="text-align: left;">Tên sản phẩm</th>
-              <th style="width: 130px; text-align: left;">SKU / Phân loại</th>
-              <th style="width: 52px; text-align: center;">SL Lấy</th>
-              <th style="width: 145px; text-align: left;">Mã đơn hàng (Order ID)</th>
+              <th style="width: 115px; text-align: left;">SKU / Phân loại</th>
+              <th style="width: 44px; text-align: center;">SL</th>
+              <th style="width: 115px; text-align: left;">Mã vận đơn</th>
+              <th style="width: 125px; text-align: left;">Mã đơn (Order ID)</th>
             </tr>
           </thead>
           <tbody>
