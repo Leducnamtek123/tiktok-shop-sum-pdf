@@ -248,15 +248,15 @@
   </header>
 
   <!-- Main App Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
     <!-- Main Navigation Tabs (no-print) -->
-    <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print">
-      <div class="flex items-center space-x-1 sm:space-x-2">
+    <div class="bg-white p-2 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+      <div class="flex items-center space-x-1.5 sm:space-x-2.5">
         <button 
           id="tabPickingBtn" 
           onclick="switchMainTab('picking')" 
-          class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs"
+          class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs"
         >
           <i data-lucide="boxes" class="w-4 h-4 mr-2"></i>
           <span>1. Gộp Phiếu Nhặt Hàng (Picking List)</span>
@@ -264,16 +264,16 @@
         <button 
           id="tabShippingBtn" 
           onclick="switchMainTab('shipping')" 
-          class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80"
+          class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80"
         >
           <i data-lucide="tags" class="w-4 h-4 mr-2 text-blue-600"></i>
           <span>2. Sắp Xếp Mã Vận Đơn Theo Món</span>
-          <span id="shippingBadge" class="hidden ml-2 px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-blue-100 text-blue-700">0 đơn</span>
+          <span id="shippingBadge" class="hidden ml-2 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-slate-200 text-slate-800">0 đơn</span>
         </button>
       </div>
 
-      <div class="hidden lg:flex items-center text-xs text-slate-500 pr-2">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+      <div class="hidden lg:flex items-center text-xs font-semibold text-slate-500 pr-3">
+        <i data-lucide="sparkles" class="w-4 h-4 mr-1.5 text-amber-500"></i>
         <span>Tự động nhận diện định dạng file khi kéo thả</span>
       </div>
     </div>
@@ -287,7 +287,7 @@
     <section class="no-print">
       <div 
         id="dropZone"
-        class="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 hover:border-rose-500 bg-white hover:bg-rose-50/20 transition-all duration-200 cursor-pointer group p-8 sm:p-10 text-center shadow-xs"
+        class="relative overflow-hidden rounded-3xl border-2 border-dashed border-slate-300 hover:border-rose-500 bg-white hover:bg-rose-50/15 transition-all duration-200 cursor-pointer group p-9 sm:p-12 text-center shadow-xs"
       >
         <input 
           type="file" 
@@ -297,30 +297,30 @@
           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
         
-        <div class="flex flex-col items-center justify-center space-y-3.5">
-          <div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center group-hover:scale-105 group-hover:bg-rose-100 transition-all duration-200 shadow-xs">
-            <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+        <div class="flex flex-col items-center justify-center space-y-4">
+          <div class="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center group-hover:scale-105 group-hover:bg-rose-100 transition-all duration-200 shadow-2xs">
+            <i data-lucide="upload-cloud" class="w-8 h-8"></i>
           </div>
           
           <div class="max-w-xl">
             <p class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-              Kéo thả file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4">Phiếu nhặt hàng</span> hoặc <span class="text-blue-600 underline decoration-blue-300 underline-offset-4">Mã vận đơn (Shipping label)</span> vào đây
+              Kéo thả file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4 font-extrabold">Phiếu nhặt hàng</span> hoặc <span class="text-slate-900 underline decoration-slate-300 underline-offset-4 font-extrabold">Mã vận đơn (Shipping label)</span> vào đây
             </p>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            <p class="text-xs sm:text-sm text-slate-600 mt-1.5">
               Hệ thống tự nhận diện: Gộp nhiều phiếu nhặt hàng hoặc Sắp xếp mã vận đơn theo đúng thứ tự món
             </p>
           </div>
 
-          <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+          <div class="flex flex-wrap justify-center items-center gap-2.5 pt-1">
+            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-2xs">
               <i data-lucide="combine" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
               Gộp phiếu nhặt hàng
             </span>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-2xs">
               <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
               Sắp xếp vận đơn theo món
             </span>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-2xs">
               <i data-lucide="file-down" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
               Tải PDF vận đơn đã xếp
             </span>
@@ -329,31 +329,31 @@
       </div>
 
       <!-- Processing Progress Bar -->
-      <div id="progressContainer" class="hidden mt-4 bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
+      <div id="progressContainer" class="hidden mt-5 bg-white border border-slate-200/90 p-4.5 rounded-2xl shadow-xs">
+        <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-2">
           <span id="progressText" class="flex items-center">
-            <i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i>
+            <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin text-rose-600"></i>
             Đang trích xuất dữ liệu và ảnh từ file PDF...
           </span>
-          <span id="progressPercent" class="font-bold text-rose-600">0%</span>
+          <span id="progressPercent" class="font-extrabold text-rose-600">0%</span>
         </div>
-        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-          <div id="progressBar" class="bg-gradient-to-r from-rose-500 to-rose-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div id="progressBar" class="bg-gradient-to-r from-rose-500 to-rose-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
       </div>
 
       <!-- File Chips Bar -->
-      <div id="fileChipsContainer" class="hidden mt-4 p-3.5 rounded-xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center mr-1">
-            <i data-lucide="folder-check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+      <div id="fileChipsContainer" class="hidden mt-5 p-4 rounded-2xl bg-white border border-slate-200/90 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center mr-1">
+            <i data-lucide="folder-check" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
             File đã nạp:
           </span>
           <div id="fileChipsList" class="flex flex-wrap gap-2"></div>
         </div>
         <button 
           id="clearBtn" 
-          class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all active:scale-[0.98]"
+          class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200/90 transition-all active:scale-[0.98] cursor-pointer"
         >
           <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i>
           Xóa tất cả
@@ -389,61 +389,61 @@
     </section>
 
     <!-- KPI Stats Cards (no-print) -->
-    <section id="statsSection" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+    <section id="statsSection" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 no-print">
       
       <!-- Card 1: Total Files -->
-      <div class="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-colors">
+      <div class="bg-white border border-slate-200/90 p-5 sm:p-6 rounded-2xl shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Số file PDF</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Số file PDF</p>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statFiles">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/80 text-slate-700 flex items-center justify-center">
             <i data-lucide="files" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-slate-500 flex items-center">
+        <div class="mt-3 text-xs text-slate-500 flex items-center">
           <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
-          TikTok tối đa 200 đơn/file
+          <span>TikTok tối đa 200 đơn/file</span>
         </div>
       </div>
 
       <!-- Card 2: Total Orders -->
-      <div class="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-colors">
+      <div class="bg-white border border-slate-200/90 p-5 sm:p-6 rounded-2xl shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Tổng số đơn hàng</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Tổng số đơn hàng</p>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statOrders">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/70 text-emerald-700 flex items-center justify-center">
             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-slate-500 flex items-center">
+        <div class="mt-3 text-xs text-slate-600 flex items-center">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-          Đã trích xuất chính xác
+          <span>Đã trích xuất chính xác</span>
         </div>
       </div>
 
       <!-- Card 3: SKU Count -->
-      <div class="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-colors">
+      <div class="bg-white border border-slate-200/90 p-5 sm:p-6 rounded-2xl shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Mặt hàng cần lấy</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Mặt hàng cần lấy</p>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statSkus">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/80 text-slate-700 flex items-center justify-center">
             <i data-lucide="layers" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-slate-500 flex items-center">
+        <div class="mt-3 text-xs text-slate-600 flex items-center">
           <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
           <span id="statSkusSub">Đã gộp trùng lặp</span>
         </div>
       </div>
 
       <!-- Card 4: Total Quantity (Hero Metric) -->
-      <div class="bg-white border-2 border-rose-200 p-4 sm:p-5 rounded-2xl shadow-xs relative overflow-hidden">
+      <div class="bg-white border-2 border-rose-200 p-5 sm:p-6 rounded-2xl shadow-2xs hover:border-rose-300 transition-all flex flex-col justify-between relative overflow-hidden">
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-rose-600"></div>
         <div class="flex justify-between items-start">
           <div>
@@ -454,22 +454,22 @@
             <i data-lucide="package-check" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-rose-600/80 font-medium flex items-center">
+        <div class="mt-3 text-xs text-rose-700/80 font-medium flex items-center">
           <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>
-          Tổng số món hàng cần nhặt
+          <span>Tổng số món hàng cần nhặt</span>
         </div>
       </div>
 
     </section>
 
     <!-- Main Results Section -->
-    <section id="resultSection" class="hidden space-y-4">
+    <section id="resultSection" class="hidden space-y-6">
       
       <!-- Action Toolbar (no-print) -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden no-print">
+      <div class="bg-white border border-slate-200/90 rounded-2xl shadow-2xs overflow-hidden no-print">
         
         <!-- Tier 1: Search & Filter Pills -->
-        <div class="p-3.5 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div class="p-4 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5">
           <!-- Search input -->
           <div class="relative flex-1 max-w-lg">
             <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -477,7 +477,7 @@
               type="text" 
               id="searchInput" 
               placeholder="Tìm theo tên sản phẩm, quy cách, mã SKU, mã đơn TikTok..." 
-              class="w-full pl-10 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white transition-all"
+              class="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-500 focus:bg-white transition-all shadow-2xs font-medium"
             />
             <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
@@ -485,32 +485,32 @@
           </div>
 
           <!-- Quick Filters Pills -->
-          <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0">
+          <div class="flex items-center space-x-2 overflow-x-auto pb-1 md:pb-0">
             <button 
               onclick="setFilter('all')" 
               id="filter-all" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-slate-900 text-white shadow-xs"
+              class="filter-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap bg-slate-900 text-white shadow-2xs"
             >
               Tất cả (<span id="count-all">0</span>)
             </button>
             <button 
               onclick="setFilter('pending')" 
               id="filter-pending" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
+              class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
             >
               Chưa nhặt (<span id="count-pending">0</span>)
             </button>
             <button 
               onclick="setFilter('done')" 
               id="filter-done" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
+              class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
             >
               Đã xong (<span id="count-done">0</span>)
             </button>
             <button 
               onclick="setFilter('bulk')" 
               id="filter-bulk" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
+              class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
             >
               📦 Thùng &amp; Lẻ (<span id="count-bulk">0</span>)
             </button>
@@ -518,17 +518,17 @@
         </div>
 
         <!-- Tier 2: Modes, Sort & Primary Actions -->
-        <div class="px-3.5 sm:px-4 py-2.5 bg-slate-50/70 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="px-4 sm:px-5 py-3 bg-slate-50/80 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5">
           
           <!-- Left: Group Mode & Sort & View -->
           <div class="flex flex-wrap items-center gap-2.5">
             <!-- Grouping Mode Switcher -->
-            <div class="bg-slate-200/80 p-0.5 rounded-lg border border-slate-200 flex items-center">
+            <div class="bg-slate-200/80 p-0.5 rounded-xl border border-slate-200 flex items-center">
               <button 
                 id="groupModeBtn" 
                 onclick="toggleGroupMode('grouped')" 
                 title="Gom nhóm Sản phẩm Cha &amp; Phân loại Con" 
-                class="px-2.5 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1.5"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1.5"
               >
                 <i data-lucide="layers" class="w-3.5 h-3.5 text-rose-600"></i>
                 <span>Gom Nhóm</span>
@@ -537,7 +537,7 @@
                 id="flatModeBtn" 
                 onclick="toggleGroupMode('flat')" 
                 title="Tách rời từng dòng SKU độc lập" 
-                class="px-2.5 py-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5"
               >
                 <i data-lucide="list" class="w-3.5 h-3.5 text-slate-400"></i>
                 <span>Tách Dòng</span>
@@ -548,7 +548,7 @@
             <button 
               id="toggleAllTreeBtn" 
               onclick="toggleAllGroupsCollapse()" 
-              class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
               title="Thu gọn hoặc mở rộng toàn bộ các nhánh phân loại con"
             >
               <i data-lucide="chevrons-up" class="w-3.5 h-3.5 text-purple-600"></i>
@@ -559,7 +559,7 @@
             <div class="flex items-center">
               <select 
                 id="sortSelector" 
-                class="bg-white border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-rose-500 font-semibold cursor-pointer shadow-2xs"
+                class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500 font-semibold cursor-pointer shadow-2xs"
                 onchange="handleSortChange(this.value)"
               >
                 <option value="name-asc" selected>Tên sản phẩm: A → Z (Chuẩn TikTok Shop)</option>
@@ -569,12 +569,12 @@
             </div>
 
             <!-- View Switcher -->
-            <div class="bg-slate-200/80 p-0.5 rounded-lg border border-slate-200 flex items-center">
+            <div class="bg-slate-200/80 p-0.5 rounded-xl border border-slate-200 flex items-center">
               <button 
                 id="viewTableBtn" 
                 onclick="switchView('table')" 
                 title="Chế độ Bảng chuẩn" 
-                class="p-1.5 rounded-md text-xs font-semibold bg-white text-slate-900 shadow-2xs transition-all"
+                class="p-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-2xs transition-all"
               >
                 <i data-lucide="table" class="w-3.5 h-3.5"></i>
               </button>
@@ -582,7 +582,7 @@
                 id="viewCardBtn" 
                 onclick="switchView('card')" 
                 title="Chế độ Thẻ kho lớn" 
-                class="p-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all"
+                class="p-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all"
               >
                 <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
               </button>
@@ -594,18 +594,18 @@
             <!-- Export Excel Button -->
             <button 
               id="exportExcelBtn" 
-              class="inline-flex items-center px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98]"
+              class="inline-flex items-center px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
             >
-              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
               Xuất file Excel
             </button>
 
             <!-- Print A4 Button -->
             <button 
               id="printBtn" 
-              class="inline-flex items-center px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98]"
+              class="inline-flex items-center px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
             >
-              <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5"></i>
+              <i data-lucide="printer" class="w-4 h-4 mr-1.5"></i>
               In phiếu A4
             </button>
           </div>
@@ -615,26 +615,26 @@
       </div>
 
       <!-- Batch Actions Bar -->
-      <div class="flex items-center justify-between px-2 text-xs text-slate-500 no-print">
+      <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-white border border-slate-200/90 rounded-xl text-xs text-slate-600 shadow-2xs no-print">
         <div class="flex items-center space-x-3">
-          <button onclick="checkAll(true)" class="hover:text-slate-900 font-semibold hover:underline">
-            Tích chọn tất cả là đã lấy
+          <button onclick="checkAll(true)" class="hover:text-slate-900 font-bold hover:underline cursor-pointer">
+            <i data-lucide="check-square" class="w-3.5 h-3.5 inline mr-1 text-emerald-600"></i>Tích chọn tất cả là đã lấy
           </button>
-          <span>•</span>
-          <button onclick="checkAll(false)" class="hover:text-slate-900 font-semibold hover:underline">
-            Bỏ chọn tất cả
+          <span class="text-slate-300">•</span>
+          <button onclick="checkAll(false)" class="hover:text-slate-900 font-bold hover:underline cursor-pointer">
+            <i data-lucide="square" class="w-3.5 h-3.5 inline mr-1 text-slate-400"></i>Bỏ chọn tất cả
           </button>
         </div>
-        <div>
-          <span>Bấm vào nút "Xem đơn" để xem toàn bộ danh sách mã đơn</span>
+        <div class="text-slate-500 font-medium">
+          <span>Bấm nút "Xem đơn" để tra cứu mã đơn &amp; mã vận đơn tương ứng</span>
         </div>
       </div>
 
       <!-- VIEW 1: TABLE VIEW (Default) -->
-      <div id="tableViewWrapper" class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+      <div id="tableViewWrapper" class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm" id="itemsTable">
-            <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase text-[11px] tracking-wider border-b border-slate-200 select-none">
+            <thead class="bg-slate-100/90 text-slate-700 font-bold uppercase text-[11px] tracking-wider border-b border-slate-200 select-none">
               <tr>
                 <th scope="col" class="py-3 px-3 text-center w-12 no-print">Lấy</th>
                 <th scope="col" class="py-3 px-3 text-center w-12 print-only">Kiểm</th>
@@ -672,95 +672,133 @@
     </section>
 
     <!-- Dedicated Shipping Labels Section (no-print) -->
-    <section id="shippingSection" class="hidden space-y-6 no-print">
+    <section id="shippingSection" class="hidden space-y-7 sm:space-y-8 no-print">
       
       <!-- Stats Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
-            <span class="font-semibold">Tổng Đơn Hàng</span>
-            <i data-lucide="package" class="w-4 h-4 text-blue-600"></i>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+        
+        <!-- Card 1: Total Orders -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
+              <span class="font-bold uppercase tracking-wider text-[11px]">Tổng Đơn Hàng</span>
+              <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200/70">
+                <i data-lucide="package" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums" id="shipTotalOrders">0</div>
           </div>
-          <div class="text-2xl font-black text-slate-900" id="shipTotalOrders">0</div>
-          <div class="text-[11px] text-slate-400 mt-1" id="shipTotalPages">0 trang in</div>
+          <div class="text-xs text-slate-500 mt-2.5 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+            <span id="shipTotalPages">0 trang in</span>
+          </div>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
-            <span class="font-semibold">Đơn 1 Món (Dán Lô)</span>
-            <i data-lucide="zap" class="w-4 h-4 text-emerald-600"></i>
+        <!-- Card 2: Single Item Orders -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
+              <span class="font-bold uppercase tracking-wider text-[11px]">Đơn 1 Món (Dán Lô)</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/60">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums" id="shipSingleOrders">0</div>
           </div>
-          <div class="text-2xl font-black text-emerald-600" id="shipSingleOrders">0</div>
-          <div class="text-[11px] text-emerald-700/80 mt-1">Đã xếp liền theo từng món</div>
+          <div class="text-xs text-slate-600 mt-2.5 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+            <span>Xếp theo từng món</span>
+          </div>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
-            <span class="font-semibold">Đơn Nhiều Món (Gom)</span>
-            <i data-lucide="layers" class="w-4 h-4 text-amber-600"></i>
+        <!-- Card 3: Multi Item Orders -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
+              <span class="font-bold uppercase tracking-wider text-[11px]">Đơn Nhiều Món (Gom)</span>
+              <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200/60">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums" id="shipMultiOrders">0</div>
           </div>
-          <div class="text-2xl font-black text-amber-600" id="shipMultiOrders">0</div>
-          <div class="text-[11px] text-amber-700/80 mt-1">Gom ở nhóm riêng để đóng</div>
+          <div class="text-xs text-slate-600 mt-2.5 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+            <span>Gom riêng đóng gói</span>
+          </div>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
-            <span class="font-semibold">Nhóm Sản Phẩm</span>
-            <i data-lucide="boxes" class="w-4 h-4 text-purple-600"></i>
+        <!-- Card 4: Product Groups -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
+              <span class="font-bold uppercase tracking-wider text-[11px]">Nhóm Sản Phẩm</span>
+              <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200/70">
+                <i data-lucide="boxes" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums" id="shipProductGroups">0</div>
           </div>
-          <div class="text-2xl font-black text-purple-600" id="shipProductGroups">0</div>
-          <div class="text-[11px] text-purple-700/80 mt-1">Mỗi món 1 chuỗi tem</div>
+          <div class="text-xs text-slate-600 mt-2.5 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+            <span>Chuỗi tem liên tục</span>
+          </div>
         </div>
 
-        <div class="col-span-2 sm:col-span-1 bg-gradient-to-tr from-rose-500 to-rose-600 text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between">
-          <div class="text-xs font-semibold text-rose-100 flex items-center justify-between">
-            <span>Thao Tác Nhanh</span>
-            <i data-lucide="file-check-2" class="w-4 h-4"></i>
+        <!-- Card 5: Total Items to Pick -->
+        <div class="col-span-2 sm:col-span-1 bg-white p-5 rounded-2xl border-2 border-rose-200 shadow-2xs hover:border-rose-300 transition-all flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-rose-600"></div>
+          <div>
+            <div class="flex items-center justify-between text-rose-600 text-xs mb-2">
+              <span class="font-bold uppercase tracking-wider text-[11px]">Tổng Món Cần Lấy</span>
+              <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100">
+                <i data-lucide="package-check" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-rose-600 tabular-nums" id="shipTotalItems">0</div>
           </div>
-          <button 
-            onclick="downloadReorderedPdf()" 
-            class="mt-2 w-full py-2 px-3 bg-white text-rose-700 hover:bg-rose-50 rounded-xl text-xs font-extrabold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <i data-lucide="download" class="w-4 h-4"></i>
-            <span>TẢI PDF ĐÃ XẾP</span>
-          </button>
+          <div class="text-xs text-rose-700/80 font-medium mt-2.5 flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>
+            <span>Khớp phiếu nhặt hàng</span>
+          </div>
         </div>
+
       </div>
 
       <!-- Action Bar & Search -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
+      <div class="bg-white p-4.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
           <!-- Filter Buttons -->
-          <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-semibold">
-            <button onclick="filterShippingList('all')" id="shipFilterAll" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-2xs transition-all cursor-pointer">Tất cả (<span id="shipCountAll">0</span>)</button>
-            <button onclick="filterShippingList('single')" id="shipFilterSingle" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">Đơn 1 món (<span id="shipCountSingle">0</span>)</button>
-            <button onclick="filterShippingList('multi')" id="shipFilterMulti" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">Đơn nhiều món (<span id="shipCountMulti">0</span>)</button>
+          <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-semibold border border-slate-200/60">
+            <button onclick="filterShippingList('all')" id="shipFilterAll" class="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 font-bold shadow-2xs transition-all cursor-pointer">Tất cả (<span id="shipCountAll">0</span>)</button>
+            <button onclick="filterShippingList('single')" id="shipFilterSingle" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn 1 món (<span id="shipCountSingle">0</span>)</button>
+            <button onclick="filterShippingList('multi')" id="shipFilterMulti" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn nhiều món (<span id="shipCountMulti">0</span>)</button>
           </div>
 
           <!-- Search Input -->
-          <div class="relative flex-1 sm:w-72">
-            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <div class="relative flex-1 sm:w-80">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
             <input 
               type="text" 
               id="shipSearchInput" 
               oninput="handleShipSearch(this.value)" 
               placeholder="Tìm mã vận đơn, Order ID, tên sản phẩm..." 
-              class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 font-medium"
+              class="w-full pl-10 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:bg-white focus:border-rose-500 focus:ring-2 focus:ring-rose-100 font-medium text-slate-900 placeholder:text-slate-400 transition-all shadow-2xs"
             />
           </div>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-3">
           <button 
             onclick="exportShippingExcel()" 
-            class="inline-flex items-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
+            class="inline-flex items-center px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
           >
             <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
             Xuất Excel Vận Đơn
           </button>
           <button 
             onclick="downloadReorderedPdf()" 
-            class="inline-flex items-center px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+            class="inline-flex items-center px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
           >
             <i data-lucide="file-down" class="w-4 h-4 mr-1.5"></i>
             Tải PDF Đã Sắp Xếp Theo Món
@@ -769,7 +807,7 @@
       </div>
 
       <!-- Shipping Orders List Container -->
-      <div id="shippingOrdersContainer" class="space-y-4">
+      <div id="shippingOrdersContainer" class="space-y-6 sm:space-y-7">
         <!-- Rendered by JS -->
       </div>
 
@@ -866,73 +904,73 @@
     <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
       
       <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70">
-        <div class="flex items-center space-x-3">
+      <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-white">
+        <div class="flex items-center space-x-3.5">
           <div class="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shadow-2xs">
             <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
           </div>
           <div>
             <h3 class="font-extrabold text-base text-slate-900">Cấu Hình Combo &amp; Quy Cách Đóng Gói</h3>
-            <p class="text-xs text-slate-500">Tự động quy đổi thùng/lốc ra món lẻ &amp; gom đơn chuẩn xác (Lưu vĩnh viễn)</p>
+            <p class="text-xs text-slate-600 mt-0.5">Tự động quy đổi thùng/lốc ra món lẻ &amp; gom đơn chuẩn xác (Lưu vĩnh viễn)</p>
           </div>
         </div>
-        <button onclick="closeComboModal()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-all cursor-pointer">
+        <button onclick="closeComboModal()" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-all cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
         
         <!-- Add / Edit Combo Form -->
-        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4.5 space-y-3">
+        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-4">
           <input type="hidden" id="editingComboId" value="" />
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="font-bold text-slate-900 text-xs flex items-center" id="formHeaderTitle">
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="font-bold text-slate-900 text-sm flex items-center" id="formHeaderTitle">
               <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
               Thêm Quy Tắc Combo / Quy Cách Mới
             </div>
             <!-- Quick Picker from Loaded Files -->
-            <div class="flex items-center gap-1.5">
-              <span class="text-slate-500 text-[11px] hidden sm:inline">Chọn nhanh:</span>
-              <select id="quickProductSelect" onchange="onQuickProductSelected(this.value)" class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[11px] text-slate-700 font-medium max-w-[220px] focus:outline-none focus:ring-1 focus:ring-rose-500 cursor-pointer shadow-2xs">
-                <option value="">-- Chọn từ sản phẩm trong file --</option>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-600 font-semibold text-xs hidden sm:inline">Chọn nhanh từ file:</span>
+              <select id="quickProductSelect" onchange="onQuickProductSelected(this.value)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium max-w-[240px] focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-2xs cursor-pointer">
+                <option value="">-- Chọn sản phẩm trong file --</option>
               </select>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">Tên Combo / Quy cách hiển thị: <span class="text-rose-500">*</span></label>
-              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Thùng 3 cặp)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Tên Combo / Quy cách hiển thị: <span class="text-rose-600">*</span></label>
+              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Thùng 3 cặp)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">Từ khóa sản phẩm áp dụng:</label>
-              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi (để trống = mọi sản phẩm)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa sản phẩm áp dụng:</label>
+              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi (để trống = mọi sản phẩm)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">Từ khóa SKU / Phân loại: <span class="text-rose-500">*</span></label>
-              <input type="text" id="newComboSkuKey" placeholder="VD: Thùng cặp, 3 cặp, Thùng 6 chai..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa SKU / Phân loại: <span class="text-rose-600">*</span></label>
+              <input type="text" id="newComboSkuKey" placeholder="VD: Thùng cặp, 3 cặp, Thùng 6 chai..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block font-semibold text-slate-700 mb-1">Số lượng lẻ: <span class="text-rose-500">*</span></label>
-                <input type="number" id="newComboPackSize" min="1" value="3" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-bold text-rose-600" />
+                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Số lượng lẻ: <span class="text-rose-600">*</span></label>
+                <input type="number" id="newComboPackSize" min="1" value="3" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-black text-slate-900 shadow-2xs transition-all" />
               </div>
               <div>
-                <label class="block font-semibold text-slate-700 mb-1">Đơn vị quy đổi:</label>
-                <input type="text" id="newComboUnit" placeholder="VD: Cặp 100ml, Chai, Gói..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Đơn vị quy đổi:</label>
+                <input type="text" id="newComboUnit" placeholder="VD: Cặp 100ml, Chai..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
               </div>
             </div>
           </div>
           <div class="flex items-center justify-between pt-1">
-            <div id="comboFormMessage" class="text-[11px] text-slate-500 italic"></div>
-            <div class="flex items-center gap-2">
-              <button id="btnCancelEditCombo" onclick="cancelEditCombo()" class="hidden px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 transition-all cursor-pointer">
+            <div id="comboFormMessage" class="text-xs text-slate-600 italic"></div>
+            <div class="flex items-center gap-2.5">
+              <button id="btnCancelEditCombo" onclick="cancelEditCombo()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
                 Hủy sửa
               </button>
-              <button id="btnSaveCombo" onclick="handleAddNewCombo()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
-                <i data-lucide="check" class="w-3.5 h-3.5 mr-1.5"></i>
+              <button id="btnSaveCombo" onclick="handleAddNewCombo()" class="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+                <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
                 <span id="btnSaveComboText">Lưu Quy Tắc Này</span>
               </button>
             </div>
@@ -941,27 +979,27 @@
 
         <!-- Current Combo Rules List -->
         <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-            <span class="font-bold text-slate-900 text-xs flex items-center">
-              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <span class="font-bold text-slate-900 text-sm flex items-center">
+              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-slate-800"></i>
               Danh Sách Quy Tắc Đang Áp Dụng (<span id="comboListCount">0</span>)
             </span>
             <div class="flex items-center gap-2">
-              <button onclick="exportComboRules()" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs" title="Tải file JSON dự phòng">
-                <i data-lucide="download" class="w-3 h-3 mr-1 text-slate-500"></i>
+              <button onclick="exportComboRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-2xs" title="Tải file JSON dự phòng">
+                <i data-lucide="download" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
                 Xuất JSON
               </button>
-              <label class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs" title="Nạp file JSON đã lưu">
-                <i data-lucide="upload" class="w-3 h-3 mr-1 text-slate-500"></i>
+              <label class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-2xs" title="Nạp file JSON đã lưu">
+                <i data-lucide="upload" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
                 Nhập JSON
                 <input type="file" id="importComboInput" accept=".json" onchange="importComboRules(event)" class="hidden" />
               </label>
-              <button onclick="clearAllComboRules()" class="text-[11px] text-rose-600 hover:text-rose-800 font-semibold transition-all cursor-pointer px-1.5 py-1">
+              <button onclick="clearAllComboRules()" class="text-xs text-rose-600 hover:text-rose-800 font-bold transition-all cursor-pointer px-2 py-1">
                 Xóa tất cả
               </button>
             </div>
           </div>
-          <div id="comboRulesList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <div id="comboRulesList" class="space-y-3 max-h-64 overflow-y-auto pr-1">
             <!-- Rendered by JS -->
           </div>
         </div>
@@ -969,12 +1007,12 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/70 flex flex-wrap justify-between items-center gap-2">
-        <div id="comboSyncStatus" class="text-[11px] text-slate-600 flex items-center">
-          <i data-lucide="cloud" class="w-3.5 h-3.5 mr-1 text-blue-500"></i>
+      <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-3">
+        <div id="comboSyncStatus" class="text-xs font-semibold text-slate-700 flex items-center">
+          <i data-lucide="cloud" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
           <span>Đã kết nối lưu trữ máy chủ &amp; trình duyệt</span>
         </div>
-        <button onclick="closeComboModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs">
+        <button onclick="closeComboModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs active:scale-[0.98]">
           Đóng &amp; Áp Dụng Ngay
         </button>
       </div>
@@ -1387,10 +1425,10 @@
       if (!container) return;
       if (comboRules.length === 0) {
         container.innerHTML = `
-          <div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 space-y-1.5">
-            <i data-lucide="sparkles" class="w-6 h-6 mx-auto text-slate-300"></i>
-            <div class="font-bold text-slate-600 text-xs">Chưa có quy tắc combo nào được lưu</div>
-            <div class="text-[11px] text-slate-400">Hãy thêm quy tắc ở form phía trên hoặc bấm "Chọn nhanh" từ file PDF đã nạp.</div>
+          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
+            <i data-lucide="sparkles" class="w-7 h-7 mx-auto text-slate-400"></i>
+            <div class="font-bold text-slate-700 text-sm">Chưa có quy tắc combo nào được lưu</div>
+            <div class="text-xs text-slate-500">Hãy thêm quy tắc ở form phía trên hoặc bấm "Chọn nhanh" từ file PDF đã nạp.</div>
           </div>
         `;
         lucide.createIcons();
@@ -1398,25 +1436,25 @@
       }
 
       container.innerHTML = comboRules.map(rule => `
-        <div class="bg-white p-3 rounded-xl border border-slate-200/90 flex items-center justify-between gap-3 shadow-2xs hover:border-slate-300 transition-all">
-          <div class="space-y-0.5 min-w-0 flex-1">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-bold text-slate-900 text-xs truncate">${escapeHtml(rule.name)}</span>
-              <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex items-center justify-between gap-4">
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(rule.name)}</span>
+              <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-rose-50 text-rose-800 border border-rose-200/80">
                 1 quy cách = ${rule.packSize} ${escapeHtml(rule.unit || 'món lẻ')}
               </span>
             </div>
-            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5">
-              ${rule.productKeyword ? `<span class="font-medium text-slate-700">Sản phẩm:</span> <span class="bg-slate-50 px-1 rounded text-slate-800">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-400">Mọi sản phẩm &bull; </span>'}
-              <span class="font-medium text-slate-700">Khớp SKU:</span> <code class="bg-rose-50 border border-rose-200/60 px-1 py-0.5 rounded text-rose-700 font-mono text-[10px]">${escapeHtml(rule.skuKeyword)}</code>
+            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-2">
+              ${rule.productKeyword ? `<span class="font-semibold text-slate-700">Sản phẩm:</span> <span class="bg-slate-100 border border-slate-200/70 px-1.5 py-0.2 rounded text-slate-900 font-medium">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-500 font-medium">Mọi sản phẩm &bull; </span>'}
+              <span class="font-semibold text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-900 font-mono text-xs font-bold">${escapeHtml(rule.skuKeyword)}</code>
             </div>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="editComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer" title="Chỉnh sửa quy tắc này">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="editComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa quy tắc này">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
-            <button onclick="deleteComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Xóa quy tắc này">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <button onclick="deleteComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa quy tắc này">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
@@ -1798,6 +1836,21 @@
       });
     }
 
+    // Product Name Sanitizer (removes noisy TikTok transport/date header prefixes)
+    function cleanItemProductName(rawName) {
+      if (!rawName) return '';
+      let cleaned = rawName.trim();
+      // Remove "In transit by: dd/mm/yyyy hh:mm Product Name " or similar TikTok export prefixes
+      cleaned = cleaned.replace(/^In\s+transit\s+by[:\s]*[\d/:\s-]+(Product\s+Name\s*[:\-]?\s*)?/i, '');
+      // Remove standalone "In transit by: ... " if any
+      cleaned = cleaned.replace(/^In\s+transit\s+by[:\s]*[\d/:\s-]+/i, '');
+      // Remove standalone "Product Name" prefix
+      cleaned = cleaned.replace(/^Product\s+Name\s*[:\-]?\s*/i, '');
+      // Remove table headers like "SKU Seller SKU Qty"
+      cleaned = cleaned.replace(/SKU\s+Seller\s+SKU\s+Qty\s*/i, '');
+      return cleaned.trim() || 'Sản phẩm TikTok Shop';
+    }
+
     // Tab Navigation Switcher
     function switchMainTab(tab) {
       currentMainTab = tab;
@@ -1807,10 +1860,12 @@
       const fulfillmentSection = document.getElementById('fulfillmentSection');
       const resultSection = document.getElementById('resultSection');
       const shippingSection = document.getElementById('shippingSection');
+      const badge = document.getElementById('shippingBadge');
 
       if (tab === 'picking') {
-        if (tabPickingBtn) tabPickingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
-        if (tabShippingBtn) tabShippingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
+        if (tabPickingBtn) tabPickingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
+        if (tabShippingBtn) tabShippingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
+        if (badge) badge.className = 'ml-2 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-slate-200 text-slate-800';
 
         if (aggregatedItems.length > 0) {
           statsSection.classList.remove('hidden');
@@ -1819,8 +1874,9 @@
         }
         if (shippingSection) shippingSection.classList.add('hidden');
       } else {
-        if (tabShippingBtn) tabShippingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
-        if (tabPickingBtn) tabPickingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
+        if (tabShippingBtn) tabShippingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
+        if (tabPickingBtn) tabPickingBtn.className = 'px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
+        if (badge) badge.className = 'ml-2 px-2.5 py-0.5 text-[11px] font-black rounded-full bg-white/20 text-white border border-white/30';
 
         statsSection.classList.add('hidden');
         fulfillmentSection.classList.add('hidden');
@@ -1845,14 +1901,17 @@
 
     // Process Shipping Label + Packing Slip PDF File
     async function processShippingLabelFile(file) {
-      currentShippingFile = file;
-      progressContainer.classList.remove('hidden');
-      progressBar.style.width = '10%';
-      progressPercent.textContent = '10%';
-      progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-blue-600"></i> Đang tải file mã vận đơn ${escapeHtml(file.name)}...`;
-      lucide.createIcons();
-
       try {
+        currentShippingFile = file;
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressText = document.getElementById('progressText');
+
+        progressContainer.classList.remove('hidden');
+        progressText.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin text-rose-600"></i> Đang đọc mã vận đơn và sản phẩm...`;
+        lucide.createIcons();
+
         const arrayBuffer = await file.arrayBuffer();
         const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         const pdfDoc = await loadingTask.promise;
@@ -1952,7 +2011,7 @@
             if (qtyWords.length > 0) {
               if (hasItem && (currentName.length > 0 || currentSku.length > 0)) {
                 itemsList.push({
-                  name: currentName.join(' ').trim(),
+                  name: cleanItemProductName(currentName.join(' ').trim()),
                   sku: currentSku.join(' ').trim() || 'Mặc định',
                   qty: currentQty
                 });
@@ -1969,7 +2028,7 @@
 
           if (hasItem && (currentName.length > 0 || currentSku.length > 0)) {
             itemsList.push({
-              name: currentName.join(' ').trim(),
+              name: cleanItemProductName(currentName.join(' ').trim()),
               sku: currentSku.join(' ').trim() || 'Mặc định',
               qty: currentQty
             });
@@ -1982,9 +2041,9 @@
               const line = m[1].trim();
               const mEnd = line.match(/^(.*?)\s+(\d+)$/);
               if (mEnd) {
-                itemsList.push({ name: mEnd[1].trim(), sku: 'Mặc định', qty: parseInt(mEnd[2], 10) });
+                itemsList.push({ name: cleanItemProductName(mEnd[1].trim()), sku: 'Mặc định', qty: parseInt(mEnd[2], 10) });
               } else {
-                itemsList.push({ name: line, sku: 'Mặc định', qty: 1 });
+                itemsList.push({ name: cleanItemProductName(line), sku: 'Mặc định', qty: 1 });
               }
             } else {
               itemsList.push({ name: 'Sản phẩm TikTok Shop', sku: 'Mặc định', qty: 1 });
@@ -1994,7 +2053,7 @@
           ord.items = itemsList;
           ord.totalQty = itemsList.reduce((acc, it) => acc + it.qty, 0);
           ord.isMultiItem = (itemsList.length > 1);
-          ord.primaryProduct = itemsList[0]?.name || 'Sản phẩm khác';
+          ord.primaryProduct = cleanItemProductName(itemsList[0]?.name) || 'Sản phẩm khác';
           ord.primarySku = itemsList[0]?.sku || 'Mặc định';
 
           parsedOrders.push(ord);
@@ -2169,15 +2228,18 @@
 
       const totalOrders = sortedShippingOrders.length;
       const totalPages = sortedShippingOrders.reduce((sum, o) => sum + o.pages.length, 0);
+      const totalItems = sortedShippingOrders.reduce((sum, o) => sum + o.totalQty, 0);
       const singleOrders = sortedShippingOrders.filter(o => !o.isMultiItem);
       const multiOrders = sortedShippingOrders.filter(o => o.isMultiItem);
-      const uniqueProds = new Set(singleOrders.map(o => o.primaryProduct)).size;
+      const uniqueProds = new Set(singleOrders.map(o => cleanItemProductName(o.primaryProduct))).size;
 
       document.getElementById('shipTotalOrders').textContent = totalOrders;
       document.getElementById('shipTotalPages').textContent = `${totalPages} trang in`;
       document.getElementById('shipSingleOrders').textContent = singleOrders.length;
       document.getElementById('shipMultiOrders').textContent = multiOrders.length;
       document.getElementById('shipProductGroups').textContent = uniqueProds;
+      const shipTotalItemsEl = document.getElementById('shipTotalItems');
+      if (shipTotalItemsEl) shipTotalItemsEl.textContent = `${totalItems} món`;
 
       document.getElementById('shipCountAll').textContent = totalOrders;
       document.getElementById('shipCountSingle').textContent = singleOrders.length;
@@ -2199,7 +2261,7 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="p-8 text-center bg-white border border-slate-200 rounded-2xl">
+          <div class="p-10 text-center bg-white border border-slate-200/90 rounded-2xl shadow-xs">
             <p class="text-sm font-bold text-slate-900">Không tìm thấy mã vận đơn phù hợp</p>
             <p class="text-xs text-slate-500 mt-1">Thử kiểm tra lại từ khóa tìm kiếm</p>
           </div>
@@ -2210,7 +2272,8 @@
 
       const groups = {};
       filtered.forEach(o => {
-        const grpKey = o.isMultiItem ? "🧩 ĐƠN NHIỀU MÓN (ĐÓNG RIÊNG)" : o.primaryProduct;
+        const cleanProd = cleanItemProductName(o.primaryProduct);
+        const grpKey = o.isMultiItem ? "🧩 ĐƠN NHIỀU MÓN (ĐÓNG RIÊNG)" : cleanProd;
         if (!groups[grpKey]) groups[grpKey] = [];
         groups[grpKey].push(o);
       });
@@ -2218,6 +2281,7 @@
       let html = '';
       for (const [prodName, ordersInGrp] of Object.entries(groups)) {
         const isMultiGroup = prodName.includes('ĐƠN NHIỀU MÓN');
+        const cleanedProdName = isMultiGroup ? prodName : cleanItemProductName(prodName);
         const totalGrpQty = ordersInGrp.reduce((sum, o) => sum + o.totalQty, 0);
 
         const skuCounts = {};
@@ -2228,37 +2292,45 @@
         const skuSummary = Object.entries(skuCounts).map(([sku, cnt]) => `${cnt} đơn ${sku}`).join(' &bull; ');
 
         html += `
-          <div class="bg-white border ${isMultiGroup ? 'border-amber-200/90' : 'border-slate-200'} rounded-2xl shadow-xs overflow-hidden">
-            <div class="${isMultiGroup ? 'bg-amber-50/70 border-b border-amber-200/70' : 'bg-slate-50/80 border-b border-slate-200'} px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div class="space-y-0.5">
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-lg ${isMultiGroup ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'} flex items-center justify-center font-bold text-xs">
-                    <i data-lucide="${isMultiGroup ? 'layers' : 'package'}" class="w-3.5 h-3.5"></i>
+          <div class="bg-white border ${isMultiGroup ? 'border-amber-300 shadow-sm' : 'border-slate-200/90 shadow-2xs'} rounded-2xl overflow-hidden hover:border-slate-300 transition-all">
+            <!-- Card Header -->
+            <div class="${isMultiGroup ? 'bg-amber-50/80 border-b border-amber-200/80' : 'bg-white border-b border-slate-200/80'} px-5 sm:px-6 py-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1.5 flex-1 min-w-0">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <span class="w-8 h-8 rounded-xl ${isMultiGroup ? 'bg-amber-100 text-amber-800' : 'bg-rose-50 text-rose-700 border border-rose-100'} flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                    <i data-lucide="${isMultiGroup ? 'layers' : 'package'}" class="w-4 h-4"></i>
                   </span>
-                  <h4 class="font-extrabold text-sm text-slate-900">${escapeHtml(prodName)}</h4>
-                  <span class="px-2.5 py-0.5 text-xs font-black rounded-full ${isMultiGroup ? 'bg-amber-200/80 text-amber-900' : 'bg-rose-100 text-rose-800'}">
+                  <h4 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-snug">${escapeHtml(cleanedProdName)}</h4>
+                  <span class="px-3 py-0.5 text-xs font-bold rounded-full ${isMultiGroup ? 'bg-amber-200/90 text-amber-900' : 'bg-slate-100 text-slate-800 border border-slate-200/80'} shrink-0">
                     ${ordersInGrp.length} đơn hàng
                   </span>
                 </div>
-                <p class="text-xs text-slate-500 pl-8">${skuSummary} &bull; Tổng SL lấy: <strong class="text-slate-800">${totalGrpQty} món</strong></p>
+                <div class="text-xs text-slate-600 font-medium flex flex-wrap items-center gap-x-2 gap-y-1 pl-10.5">
+                  <span class="bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md text-slate-700 font-semibold">${skuSummary}</span>
+                  <span>&bull;</span>
+                  <span>Tổng SL lấy: <strong class="text-slate-900 font-bold">${totalGrpQty} món</strong></span>
+                </div>
               </div>
-              <div class="text-xs text-slate-500 font-semibold sm:text-right pl-8 sm:pl-0">
-                <span>Thứ tự in mới: </span>
-                <strong class="text-emerald-700 font-bold font-mono">#${ordersInGrp[0].newSeq} &rarr; #${ordersInGrp[ordersInGrp.length - 1].newSeq}</strong>
+              <div class="sm:text-right shrink-0 pl-10.5 sm:pl-0">
+                <div class="inline-flex flex-col sm:items-end bg-slate-50 border border-slate-200/80 px-3.5 py-1.5 rounded-xl">
+                  <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Thứ tự in mới</span>
+                  <span class="text-xs font-black font-mono text-emerald-700">#${ordersInGrp[0].newSeq} &rarr; #${ordersInGrp[ordersInGrp.length - 1].newSeq}</span>
+                </div>
               </div>
             </div>
 
+            <!-- Card Table -->
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50/50 text-slate-500 font-semibold border-b border-slate-100 select-none text-[11px] uppercase tracking-wider">
+                <thead class="bg-slate-100/90 text-slate-700 font-bold border-b border-slate-200 select-none text-[11px] uppercase tracking-wider">
                   <tr>
-                    <th class="py-2.5 px-3 text-center w-14">STT Mới</th>
-                    <th class="py-2.5 px-3 min-w-[150px]">Mã Vận Đơn</th>
-                    <th class="py-2.5 px-3 min-w-[155px]">Mã Đơn Hàng (Order ID)</th>
-                    <th class="py-2.5 px-3 min-w-[180px]">Người Nhận &amp; Trọng Lượng</th>
-                    <th class="py-2.5 px-3 min-w-[140px]">Quy Cách / SKU</th>
-                    <th class="py-2.5 px-3 text-center w-16">SL</th>
-                    <th class="py-2.5 px-3 min-w-[170px] text-right">Trang PDF Gốc &rarr; Mới</th>
+                    <th class="py-3 px-4 text-center w-14">STT Mới</th>
+                    <th class="py-3 px-4 min-w-[160px]">Mã Vận Đơn</th>
+                    <th class="py-3 px-4 min-w-[165px]">Mã Đơn Hàng (Order ID)</th>
+                    <th class="py-3 px-4 min-w-[190px]">Người Nhận &amp; Trọng Lượng</th>
+                    <th class="py-3 px-4 min-w-[150px]">Quy Cách / SKU</th>
+                    <th class="py-3 px-4 text-center w-16">SL</th>
+                    <th class="py-3 px-4 min-w-[180px] text-right">Trang PDF Gốc &rarr; Mới</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -2270,50 +2342,50 @@
                     const origPageDisplay = o.pageNumbers.join(', ');
 
                     return `
-                      <tr class="hover:bg-slate-50/80 transition-colors">
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-700">
+                      <tr class="hover:bg-slate-50/90 transition-colors">
+                        <td class="py-3.5 px-4 text-center font-bold text-slate-700">
                           <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 text-slate-800 font-mono text-[11px] font-bold">
                             ${o.newSeq}
                           </span>
                         </td>
-                        <td class="py-2.5 px-3 font-mono font-bold text-slate-900">
+                        <td class="py-3.5 px-4 font-mono font-bold text-slate-900">
                           <div class="flex items-center gap-1.5">
                             <span>${escapeHtml(o.tracking)}</span>
-                            <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-700 p-0.5 rounded transition-all cursor-pointer" title="Sao chép mã vận đơn">
-                              <i data-lucide="copy" class="w-3 h-3"></i>
+                            <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-800 p-0.5 rounded transition-all cursor-pointer" title="Sao chép mã vận đơn">
+                              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                             </button>
                           </div>
                         </td>
-                        <td class="py-2.5 px-3 font-mono text-slate-600">
+                        <td class="py-3.5 px-4 font-mono text-slate-600">
                           ${escapeHtml(o.orderId)}
                         </td>
-                        <td class="py-2.5 px-3 text-slate-700">
-                          <div class="font-medium">${escapeHtml(o.receiver || '-')}</div>
-                          ${o.weight ? `<div class="text-[10px] text-slate-400">${escapeHtml(o.weight)}</div>` : ''}
+                        <td class="py-3.5 px-4 text-slate-700">
+                          <div class="font-medium text-slate-900">${escapeHtml(o.receiver || '-')}</div>
+                          ${o.weight ? `<div class="text-[11px] text-slate-500 font-normal mt-0.5">${escapeHtml(o.weight)}</div>` : ''}
                         </td>
-                        <td class="py-2.5 px-3 text-slate-800">
+                        <td class="py-3.5 px-4 text-slate-800">
                           ${o.isMultiItem ? `
-                            <div class="text-amber-700 font-semibold space-y-0.5">
-                              ${o.items.map(it => `<div>&bull; ${escapeHtml(it.name)} (${escapeHtml(it.sku)}) <strong class="text-slate-900">x${it.qty}</strong></div>`).join('')}
+                            <div class="text-amber-800 font-semibold space-y-1">
+                              ${o.items.map(it => `<div>&bull; ${escapeHtml(cleanItemProductName(it.name))} (${escapeHtml(it.sku)}) <strong class="text-slate-900 font-black">x${it.qty}</strong></div>`).join('')}
                             </div>
                           ` : `
-                            <span class="font-medium">${escapeHtml(o.primarySku)}</span>
+                            <span class="font-medium text-slate-900">${escapeHtml(o.primarySku)}</span>
                           `}
                         </td>
-                        <td class="py-2.5 px-3 text-center font-extrabold text-slate-900 text-sm">
+                        <td class="py-3.5 px-4 text-center font-black text-slate-900 text-sm">
                           ${o.totalQty}
                         </td>
-                        <td class="py-2.5 px-3 text-right">
-                          <div class="inline-flex items-center gap-1.5">
-                            <span class="px-2 py-0.5 rounded bg-slate-100 font-mono text-[10px] text-slate-600" title="Số trang trong file PDF gốc">
+                        <td class="py-3.5 px-4 text-right">
+                          <div class="inline-flex items-center gap-1.5 justify-end">
+                            <span class="px-2 py-0.5 rounded bg-slate-100 font-mono text-[11px] text-slate-600 font-medium" title="Số trang trong file PDF gốc">
                               Gốc: ${origPageDisplay}
                             </span>
                             <i data-lucide="arrow-right" class="w-3 h-3 text-emerald-600"></i>
-                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[10px] font-bold" title="Số trang sau khi sắp xếp lại">
+                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/90 font-mono text-[11px] font-bold" title="Số trang sau khi sắp xếp lại">
                               Mới: ${pageDisplay}
                             </span>
                           </div>
-                          ${isMultiPage ? '<div class="text-[10px] text-amber-600 font-bold mt-0.5">Đơn 2 trang</div>' : ''}
+                          ${isMultiPage ? '<div class="text-[10px] text-amber-700 font-bold mt-1">Đơn 2 trang</div>' : ''}
                         </td>
                       </tr>
                     `;
