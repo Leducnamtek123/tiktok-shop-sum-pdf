@@ -654,7 +654,7 @@
       </div>
 
       <!-- Batch Actions Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-white border border-slate-200/90 rounded-xl text-xs text-slate-600 shadow-2xs no-print">
+      <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3 bg-white border border-slate-200/90 rounded-2xl text-xs text-slate-600 shadow-2xs no-print">
         <div class="flex items-center space-x-3">
           <button onclick="checkAll(true)" class="hover:text-slate-900 font-bold hover:underline cursor-pointer">
             <i data-lucide="check-square" class="w-3.5 h-3.5 inline mr-1 text-emerald-600"></i>Tích chọn tất cả là đã lấy
@@ -669,22 +669,40 @@
         </div>
       </div>
 
+      <!-- Mismatch Alert Banner (Auto-detects different dates/batches between Picking & Shipping files) -->
+      <div id="mismatchBanner" class="hidden p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-200 shadow-2xs text-xs text-amber-950 no-print">
+        <div class="flex items-start gap-3.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </div>
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="font-bold text-slate-900 text-sm flex items-center gap-2 flex-wrap">
+              <span>Lệch đợt file: Tem vận đơn không trùng khớp với Phiếu nhặt hàng</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900">0 đơn trùng khớp</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed text-xs" id="mismatchBannerDesc">
+              Bạn đang nạp file Phiếu nhặt hàng và file Tem vận đơn từ 2 ngày/đợt xuất khác nhau trên TikTok Shop. Do đó các sản phẩm ở Tab 1 chưa thể tự động khớp mã vận đơn. Hãy kiểm tra lại file tem xuất cùng ngày nhé!
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- VIEW 1: TABLE VIEW (Default) -->
       <div id="tableViewWrapper" class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm" id="itemsTable">
             <thead class="bg-slate-100/90 text-slate-700 font-bold uppercase text-[11px] tracking-wider border-b border-slate-200 select-none">
               <tr>
-                <th scope="col" class="py-3 px-3 text-center w-12 no-print">Lấy</th>
-                <th scope="col" class="py-3 px-3 text-center w-12 print-only">Kiểm</th>
-                <th scope="col" class="py-3 px-3 text-center w-14">STT</th>
-                <th scope="col" class="py-3 px-3 text-center w-16 no-print">Ảnh</th>
-                <th scope="col" class="py-3 px-4 min-w-[280px]">Tên sản phẩm</th>
-                <th scope="col" class="py-3 px-4 min-w-[150px]">Quy cách / Phân loại</th>
-                <th scope="col" class="py-3 px-4 text-center min-w-[120px] font-bold text-slate-800">TỔNG SỐ LƯỢNG</th>
-                <th scope="col" class="py-3 px-3 min-w-[145px]">Mã vận đơn</th>
-                <th scope="col" class="py-3 px-3 text-center min-w-[95px] no-print">Xem đơn</th>
-                <th scope="col" class="py-3 px-4 min-w-[160px] no-print">Nguồn từng file PDF</th>
+                <th scope="col" class="py-3.5 px-4 text-center w-12 no-print">Lấy</th>
+                <th scope="col" class="py-3.5 px-4 text-center w-12 print-only">Kiểm</th>
+                <th scope="col" class="py-3.5 px-4 text-center w-16">STT</th>
+                <th scope="col" class="py-3.5 px-4 text-center w-18 no-print">Ảnh</th>
+                <th scope="col" class="py-3.5 px-5 min-w-[300px]">Tên sản phẩm</th>
+                <th scope="col" class="py-3.5 px-5 min-w-[160px]">Quy cách / Phân loại</th>
+                <th scope="col" class="py-3.5 px-5 text-center min-w-[130px] font-bold text-slate-800">TỔNG SỐ LƯỢNG</th>
+                <th scope="col" class="py-3.5 px-5 min-w-[160px]">Mã vận đơn</th>
+                <th scope="col" class="py-3.5 px-4 text-center min-w-[100px] no-print">Xem đơn</th>
+                <th scope="col" class="py-3.5 px-5 min-w-[170px] no-print">Nguồn từng file PDF</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-800">
@@ -847,7 +865,7 @@
       </div>
 
       <!-- Shipping Orders List Container -->
-      <div id="shippingOrdersContainer" class="space-y-6 sm:space-y-7">
+      <div id="shippingOrdersContainer" class="space-y-7 sm:space-y-8">
         <!-- Rendered by JS -->
       </div>
 
@@ -919,18 +937,18 @@
   </main>
 
   <!-- Order IDs Modal (no-print) -->
-  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="if(event.target === this) closeModal()">
+  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden no-print" onclick="if(event.target === this) closeModal()">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
       <!-- Header -->
-      <div class="px-5 sm:px-6 py-4.5 border-b border-slate-200 flex justify-between items-center bg-white shrink-0">
+      <div class="px-6 sm:px-7 py-5 border-b border-slate-200 flex justify-between items-center bg-white shrink-0">
         <div class="min-w-0 pr-4">
-          <div class="flex items-center gap-2.5">
-            <span class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-              <i data-lucide="package" class="w-4 h-4"></i>
+          <div class="flex items-center gap-3">
+            <span class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+              <i data-lucide="package" class="w-4.5 h-4.5"></i>
             </span>
             <h3 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-snug truncate" id="modalTitle">Danh sách mã đơn &amp; mã vận đơn</h3>
           </div>
-          <p class="text-xs text-slate-500 font-medium mt-1 pl-10.5" id="modalSubTitle">Sản phẩm: ...</p>
+          <p class="text-xs text-slate-500 font-medium mt-1.5 pl-12" id="modalSubTitle">Sản phẩm: ...</p>
         </div>
         <button onclick="closeModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-all shrink-0">
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -938,19 +956,19 @@
       </div>
 
       <!-- Action Bar & Stats -->
-      <div class="px-5 sm:px-6 py-3 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5 text-xs shrink-0">
-        <div class="flex items-center gap-2">
-          <span id="modalOrderCount" class="font-bold text-slate-900 bg-white border border-slate-200 px-3 py-1 rounded-lg shadow-2xs">
+      <div class="px-6 sm:px-7 py-3.5 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span id="modalOrderCount" class="font-bold text-slate-900 bg-white border border-slate-200 px-3.5 py-1.5 rounded-xl shadow-2xs">
             Tổng cộng: 0 đơn hàng
           </span>
-          <span id="modalMatchedBadge" class="hidden font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px]">
+          <span id="modalMatchedBadge" class="hidden font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs">
             Đã khớp tem
           </span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2.5">
           <button 
             onclick="copyTrackings()" 
-            class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
+            class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             title="Sao chép toàn bộ danh sách mã vận đơn để đối soát"
           >
             <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i>
@@ -958,7 +976,7 @@
           </button>
           <button 
             onclick="copyOrderIds()" 
-            class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
+            class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             title="Sao chép toàn bộ danh sách Order ID"
           >
             <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i>
@@ -968,16 +986,16 @@
       </div>
 
       <!-- Modal Content Body -->
-      <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50">
-        <!-- Notice if no shipping labels loaded yet -->
-        <div id="modalNoShippingNotice" class="hidden p-3.5 bg-amber-50/90 border border-amber-200 rounded-2xl flex items-start gap-3 text-xs text-amber-900">
-          <div class="w-7 h-7 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
-            <i data-lucide="info" class="w-4 h-4"></i>
+      <div class="p-6 sm:p-7 overflow-y-auto flex-1 space-y-4 bg-slate-50/50">
+        <!-- Notice if no shipping labels loaded yet or mismatched -->
+        <div id="modalNoShippingNotice" class="hidden p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3.5 text-xs text-amber-900 shadow-2xs">
+          <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+            <i data-lucide="alert-circle" class="w-4.5 h-4.5"></i>
           </div>
-          <div class="space-y-0.5 flex-1 min-w-0">
-            <div class="font-bold text-slate-900">Chưa tải file tem vận đơn (Shipping label)</div>
-            <p class="text-slate-600 leading-relaxed">
-              Bạn đang xem danh sách đơn từ <strong>Phiếu nhặt hàng (Picking list)</strong>. Để xem mã vận đơn, người nhận và ảnh tem A6 y hệt bên Tab 2, hãy kéo thả file <code class="bg-amber-100 px-1 py-0.2 rounded font-mono text-[11px]">Shipping label+Packing slip.pdf</code> vào trang web!
+          <div class="space-y-1 flex-1 min-w-0">
+            <div class="font-bold text-slate-900 text-sm" id="modalNoticeTitle">Chưa tải file tem vận đơn (Shipping label)</div>
+            <p class="text-slate-600 leading-relaxed" id="modalNoticeDesc">
+              Bạn đang xem danh sách đơn từ <strong>Phiếu nhặt hàng (Picking list)</strong>. Để xem mã vận đơn, người nhận và ảnh tem A6, hãy kéo thả file <code class="bg-amber-100 px-1 py-0.2 rounded font-mono text-[11px]">Shipping label+Packing slip.pdf</code> vào trang web!
             </p>
           </div>
         </div>
@@ -988,12 +1006,12 @@
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-100/90 text-slate-700 font-bold border-b border-slate-200 select-none text-[11px] uppercase tracking-wider">
                 <tr>
-                  <th class="py-3 px-3 text-center w-12">STT</th>
-                  <th class="py-3 px-3 w-18 text-center">Ảnh Tem</th>
-                  <th class="py-3 px-3 min-w-[170px]">Mã Vận Đơn</th>
-                  <th class="py-3 px-3 min-w-[160px]">Mã Đơn (Order ID)</th>
-                  <th class="py-3 px-3 min-w-[150px]">Người Nhận</th>
-                  <th class="py-3 px-3 min-w-[120px] text-right">Thao Tác</th>
+                  <th class="py-3.5 px-4 text-center w-14">STT</th>
+                  <th class="py-3.5 px-4 w-20 text-center">Ảnh Tem</th>
+                  <th class="py-3.5 px-5 min-w-[190px]">Mã Vận Đơn</th>
+                  <th class="py-3.5 px-5 min-w-[180px]">Mã Đơn (Order ID)</th>
+                  <th class="py-3.5 px-5 min-w-[160px]">Người Nhận</th>
+                  <th class="py-3.5 px-5 min-w-[130px] text-right">Thao Tác</th>
                 </tr>
               </thead>
               <tbody id="modalOrderList" class="divide-y divide-slate-100 text-slate-800">
@@ -1005,9 +1023,9 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-5 sm:px-6 py-3.5 border-t border-slate-200 bg-white flex items-center justify-between shrink-0">
+      <div class="px-6 sm:px-7 py-4 border-t border-slate-200 bg-white flex items-center justify-between shrink-0">
         <span class="text-xs text-slate-500 font-medium">Bấm "Xem tem" để mở to toàn bộ tem in A6</span>
-        <button onclick="closeModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer transition-all shadow-2xs">
+        <button onclick="closeModal()" class="px-6 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer transition-all shadow-2xs">
           Đóng
         </button>
       </div>
@@ -1016,29 +1034,29 @@
 
   <!-- Image Zoom Modal (no-print) -->
   <div id="imageModal" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeImageModal()">
-    <div class="bg-white p-3 rounded-2xl max-w-sm w-full shadow-2xl text-center space-y-3" onclick="event.stopPropagation()">
-      <div class="overflow-hidden rounded-xl bg-slate-100 border border-slate-200">
+    <div class="bg-white p-4 rounded-3xl max-w-sm w-full shadow-2xl text-center space-y-3.5" onclick="event.stopPropagation()">
+      <div class="overflow-hidden rounded-2xl bg-slate-100 border border-slate-200">
         <img id="zoomImg" src="" alt="Ảnh sản phẩm" class="w-full h-auto object-contain max-h-[350px]" />
       </div>
       <p id="zoomTitle" class="text-xs font-bold text-slate-900 px-2 line-clamp-2"></p>
-      <button onclick="closeImageModal()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">
+      <button onclick="closeImageModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition-all cursor-pointer">
         Đóng
       </button>
     </div>
   </div>
 
   <!-- Dedicated Shipping Label Full Preview Modal (no-print) -->
-  <div id="shippingLabelModal" class="fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="closeShippingLabelModal()">
-    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+  <div id="shippingLabelModal" class="fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden no-print" onclick="closeShippingLabelModal()">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
       <!-- Header -->
-      <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white">
-        <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
-            <i data-lucide="file-badge" class="w-4.5 h-4.5"></i>
+      <div class="px-6 sm:px-7 py-5 border-b border-slate-200 flex justify-between items-center bg-white">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shadow-2xs">
+            <i data-lucide="file-badge" class="w-5 h-5"></i>
           </div>
           <div>
             <h3 class="font-extrabold text-sm sm:text-base text-slate-900" id="labelModalTracking">Mã Vận Đơn: -</h3>
-            <p class="text-xs text-slate-500 font-mono" id="labelModalOrderId">Order ID: -</p>
+            <p class="text-xs text-slate-500 font-mono mt-0.5" id="labelModalOrderId">Order ID: -</p>
           </div>
         </div>
         <button onclick="closeShippingLabelModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center cursor-pointer transition-all">
@@ -1047,53 +1065,53 @@
       </div>
 
       <!-- Body -->
-      <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+      <div class="p-6 sm:p-7 overflow-y-auto space-y-5 flex-1 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-7 items-start">
           <!-- Canvas / Image Preview (6 cols) -->
-          <div class="md:col-span-6 bg-slate-100 border border-slate-200/90 rounded-2xl p-2.5 flex flex-col items-center justify-center min-h-[320px] relative shadow-inner">
+          <div class="md:col-span-6 bg-slate-100 border border-slate-200/90 rounded-2xl p-4 flex flex-col items-center justify-center min-h-[360px] relative shadow-inner">
             <div id="labelModalCanvasContainer" class="w-full flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-xs">
-              <canvas id="labelModalCanvas" class="w-full h-auto max-h-[460px] object-contain"></canvas>
+              <canvas id="labelModalCanvas" class="w-full h-auto max-h-[480px] object-contain"></canvas>
             </div>
-            <div class="mt-2 text-[11px] text-slate-500 font-medium text-center">
+            <div class="mt-3 text-[11px] text-slate-500 font-medium text-center">
               Tem vận đơn TikTok Shop chuẩn khổ A6 (100x150mm)
             </div>
           </div>
 
           <!-- Metadata Details (6 cols) -->
-          <div class="md:col-span-6 space-y-3.5">
+          <div class="md:col-span-6 space-y-4">
             <!-- Recipient Card -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2">
               <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Thông tin người nhận</span>
               <div class="font-bold text-slate-900 text-sm" id="labelModalReceiver">-</div>
               <div class="text-slate-600 text-xs" id="labelModalWeight">Trọng lượng: -</div>
             </div>
 
             <!-- Products List Card -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5">
               <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sản phẩm trong kiện hàng</span>
-              <div id="labelModalItemsList" class="space-y-2 max-h-[160px] overflow-y-auto">
+              <div id="labelModalItemsList" class="space-y-2 max-h-[170px] overflow-y-auto">
                 <!-- dynamic items -->
               </div>
             </div>
 
             <!-- Page info & Sequence -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between text-xs">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex items-center justify-between text-xs">
               <div>
                 <span class="text-slate-500 block text-[10px] font-bold uppercase">Thứ tự in mới</span>
-                <span class="font-mono font-black text-emerald-700 text-sm" id="labelModalSeq">#1</span>
+                <span class="font-mono font-black text-emerald-700 text-base" id="labelModalSeq">#1</span>
               </div>
               <div class="text-right">
                 <span class="text-slate-500 block text-[10px] font-bold uppercase">Trang PDF gốc</span>
-                <span class="font-mono font-bold text-slate-700" id="labelModalPage">Trang 1</span>
+                <span class="font-mono font-bold text-slate-700 text-sm" id="labelModalPage">Trang 1</span>
               </div>
             </div>
 
             <!-- Quick Copy Buttons -->
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <button id="btnCopyLabelTracking" class="w-full py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer">
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <button id="btnCopyLabelTracking" class="w-full py-2.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer shadow-2xs">
                 <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i> Chép Mã VĐ
               </button>
-              <button id="btnCopyLabelOrderId" class="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer">
+              <button id="btnCopyLabelOrderId" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer shadow-2xs">
                 <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i> Chép Order ID
               </button>
             </div>
@@ -1102,11 +1120,11 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-5 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-        <button onclick="downloadCurrentLabelImage()" class="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-semibold text-xs flex items-center cursor-pointer transition-all">
+      <div class="px-6 sm:px-7 py-4 border-t border-slate-200 bg-white flex items-center justify-between">
+        <button onclick="downloadCurrentLabelImage()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold text-xs flex items-center cursor-pointer transition-all shadow-2xs">
           <i data-lucide="download" class="w-3.5 h-3.5 mr-1.5"></i> Tải ảnh tem (JPG)
         </button>
-        <button onclick="closeShippingLabelModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs cursor-pointer transition-all">
+        <button onclick="closeShippingLabelModal()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs cursor-pointer transition-all shadow-2xs">
           Đóng
         </button>
       </div>
@@ -1949,6 +1967,9 @@
       const shippingContainer = document.getElementById('shippingOrdersContainer');
       if (shippingContainer) shippingContainer.innerHTML = '';
 
+      const mismatchBanner = document.getElementById('mismatchBanner');
+      if (mismatchBanner) mismatchBanner.classList.add('hidden');
+
       switchMainTab('picking');
       showToast('Đã xóa và đặt lại toàn bộ dữ liệu!');
     });
@@ -2680,36 +2701,36 @@
         html += `
           <div class="bg-white border ${isMultiGroup ? 'border-amber-300 shadow-sm' : 'border-slate-200/90 shadow-2xs'} rounded-2xl overflow-hidden hover:border-slate-300 transition-all">
             <!-- Card Header -->
-            <div class="${isMultiGroup ? 'bg-amber-50/80 border-b border-amber-200/80' : 'bg-white border-b border-slate-200/80'} px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-              <div class="flex items-center gap-3.5 flex-1 min-w-0">
+            <div class="${isMultiGroup ? 'bg-amber-50/80 border-b border-amber-200/80' : 'bg-white border-b border-slate-200/80'} px-6 sm:px-7 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-4 flex-1 min-w-0">
                 ${prodImg ? `
-                  <div class="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 shadow-2xs shrink-0 bg-white cursor-pointer group relative" onclick="zoomImage('${escapeQuotes(prodImg)}', '${escapeQuotes(cleanedProdName)}')" title="Nhấp để phóng to ảnh sản phẩm">
-                    <img src="${prodImg}" class="w-full h-full object-contain p-0.5" alt="${escapeQuotes(cleanedProdName)}" />
+                  <div class="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 shadow-2xs shrink-0 bg-white cursor-pointer group relative" onclick="zoomImage('${escapeQuotes(prodImg)}', '${escapeQuotes(cleanedProdName)}')" title="Nhấp để phóng to ảnh sản phẩm">
+                    <img src="${prodImg}" class="w-full h-full object-contain p-1" alt="${escapeQuotes(cleanedProdName)}" />
                     <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
-                      <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                      <i data-lucide="zoom-in" class="w-4.5 h-4.5"></i>
                     </div>
                   </div>
                 ` : `
-                  <span class="w-11 h-11 rounded-xl ${isMultiGroup ? 'bg-amber-100 text-amber-800' : 'bg-rose-50 text-rose-700 border border-rose-100'} flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                    <i data-lucide="${isMultiGroup ? 'layers' : 'package'}" class="w-5 h-5"></i>
+                  <span class="w-13 h-13 rounded-2xl ${isMultiGroup ? 'bg-amber-100 text-amber-800' : 'bg-rose-50 text-rose-700 border border-rose-100'} flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                    <i data-lucide="${isMultiGroup ? 'layers' : 'package'}" class="w-6 h-6"></i>
                   </span>
                 `}
-                <div class="space-y-1 min-w-0 flex-1">
+                <div class="space-y-1.5 min-w-0 flex-1">
                   <div class="flex items-center gap-2.5 flex-wrap">
                     <h4 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-snug truncate" title="${escapeQuotes(cleanedProdName)}">${escapeHtml(cleanedProdName)}</h4>
-                    <span class="px-2.5 py-0.5 text-xs font-bold rounded-full ${isMultiGroup ? 'bg-amber-200/90 text-amber-900' : 'bg-slate-100 text-slate-800 border border-slate-200/80'} shrink-0">
+                    <span class="px-3 py-0.5 text-xs font-bold rounded-full ${isMultiGroup ? 'bg-amber-200/90 text-amber-900' : 'bg-slate-100 text-slate-800 border border-slate-200/80'} shrink-0">
                       ${ordersInGrp.length} đơn hàng
                     </span>
                   </div>
                   <div class="text-xs text-slate-600 font-medium flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span class="bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md text-slate-700 font-semibold">${skuSummary}</span>
+                    <span class="bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-lg text-slate-700 font-semibold">${skuSummary}</span>
                     <span>&bull;</span>
                     <span>Tổng SL lấy: <strong class="text-slate-900 font-bold">${totalGrpQty} món</strong></span>
                   </div>
                 </div>
               </div>
-              <div class="sm:text-right shrink-0 pl-14 sm:pl-0">
-                <div class="inline-flex flex-col sm:items-end bg-slate-50 border border-slate-200/80 px-3.5 py-1.5 rounded-xl">
+              <div class="sm:text-right shrink-0 pl-18 sm:pl-0">
+                <div class="inline-flex flex-col sm:items-end bg-slate-50 border border-slate-200/80 px-4 py-2 rounded-xl">
                   <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Thứ tự in mới</span>
                   <span class="text-xs font-black font-mono text-emerald-700">#${ordersInGrp[0].newSeq} &rarr; #${ordersInGrp[ordersInGrp.length - 1].newSeq}</span>
                 </div>
@@ -2721,15 +2742,15 @@
               <table class="w-full text-left text-xs">
                 <thead class="bg-slate-100/90 text-slate-700 font-bold border-b border-slate-200 select-none text-[11px] uppercase tracking-wider">
                   <tr>
-                    <th class="py-3 px-3 text-center w-12">STT</th>
-                    <th class="py-3 px-3 w-18 text-center">Ảnh Tem</th>
-                    <th class="py-3 px-3 w-16 text-center">Ảnh SP</th>
-                    <th class="py-3 px-3 min-w-[150px]">Phân loại / SKU</th>
-                    <th class="py-3 px-3 min-w-[170px]">Mã Vận Đơn</th>
-                    <th class="py-3 px-3 min-w-[150px]">Mã Đơn (Order ID)</th>
-                    <th class="py-3 px-3 min-w-[140px]">Người Nhận</th>
-                    <th class="py-3 px-2 text-center w-12">SL</th>
-                    <th class="py-3 px-3 min-w-[150px] text-right">Trang &amp; Thao Tác</th>
+                    <th class="py-3.5 px-4 text-center w-14">STT</th>
+                    <th class="py-3.5 px-4 w-20 text-center">Ảnh Tem</th>
+                    <th class="py-3.5 px-4 w-20 text-center">Ảnh SP</th>
+                    <th class="py-3.5 px-5 min-w-[170px]">Phân loại / SKU</th>
+                    <th class="py-3.5 px-5 min-w-[180px]">Mã Vận Đơn</th>
+                    <th class="py-3.5 px-5 min-w-[160px]">Mã Đơn (Order ID)</th>
+                    <th class="py-3.5 px-5 min-w-[150px]">Người Nhận</th>
+                    <th class="py-3.5 px-3 text-center w-14">SL</th>
+                    <th class="py-3.5 px-5 min-w-[170px] text-right">Trang &amp; Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -2751,13 +2772,13 @@
 
                     return `
                       <tr class="hover:bg-slate-50/90 transition-colors">
-                        <td class="py-3 px-3 text-center font-bold text-slate-700">
+                        <td class="py-4 px-4 text-center font-bold text-slate-700">
                           <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 text-slate-800 font-mono text-[11px] font-bold">
                             ${o.newSeq}
                           </span>
                         </td>
                         <!-- Cột 1: HÌNH PREVIEW CỦA MÃ VẬN ĐƠN (A6) -->
-                        <td class="py-2.5 px-3 text-center">
+                        <td class="py-3.5 px-4 text-center">
                           <div class="relative group cursor-pointer w-12 h-17 sm:w-14 sm:h-20 rounded-lg overflow-hidden border border-slate-200/90 bg-slate-50 shadow-2xs mx-auto shrink-0 transition-transform hover:scale-105" onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" title="Nhấp để xem to toàn bộ tem vận đơn">
                             ${o.thumbnailUrl ? `
                               <img src="${o.thumbnailUrl}" class="w-full h-full object-cover" alt="Tem ${escapeQuotes(o.tracking)}" />
@@ -2774,7 +2795,7 @@
                           </div>
                         </td>
                         <!-- Cột 2: ẢNH SẢN PHẨM (Từ Picking List) -->
-                        <td class="py-2.5 px-3 text-center">
+                        <td class="py-3.5 px-4 text-center">
                           ${rowProductImg ? `
                             <div class="relative group cursor-pointer w-11 h-11 rounded-lg overflow-hidden border border-slate-200 bg-white p-0.5 shadow-2xs mx-auto shrink-0 transition-transform hover:scale-105" onclick="zoomImage('${escapeQuotes(rowProductImg)}', '${escapeQuotes(rowProdName)}')" title="Nhấp để phóng to ảnh sản phẩm">
                               <img src="${rowProductImg}" class="w-full h-full object-contain" alt="Ảnh SP" />
@@ -2789,17 +2810,17 @@
                           `}
                         </td>
                         <!-- Cột 3: PHÂN LOẠI / SKU (Không lặp lại tên sản phẩm dài) -->
-                        <td class="py-3 px-3 text-slate-900">
+                        <td class="py-4 px-5 text-slate-900">
                           ${o.isMultiItem ? `
-                            <div class="text-[11px] font-bold text-amber-900 mb-1 flex items-center">
-                              <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-extrabold mr-1">ĐƠN ${o.items.length} MÓN</span>
+                            <div class="text-[11px] font-bold text-amber-900 mb-1.5 flex items-center">
+                              <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-extrabold mr-1.5">ĐƠN ${o.items.length} MÓN</span>
                             </div>
                             <div class="space-y-1.5 pl-0.5">
                               ${o.items.map(it => `
-                                <div class="text-xs border-l-2 border-amber-300 pl-2">
+                                <div class="text-xs border-l-2 border-amber-300 pl-2.5">
                                   <div class="font-bold text-slate-900 text-[11px] leading-snug line-clamp-1">${escapeHtml(cleanItemProductName(it.name))}</div>
                                   <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-600">
-                                    <span class="px-1.5 py-0.2 rounded bg-slate-100 font-bold text-slate-700">${escapeHtml(cleanSku(it.sku))}</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 font-bold text-slate-700">${escapeHtml(cleanSku(it.sku))}</span>
                                     <span>&bull;</span>
                                     <span class="font-black text-slate-900">x${it.qty}</span>
                                   </div>
@@ -2807,7 +2828,7 @@
                               `).join('')}
                             </div>
                           ` : `
-                            <div class="flex flex-col gap-1">
+                            <div class="flex flex-col gap-1.5">
                               <div class="inline-flex items-center">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
                                   ${escapeHtml(cleanSku(o.primarySku))}
@@ -2821,43 +2842,43 @@
                           `}
                         </td>
                         <!-- Cột 4: MÃ VẬN ĐƠN -->
-                        <td class="py-3 px-3 font-mono">
-                          <div class="flex items-center gap-1.5">
-                            <span class="font-black text-slate-900 text-xs sm:text-sm tracking-tight">${escapeHtml(o.tracking)}</span>
+                        <td class="py-4 px-5 font-mono">
+                          <div class="flex items-center gap-2">
+                            <span class="font-mono font-black text-slate-900 text-xs sm:text-sm tracking-tight bg-slate-100 px-2 py-0.5 rounded border border-slate-200 select-all">${escapeHtml(o.tracking)}</span>
                             <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép mã vận đơn">
                               <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                             </button>
                           </div>
-                          <div class="flex items-center text-[10px] text-emerald-700 font-bold mt-1 gap-1">
-                            <i data-lucide="truck" class="w-3 h-3 text-emerald-600"></i>
+                          <div class="flex items-center text-[11px] text-emerald-700 font-bold mt-1.5 gap-1">
+                            <i data-lucide="truck" class="w-3.5 h-3.5 text-emerald-600"></i>
                             <span>TikTok Express</span>
                           </div>
                         </td>
                         <!-- Cột 5: MÃ ĐƠN HÀNG (Order ID) -->
-                        <td class="py-3 px-3 font-mono text-slate-600 text-xs">
+                        <td class="py-4 px-5 font-mono text-slate-600 text-xs">
                           <div class="flex items-center gap-1.5">
-                            <span>${escapeHtml(o.orderId)}</span>
+                            <span class="select-all">${escapeHtml(o.orderId)}</span>
                             <button onclick="copyText('${escapeQuotes(o.orderId)}')" class="text-slate-400 hover:text-slate-800 p-0.5 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép Order ID">
-                              <i data-lucide="copy" class="w-3 h-3"></i>
+                              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                             </button>
                           </div>
                         </td>
                         <!-- Cột 6: NGƯỜI NHẬN & TRỌNG LƯỢNG -->
-                        <td class="py-3 px-3 text-slate-700">
-                          <div class="font-bold text-slate-900 text-xs flex items-center gap-1">
+                        <td class="py-4 px-5 text-slate-700">
+                          <div class="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                             <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                            <span class="truncate max-w-[130px]" title="${escapeQuotes(o.receiver)}">${escapeHtml(o.receiver || '-')}</span>
+                            <span class="truncate max-w-[140px]" title="${escapeQuotes(o.receiver)}">${escapeHtml(o.receiver || '-')}</span>
                           </div>
-                          ${o.weight ? `<div class="text-[11px] text-slate-500 font-medium mt-0.5 pl-4.5">${escapeHtml(o.weight)}</div>` : ''}
+                          ${o.weight ? `<div class="text-[11px] text-slate-500 font-medium mt-1 pl-5">${escapeHtml(o.weight)}</div>` : ''}
                         </td>
                         <!-- Cột 7: SL -->
-                        <td class="py-3 px-2 text-center">
-                          <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-900 text-white font-black text-xs shadow-2xs">
+                        <td class="py-4 px-3 text-center">
+                          <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-900 text-white font-black text-xs shadow-2xs">
                             ${o.totalQty}
                           </span>
                         </td>
                         <!-- Cột 8: TRANG & THAO TÁC -->
-                        <td class="py-3 px-3 text-right">
+                        <td class="py-4 px-5 text-right">
                           <div class="flex flex-col items-end gap-1.5">
                             <div class="inline-flex items-center gap-1.5 justify-end">
                               <span class="px-2 py-0.5 rounded bg-slate-100 font-mono text-[10px] text-slate-600 font-medium" title="Số trang trong file PDF gốc">
@@ -2868,8 +2889,8 @@
                                 Mới: ${pageDisplay}
                               </span>
                             </div>
-                            <button onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
-                              <i data-lucide="eye" class="w-3 h-3 mr-1 text-rose-600"></i> Xem tem
+                            <button onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
+                              <i data-lucide="eye" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i> Xem tem
                             </button>
                           </div>
                           ${isMultiPage ? '<div class="text-[10px] text-amber-700 font-bold mt-1 text-right">Đơn 2 trang</div>' : ''}
@@ -3511,6 +3532,31 @@
         resultSection.classList.remove('hidden');
       }
 
+      // Check for mismatch between Picking lists and Shipping files
+      const hasPicking = parsedFilesData.some(d => d.metadata.fileType !== 'shipping');
+      const hasShipping = (shippingOrders && shippingOrders.length > 0);
+      let matchedOrdersCount = 0;
+      if (hasPicking && hasShipping) {
+        allOrdersGlobal.forEach(id => {
+          if (orderToTrackingMap[id] && orderToTrackingMap[id] !== '-') {
+            matchedOrdersCount++;
+          }
+        });
+      }
+
+      const mismatchBanner = document.getElementById('mismatchBanner');
+      if (mismatchBanner) {
+        if (hasPicking && hasShipping && matchedOrdersCount === 0 && allOrdersGlobal.size > 0) {
+          mismatchBanner.classList.remove('hidden');
+          const mismatchDesc = document.getElementById('mismatchBannerDesc');
+          if (mismatchDesc) {
+            mismatchDesc.innerHTML = `Bạn đang nạp <strong>${allOrdersGlobal.size} đơn</strong> từ Phiếu nhặt hàng và <strong>${shippingOrders.length} đơn</strong> từ Tem vận đơn, nhưng <strong>0 đơn nào trùng mã đơn hàng</strong>. Điều này xảy ra do 2 file được xuất từ 2 ngày/đợt khác nhau trên TikTok Shop. Vui lòng kiểm tra và nạp đúng file tem vận đơn xuất cùng ngày để tự động khớp mã!`;
+          }
+        } else {
+          mismatchBanner.classList.add('hidden');
+        }
+      }
+
       updateFulfillmentProgress();
       renderCurrentView();
 
@@ -3615,14 +3661,26 @@
 
     function renderWebTrackingBadges(trackingNumbers, orderIds, productName, sku) {
       if (!trackingNumbers || trackingNumbers.length === 0) {
-        return `<span class="text-slate-400 text-xs font-mono">-</span>`;
+        const hasShipping = (shippingOrders && shippingOrders.length > 0);
+        if (hasShipping) {
+          return `
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200/70" title="Chưa khớp với file tem vận đơn đã nạp (có thể khác ngày xuất)">
+              Chưa khớp tem
+            </span>
+          `;
+        }
+        return `
+          <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 bg-slate-50 border border-slate-200/70" title="Cần nạp thêm file tem vận đơn A6 để tự động gắn mã">
+            Chưa có tem
+          </span>
+        `;
       }
       const count = trackingNumbers.length;
       if (count === 1) {
         const trk = trackingNumbers[0];
         return `
-          <div class="inline-flex items-center gap-1 bg-sky-50 text-sky-800 border border-sky-200 px-2 py-0.5 rounded text-xs font-mono font-medium max-w-[140px]" title="Mã vận đơn: ${escapeHtml(trk)}">
-            <i data-lucide="truck" class="w-3 h-3 flex-shrink-0 text-sky-600"></i>
+          <div class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg text-xs font-mono font-bold max-w-[150px] shadow-2xs" title="Mã vận đơn: ${escapeHtml(trk)}">
+            <i data-lucide="truck" class="w-3.5 h-3.5 flex-shrink-0 text-emerald-600"></i>
             <span class="truncate select-all">${escapeHtml(trk)}</span>
           </div>
         `;
@@ -3630,10 +3688,10 @@
       return `
         <button 
           onclick='showOrderListModal("${escapeQuotes(productName)}", "Mã vận đơn (${count} đơn) • Phân loại: ${escapeQuotes(sku)}", ${JSON.stringify(orderIds || [])}, ${JSON.stringify(trackingNumbers)})'
-          class="inline-flex items-center gap-1 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 px-2 py-0.5 rounded text-xs font-mono font-semibold transition-colors shadow-2xs cursor-pointer"
+          class="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all shadow-2xs cursor-pointer"
           title="Xem chi tiết ${count} mã vận đơn"
         >
-          <i data-lucide="truck" class="w-3 h-3 text-sky-600"></i>
+          <i data-lucide="truck" class="w-3.5 h-3.5 text-emerald-600"></i>
           <span>${count} mã VĐ</span>
         </button>
       `;
@@ -3716,7 +3774,7 @@
 
           return `
             <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
-              <td class="py-3 px-3 text-center no-print">
+              <td class="py-3.5 px-4 text-center no-print">
                 <input 
                   type="checkbox" 
                   ${isDone ? 'checked' : ''} 
@@ -3724,29 +3782,29 @@
                   class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
                 />
               </td>
-              <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
-              <td class="py-3 px-3 text-center text-xs font-semibold text-slate-400">${idx + 1}</td>
-              <td class="py-2.5 px-3 text-center no-print">
+              <td class="py-3.5 px-4 text-center font-bold text-xs print-only">[   ]</td>
+              <td class="py-3.5 px-4 text-center text-xs font-semibold text-slate-400">${idx + 1}</td>
+              <td class="py-3.5 px-4 text-center no-print">
                 <div class="flex justify-center">${imageThumb}</div>
               </td>
-              <td class="py-3 px-4 font-semibold text-slate-900 leading-snug">
+              <td class="py-3.5 px-5 font-semibold text-slate-900 leading-snug">
                 <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</div>
                 ${v.sellerSku && v.sellerSku !== '-' ? `<div class="text-[11px] text-slate-400 font-normal mt-0.5">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
               </td>
-              <td class="py-3 px-4">
+              <td class="py-3.5 px-5">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
                   ${pack.isBulk ? `📦 Thùng (${pack.packSize}) • ` : ''}${escapeHtml(v.sku)}
                 </span>
               </td>
-              <td class="py-3 px-4 text-center">
+              <td class="py-3.5 px-5 text-center">
                 <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs tabular-nums">
                   ${group.totalQty}
                 </span>
               </td>
-              <td class="py-3 px-3">
+              <td class="py-3.5 px-5">
                 ${renderWebTrackingBadges(v.trackingNumbers, v.orderIds, group.productName, v.sku)}
               </td>
-              <td class="py-3 px-3 text-center no-print">
+              <td class="py-3.5 px-4 text-center no-print">
                 <button 
                   onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(group.orderIds)}, ${JSON.stringify(v.trackingNumbers)})'
                   class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
@@ -3754,7 +3812,7 @@
                   ${group.orderIds.length} đơn
                 </button>
               </td>
-              <td class="py-3 px-4 no-print">
+              <td class="py-3.5 px-5 no-print">
                 <div class="flex flex-wrap items-center">
                   ${renderFileBadges(group.byFile)}
                 </div>
@@ -3772,7 +3830,7 @@
             class="bg-slate-50/90 border-t-2 border-slate-200/90 hover:bg-purple-50/20 transition-colors cursor-pointer select-none ${isAllDone ? 'bg-emerald-50/50' : ''}"
             title="${isCollapsed ? 'Bấm để mở rộng cây phân loại' : 'Bấm để thu gọn cây phân loại'}"
           >
-            <td class="py-3 px-3 text-center no-print" onclick="event.stopPropagation()">
+            <td class="py-4 px-4 text-center no-print" onclick="event.stopPropagation()">
               <input 
                 type="checkbox" 
                 ${isAllDone ? 'checked' : ''} 
@@ -3781,8 +3839,8 @@
                 class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
               />
             </td>
-            <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
-            <td class="py-3 px-3 text-center text-xs font-bold text-slate-700">
+            <td class="py-4 px-4 text-center font-bold text-xs print-only">[   ]</td>
+            <td class="py-4 px-4 text-center text-xs font-bold text-slate-700">
               <div class="inline-flex items-center justify-center gap-1.5">
                 <span class="w-5 h-5 rounded-md ${isCollapsed ? 'bg-slate-200/70 text-slate-600' : 'bg-purple-100 text-purple-700'} flex items-center justify-center transition-all">
                   <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3.5 h-3.5"></i>
@@ -3790,15 +3848,15 @@
                 <span>${idx + 1}</span>
               </div>
             </td>
-            <td class="py-2.5 px-3 text-center no-print" onclick="event.stopPropagation()">
+            <td class="py-4 px-4 text-center no-print" onclick="event.stopPropagation()">
               <div class="flex justify-center">${imageThumb}</div>
             </td>
-            <td class="py-3 px-4 font-bold text-slate-900 leading-snug">
+            <td class="py-4 px-5 font-bold text-slate-900 leading-snug">
               <div class="flex items-center space-x-2">
                 <span class="${isAllDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</span>
               </div>
               ${group.packagingInfo ? `
-                <div class="mt-2 inline-flex flex-wrap items-center gap-2 p-1.5 px-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs" onclick="event.stopPropagation()">
+                <div class="mt-2.5 inline-flex flex-wrap items-center gap-2.5 p-2 px-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs" onclick="event.stopPropagation()">
                   <span class="font-semibold text-emerald-800 flex items-center">
                     <i data-lucide="package-check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
                     Lấy thực tế: <strong class="ml-1">${escapeHtml(group.packagingInfo.actualPickText)}</strong>
@@ -3810,22 +3868,22 @@
                 </div>
               ` : ''}
             </td>
-            <td class="py-3 px-4">
+            <td class="py-4 px-5">
               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-2xs ${isCollapsed ? 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200' : 'bg-purple-100/90 text-purple-800 border border-purple-300 hover:bg-purple-200'}">
                 <i data-lucide="${isCollapsed ? 'folder' : 'folder-open'}" class="w-3.5 h-3.5 ${isCollapsed ? 'text-slate-500' : 'text-purple-700'}"></i>
                 <span>Gộp ${group.variants.length} phân loại</span>
                 <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3 h-3 ml-0.5 opacity-70"></i>
               </div>
             </td>
-            <td class="py-3 px-4 text-center">
+            <td class="py-4 px-5 text-center">
               <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs tabular-nums" title="Tổng các phân loại">
                 ${group.totalQty}
               </span>
             </td>
-            <td class="py-3 px-3" onclick="event.stopPropagation()">
+            <td class="py-4 px-5" onclick="event.stopPropagation()">
               ${renderWebTrackingBadges(group.trackingNumbers, group.orderIds, group.productName, 'Tất cả phân loại')}
             </td>
-            <td class="py-3 px-3 text-center no-print" onclick="event.stopPropagation()">
+            <td class="py-4 px-4 text-center no-print" onclick="event.stopPropagation()">
               <button 
                 onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ đơn hàng (${group.variants.length} phân loại)", ${JSON.stringify(group.orderIds)}, ${JSON.stringify(group.trackingNumbers)})'
                 class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
@@ -3833,7 +3891,7 @@
                 ${group.orderIds.length} đơn
               </button>
             </td>
-            <td class="py-3 px-4 no-print" onclick="event.stopPropagation()">
+            <td class="py-4 px-5 no-print" onclick="event.stopPropagation()">
               <div class="flex flex-wrap items-center">
                 ${renderFileBadges(group.byFile)}
               </div>
@@ -3848,7 +3906,7 @@
 
           return `
             <tr class="bg-slate-50/50 hover:bg-slate-100/70 transition-colors border-t border-slate-100 ${isVdone ? 'bg-emerald-50/40' : ''}">
-              <td class="py-2.5 px-3 text-center no-print">
+              <td class="py-3.5 px-4 text-center no-print">
                 <input 
                   type="checkbox" 
                   ${isVdone ? 'checked' : ''} 
@@ -3856,18 +3914,18 @@
                   class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
                 />
               </td>
-              <td class="py-2.5 px-3 text-center font-bold text-xs print-only">[   ]</td>
-              <td class="py-2.5 px-3 text-center">
+              <td class="py-3.5 px-4 text-center font-bold text-xs print-only">[   ]</td>
+              <td class="py-3.5 px-4 text-center">
                 <span class="inline-flex items-center justify-center min-w-[32px] px-1.5 py-0.5 rounded text-[11px] font-mono font-semibold text-slate-500 bg-white border border-slate-200/90 shadow-2xs">
                   ${subIndex}
                 </span>
               </td>
-              <td class="py-2.5 px-3 text-center no-print text-slate-400">
+              <td class="py-3.5 px-4 text-center no-print text-slate-400">
                 <div class="flex justify-center items-center">
                   <i data-lucide="corner-down-right" class="w-3.5 h-3.5"></i>
                 </div>
               </td>
-              <td class="py-2.5 px-4 font-semibold text-slate-800 text-xs sm:text-sm">
+              <td class="py-3.5 px-5 font-semibold text-slate-800 text-xs sm:text-sm">
                 <div class="flex items-center gap-1.5 pl-2">
                   <span class="${isVdone ? 'line-through text-slate-400' : 'text-slate-800 font-semibold'}">${escapeHtml(v.sku)}</span>
                 </div>
@@ -3875,7 +3933,7 @@
                   <div class="text-[11px] text-slate-400 font-normal mt-0.5 pl-6">Mã SKU: ${escapeHtml(v.sellerSku)}</div>
                 ` : ''}
               </td>
-              <td class="py-2.5 px-4">
+              <td class="py-3.5 px-5">
                 ${pack.isBulk ? `
                   <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs">
                     <i data-lucide="boxes" class="w-3 h-3 mr-1 text-purple-600"></i>
@@ -3887,15 +3945,15 @@
                   </span>
                 `}
               </td>
-              <td class="py-2.5 px-4 text-center">
+              <td class="py-3.5 px-5 text-center">
                 <span class="inline-flex items-center justify-center min-w-[42px] px-2.5 py-0.5 rounded-lg text-xs font-black bg-white text-slate-900 border border-slate-200/90 shadow-2xs tabular-nums">
                   ${v.totalQty}
                 </span>
               </td>
-              <td class="py-2.5 px-3">
+              <td class="py-3.5 px-5">
                 ${renderWebTrackingBadges(v.trackingNumbers, v.orderIds, group.productName, v.sku)}
               </td>
-              <td class="py-2.5 px-3 text-center no-print">
+              <td class="py-3.5 px-4 text-center no-print">
                 <button 
                   onclick='showOrderListModal("${escapeQuotes(v.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(v.orderIds)}, ${JSON.stringify(v.trackingNumbers)})' 
                   class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
@@ -3903,7 +3961,7 @@
                   ${v.orderIds.length} đơn
                 </button>
               </td>
-              <td class="py-2.5 px-4 no-print">
+              <td class="py-3.5 px-5 no-print">
                 <div class="flex flex-wrap items-center">
                   ${renderFileBadges(v.byFile)}
                 </div>
@@ -3947,7 +4005,7 @@
 
         return `
           <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
-            <td class="py-3 px-3 text-center no-print">
+            <td class="py-3.5 px-4 text-center no-print">
               <input 
                 type="checkbox" 
                 ${isDone ? 'checked' : ''} 
@@ -3955,32 +4013,32 @@
                 class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
               />
             </td>
-            <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
-            <td class="py-3 px-3 text-center text-xs font-semibold text-slate-400">${idx + 1}</td>
-            <td class="py-2.5 px-3 text-center no-print">
+            <td class="py-3.5 px-4 text-center font-bold text-xs print-only">[   ]</td>
+            <td class="py-3.5 px-4 text-center text-xs font-semibold text-slate-400">${idx + 1}</td>
+            <td class="py-3.5 px-4 text-center no-print">
               <div class="flex justify-center">${imageThumb}</div>
             </td>
-            <td class="py-3 px-4 font-semibold text-slate-900 leading-snug">
+            <td class="py-3.5 px-5 font-semibold text-slate-900 leading-snug">
               <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(item.productName)}</div>
               ${item.sellerSku && item.sellerSku !== '-' ? `<span class="text-[11px] text-slate-400 font-normal mt-0.5 block">Mã SKU: ${escapeHtml(item.sellerSku)}</span>` : ''}
             </td>
-            <td class="py-3 px-4">
+            <td class="py-3.5 px-5">
               <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
                 ${pack.isBulk ? `<i data-lucide="boxes" class="w-3.5 h-3.5 mr-1.5 text-purple-600"></i>` : ''}${escapeHtml(item.sku)}
               </span>
             </td>
-            <td class="py-3 px-4 text-center">
+            <td class="py-3.5 px-5 text-center">
               <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs tabular-nums">
                 ${item.totalQty}
               </span>
             </td>
-            <td class="py-3 px-3">
+            <td class="py-3.5 px-5">
               ${renderWebTrackingBadges(item.trackingNumbers, item.orderIds, item.productName, item.sku)}
             </td>
-            <td class="py-3 px-3 text-center no-print">
+            <td class="py-3.5 px-4 text-center no-print">
               ${orderBtn}
             </td>
-            <td class="py-3 px-4 no-print">
+            <td class="py-3.5 px-5 no-print">
               <div class="flex flex-wrap items-center">
                 ${fileBadges}
               </div>
@@ -4009,9 +4067,9 @@
         `;
 
         return `
-          <div class="p-4 rounded-2xl border transition-all duration-200 ${isAllDone ? 'bg-emerald-50/50 border-emerald-300' : 'bg-white border-slate-200 shadow-xs hover:border-slate-300'} flex flex-col justify-between space-y-3">
+          <div class="p-5 rounded-2xl border transition-all duration-200 ${isAllDone ? 'bg-emerald-50/50 border-emerald-300' : 'bg-white border-slate-200/90 shadow-2xs hover:border-slate-300'} flex flex-col justify-between space-y-4">
             
-            <div class="flex items-start gap-3">
+            <div class="flex items-start gap-3.5">
               ${imageThumb}
 
               <div class="flex-1 min-w-0">
@@ -4038,7 +4096,7 @@
 
             <!-- Smart Packaging Conversion Banner -->
             ${group.packagingInfo ? `
-              <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-1">
+              <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-1">
                 <div class="font-bold text-emerald-900 flex items-center">
                   <i data-lucide="boxes" class="w-4 h-4 mr-1.5 text-emerald-600 flex-shrink-0"></i>
                   <span>Lấy thực tế: ${escapeHtml(group.packagingInfo.actualPickText)}</span>
@@ -4052,12 +4110,12 @@
 
             <!-- Multi-Variant Sub-checklist -->
             ${group.variants.length > 1 ? `
-              <div class="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
                 ${group.variants.map(v => {
                   const isVdone = checkedItemKeys.has(v.key);
                   const pack = parseSkuPackagingType(v.sku, group.productName);
                   return `
-                    <div class="flex items-center justify-between p-1.5 px-2 rounded-lg ${isVdone ? 'bg-emerald-100/50 text-slate-400' : 'bg-white border border-slate-200 text-slate-800'} text-xs">
+                    <div class="flex items-center justify-between p-2 px-2.5 rounded-lg ${isVdone ? 'bg-emerald-100/50 text-slate-400' : 'bg-white border border-slate-200 text-slate-800'} text-xs">
                       <label class="flex items-center space-x-2 cursor-pointer flex-1 min-w-0 pr-2">
                         <input 
                           type="checkbox" 
@@ -4084,7 +4142,7 @@
             `}
 
             <!-- Source Files -->
-            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center">
+            <div class="pt-2.5 border-t border-slate-100 flex flex-wrap items-center">
               ${renderFileBadges(group.byFile)}
             </div>
 
@@ -4123,9 +4181,9 @@
         `;
 
         return `
-          <div class="p-4 rounded-2xl border transition-all duration-200 ${isDone ? 'bg-emerald-50/50 border-emerald-300' : 'bg-white border-slate-200 shadow-xs hover:border-slate-300'} flex flex-col justify-between space-y-3">
+          <div class="p-5 rounded-2xl border transition-all duration-200 ${isDone ? 'bg-emerald-50/50 border-emerald-300' : 'bg-white border-slate-200/90 shadow-2xs hover:border-slate-300'} flex flex-col justify-between space-y-4">
             
-            <div class="flex items-start gap-3">
+            <div class="flex items-start gap-3.5">
               ${imageThumb}
 
               <div class="flex-1 min-w-0">
@@ -4156,7 +4214,7 @@
             </div>
 
             <!-- Source files -->
-            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center">
+            <div class="pt-2.5 border-t border-slate-100 flex flex-wrap items-center">
               ${fileBadges}
             </div>
 
@@ -4211,8 +4269,17 @@
 
       const noticeEl = document.getElementById('modalNoShippingNotice');
       if (noticeEl) {
-        if (matchedCount === 0 && (!shippingOrders || shippingOrders.length === 0)) {
+        if (matchedCount === 0) {
           noticeEl.classList.remove('hidden');
+          const noticeTitle = document.getElementById('modalNoticeTitle');
+          const noticeDesc = document.getElementById('modalNoticeDesc');
+          if (!shippingOrders || shippingOrders.length === 0) {
+            if (noticeTitle) noticeTitle.textContent = 'Chưa tải file tem vận đơn (Shipping label)';
+            if (noticeDesc) noticeDesc.innerHTML = 'Bạn đang xem danh sách đơn từ <strong>Phiếu nhặt hàng (Picking list)</strong>. Để xem mã vận đơn, người nhận và ảnh tem A6, hãy kéo thả file <code class="bg-amber-100 px-1 py-0.2 rounded font-mono text-[11px]">Shipping label+Packing slip.pdf</code> vào trang web!';
+          } else {
+            if (noticeTitle) noticeTitle.textContent = 'Lệch ngày xuất file: Chưa khớp mã vận đơn';
+            if (noticeDesc) noticeDesc.innerHTML = `File tem vận đơn hiện tại (<strong>${shippingOrders.length} đơn</strong>) không chứa các mã đơn hàng này do khác ngày/đợt xuất trên TikTok Shop. Vui lòng nạp đúng file tem vận đơn cùng đợt xuất để tự động khớp mã!`;
+          }
         } else {
           noticeEl.classList.add('hidden');
         }
@@ -4241,13 +4308,13 @@
           return `
             <tr class="hover:bg-slate-50/90 transition-colors">
               <!-- STT -->
-              <td class="py-3 px-3 text-center font-bold text-slate-700">
+              <td class="py-3.5 px-4 text-center font-bold text-slate-700">
                 <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 text-slate-800 font-mono text-[11px] font-bold">
                   ${i + 1}
                 </span>
               </td>
               <!-- ẢNH TEM (A6 Preview) -->
-              <td class="py-2.5 px-3 text-center">
+              <td class="py-3 px-4 text-center">
                 <div class="relative group cursor-pointer w-12 h-17 sm:w-14 sm:h-20 rounded-lg overflow-hidden border border-slate-200/90 bg-slate-50 shadow-2xs mx-auto shrink-0 transition-transform hover:scale-105" onclick="openShippingLabelModal('${escapeQuotes(id)}')" title="Nhấp để xem to toàn bộ tem vận đơn">
                   ${thumbUrl ? `
                     <img src="${thumbUrl}" class="w-full h-full object-cover" alt="Tem ${escapeQuotes(trk)}" />
@@ -4264,52 +4331,52 @@
                 </div>
               </td>
               <!-- MÃ VẬN ĐƠN -->
-              <td class="py-3 px-3 font-mono">
+              <td class="py-3.5 px-5 font-mono">
                 ${hasTrack ? `
-                  <div class="flex items-center gap-1.5">
-                    <span class="font-black text-slate-900 text-xs sm:text-sm tracking-tight">${escapeHtml(trk)}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono font-black text-slate-900 text-xs sm:text-sm tracking-tight bg-slate-100 px-2 py-0.5 rounded border border-slate-200 select-all">${escapeHtml(trk)}</span>
                     <button onclick="copyText('${escapeQuotes(trk)}')" class="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép mã vận đơn">
                       <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                     </button>
                   </div>
-                  <div class="flex items-center text-[10px] text-emerald-700 font-bold mt-1 gap-1">
-                    <i data-lucide="truck" class="w-3 h-3 text-emerald-600"></i>
+                  <div class="flex items-center text-[11px] text-emerald-700 font-bold mt-1.5 gap-1">
+                    <i data-lucide="truck" class="w-3.5 h-3.5 text-emerald-600"></i>
                     <span>TikTok Express</span>
                   </div>
                 ` : `
-                  <div class="space-y-0.5">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
-                      Chưa có mã VĐ
+                  <div class="space-y-1">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${shippingOrders && shippingOrders.length > 0 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
+                      ${shippingOrders && shippingOrders.length > 0 ? 'Chưa khớp tem' : 'Chưa có mã VĐ'}
                     </span>
-                    <div class="text-[10px] text-slate-400">Kéo file tem để khớp</div>
+                    <div class="text-[11px] text-slate-400">${shippingOrders && shippingOrders.length > 0 ? 'Khác ngày/đợt xuất' : 'Kéo file tem để khớp'}</div>
                   </div>
                 `}
               </td>
               <!-- MÃ ĐƠN (ORDER ID) -->
-              <td class="py-3 px-3 font-mono text-slate-700 text-xs">
+              <td class="py-3.5 px-5 font-mono text-slate-700 text-xs">
                 <div class="flex items-center gap-1.5">
-                  <span class="font-semibold text-slate-900">${escapeHtml(id)}</span>
+                  <span class="font-semibold text-slate-900 select-all">${escapeHtml(id)}</span>
                   <button onclick="copyText('${escapeQuotes(id)}')" class="text-slate-400 hover:text-slate-800 p-0.5 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép Order ID">
                     <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
               </td>
               <!-- NGƯỜI NHẬN & TRỌNG LƯỢNG -->
-              <td class="py-3 px-3 text-slate-700">
-                <div class="font-bold text-slate-900 text-xs flex items-center gap-1">
+              <td class="py-3.5 px-5 text-slate-700">
+                <div class="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                   <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                  <span class="truncate max-w-[140px]" title="${escapeQuotes(receiver)}">${escapeHtml(receiver || '-')}</span>
+                  <span class="truncate max-w-[150px]" title="${escapeQuotes(receiver)}">${escapeHtml(receiver || '-')}</span>
                 </div>
-                ${weight ? `<div class="text-[11px] text-slate-500 font-medium mt-0.5 pl-4.5">${escapeHtml(weight)}</div>` : ''}
+                ${weight ? `<div class="text-[11px] text-slate-500 font-medium mt-1 pl-5">${escapeHtml(weight)}</div>` : ''}
               </td>
               <!-- THAO TÁC -->
-              <td class="py-3 px-3 text-right">
+              <td class="py-3.5 px-5 text-right">
                 ${(hasTrack || hasFullLabel || thumbUrl) ? `
-                  <button onclick="openShippingLabelModal('${escapeQuotes(id)}')" class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
-                    <i data-lucide="eye" class="w-3 h-3 mr-1 text-rose-600"></i> Xem tem
+                  <button onclick="openShippingLabelModal('${escapeQuotes(id)}')" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
+                    <i data-lucide="eye" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i> Xem tem
                   </button>
                 ` : `
-                  <span class="text-[10px] text-slate-400 font-medium">Chờ file tem</span>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] text-slate-400 bg-slate-50 border border-slate-200/70 font-medium">Chờ file tem</span>
                 `}
               </td>
             </tr>
