@@ -575,7 +575,21 @@
                 <th scope="col" class="py-3 px-3 text-center w-14">STT</th>
                 <th scope="col" class="py-3 px-3 text-center w-16 no-print">Ảnh</th>
                 <th scope="col" class="py-3 px-4 min-w-[300px]">Tên sản phẩm</th>
-                <th scope="col" class="py-3 px-4 min-w-[160px]">Quy cách / Phân loại</th>
+                <th scope="col" class="py-3 px-4 min-w-[200px]">
+                  <div class="flex items-center justify-between gap-2">
+                    <span>Quy cách / Phân loại</span>
+                    <button 
+                      type="button" 
+                      id="toggleAllTreeBtn" 
+                      onclick="toggleAllGroupsCollapse()" 
+                      class="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md transition-all shadow-2xs no-print cursor-pointer"
+                      title="Thu gọn hoặc mở rộng tất cả các nhánh phân loại con"
+                    >
+                      <i data-lucide="chevrons-up" class="w-3 h-3"></i>
+                      <span id="toggleAllTreeText">Thu gọn cây</span>
+                    </button>
+                  </div>
+                </th>
                 <th scope="col" class="py-3 px-4 text-center min-w-[130px] font-bold text-slate-800">TỔNG SỐ LƯỢNG</th>
                 <th scope="col" class="py-3 px-3 text-center min-w-[95px] no-print">Xem đơn</th>
                 <th scope="col" class="py-3 px-4 min-w-[180px] no-print">Nguồn từng file PDF</th>
@@ -704,6 +718,7 @@
     let groupedProducts = [];
     let globalStats = { totalFiles: 0, totalOrders: 0, uniqueProducts: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
     let checkedItemKeys = new Set();
+    let collapsedGroupKeys = new Set();
     let currentFilter = 'all'; // 'all', 'pending', 'done', 'bulk'
     let currentView = 'table'; // 'table', 'card'
     let groupViewMode = 'grouped'; // 'grouped' (Parent-Child) or 'flat' (Individual SKUs)
@@ -876,6 +891,7 @@
       groupedProducts = [];
       globalStats = { totalFiles: 0, totalOrders: 0, uniqueProducts: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
       checkedItemKeys.clear();
+      collapsedGroupKeys.clear();
       fileInput.value = '';
       fileChipsContainer.classList.add('hidden');
       statsSection.classList.add('hidden');
@@ -988,6 +1004,26 @@
         grp.variants.forEach(v => checkedItemKeys.add(v.key));
       }
       updateFulfillmentProgress();
+      renderCurrentView();
+    };
+
+    window.toggleGroupCollapse = function(productName) {
+      if (collapsedGroupKeys.has(productName)) {
+        collapsedGroupKeys.delete(productName);
+      } else {
+        collapsedGroupKeys.add(productName);
+      }
+      renderCurrentView();
+    };
+
+    window.toggleAllGroupsCollapse = function() {
+      const multiGroups = groupedProducts.filter(g => g.variants && g.variants.length > 1);
+      const allCollapsed = multiGroups.length > 0 && multiGroups.every(g => collapsedGroupKeys.has(g.productName));
+      if (allCollapsed) {
+        collapsedGroupKeys.clear();
+      } else {
+        multiGroups.forEach(g => collapsedGroupKeys.add(g.productName));
+      }
       renderCurrentView();
     };
 
@@ -1498,6 +1534,22 @@
           renderFlatCards(items);
         }
       }
+
+      // Update header toggle button state for Tree mode
+      const toggleAllBtn = document.getElementById('toggleAllTreeBtn');
+      if (toggleAllBtn) {
+        if (groupViewMode !== 'grouped') {
+          toggleAllBtn.classList.add('hidden');
+        } else {
+          toggleAllBtn.classList.remove('hidden');
+          const multiGroups = groupedProducts.filter(g => g.variants && g.variants.length > 1);
+          const allCollapsed = multiGroups.length > 0 && multiGroups.every(g => collapsedGroupKeys.has(g.productName));
+          toggleAllBtn.innerHTML = allCollapsed
+            ? `<i data-lucide="chevrons-down" class="w-3 h-3"></i><span id="toggleAllTreeText">Mở rộng cây</span>`
+            : `<i data-lucide="chevrons-up" class="w-3 h-3"></i><span id="toggleAllTreeText">Thu gọn cây</span>`;
+        }
+      }
+
       lucide.createIcons();
     }
 
@@ -1572,10 +1624,16 @@
           `;
         }
 
-        // Case B: Multi-Variant Product (Parent Row + Indented Child Rows)
+        // Case B: Multi-Variant Product (Collapsible Tree View)
+        const isCollapsed = collapsedGroupKeys.has(group.productName);
+
         const parentRow = `
-          <tr class="bg-slate-50/80 border-t border-slate-200 hover:bg-slate-100/60 transition-colors ${isAllDone ? 'bg-emerald-50/50' : ''}">
-            <td class="py-3 px-3 text-center no-print">
+          <tr 
+            onclick="toggleGroupCollapse('${escapeQuotes(group.productName)}')"
+            class="bg-slate-50/90 border-t-2 border-slate-200/90 hover:bg-slate-100/80 transition-colors cursor-pointer select-none ${isAllDone ? 'bg-emerald-50/50' : ''}"
+            title="${isCollapsed ? 'Nhấn để mở rộng cây phân loại con' : 'Nhấn để thu gọn cây phân loại con'}"
+          >
+            <td class="py-3 px-3 text-center no-print" onclick="event.stopPropagation()">
               <input 
                 type="checkbox" 
                 ${isAllDone ? 'checked' : ''} 
@@ -1586,9 +1644,14 @@
             </td>
             <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
             <td class="py-3 px-3 text-center text-xs font-bold text-slate-700">
-              ${idx + 1}
+              <div class="inline-flex items-center justify-center gap-1">
+                <span class="w-5 h-5 rounded hover:bg-slate-200/80 text-slate-600 flex items-center justify-center transition-transform">
+                  <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3.5 h-3.5 text-slate-700"></i>
+                </span>
+                <span>${idx + 1}</span>
+              </div>
             </td>
-            <td class="py-2.5 px-3 text-center no-print">
+            <td class="py-2.5 px-3 text-center no-print" onclick="event.stopPropagation()">
               <div class="flex justify-center">${imageThumb}</div>
             </td>
             <td class="py-3 px-4 font-bold text-slate-900 leading-snug">
@@ -1596,7 +1659,7 @@
                 <span class="${isAllDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</span>
               </div>
               ${group.packagingInfo ? `
-                <div class="mt-2 inline-flex flex-wrap items-center gap-2 p-1.5 px-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs">
+                <div class="mt-2 inline-flex flex-wrap items-center gap-2 p-1.5 px-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs" onclick="event.stopPropagation()">
                   <span class="font-semibold text-emerald-800 flex items-center">
                     <i data-lucide="package-check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
                     Lấy thực tế: <strong class="ml-1">${escapeHtml(group.packagingInfo.actualPickText)}</strong>
@@ -1609,16 +1672,18 @@
               ` : ''}
             </td>
             <td class="py-3 px-4">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">
-                Gộp ${group.variants.length} phân loại
-              </span>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-2xs ${isCollapsed ? 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200' : 'bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100'}">
+                <i data-lucide="${isCollapsed ? 'folder' : 'folder-open'}" class="w-3.5 h-3.5 ${isCollapsed ? 'text-slate-500' : 'text-purple-600'}"></i>
+                <span>Gộp ${group.variants.length} phân loại</span>
+                <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3 h-3 ml-0.5 opacity-60"></i>
+              </div>
             </td>
             <td class="py-3 px-4 text-center">
               <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs tabular-nums" title="Tổng các phân loại">
                 ${group.totalQty}
               </span>
             </td>
-            <td class="py-3 px-3 text-center no-print">
+            <td class="py-3 px-3 text-center no-print" onclick="event.stopPropagation()">
               <button 
                 onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ đơn hàng (${group.variants.length} phân loại)", ${JSON.stringify(group.orderIds)})'
                 class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
@@ -1626,7 +1691,7 @@
                 ${group.orderIds.length} đơn
               </button>
             </td>
-            <td class="py-3 px-4 no-print">
+            <td class="py-3 px-4 no-print" onclick="event.stopPropagation()">
               <div class="flex flex-wrap items-center">
                 ${renderFileBadges(group.byFile)}
               </div>
@@ -1634,12 +1699,17 @@
           </tr>
         `;
 
+        if (isCollapsed) {
+          return parentRow;
+        }
+
         const childRows = group.variants.map((v, vIdx) => {
           const isVdone = checkedItemKeys.has(v.key);
           const pack = parseSkuPackagingType(v.sku);
+          const isLastVar = (vIdx === group.variants.length - 1);
 
           return `
-            <tr class="bg-white hover:bg-slate-50/70 transition-colors ${isVdone ? 'bg-emerald-50/30' : ''}">
+            <tr class="bg-slate-50/25 hover:bg-purple-50/30 transition-colors border-l-4 border-l-purple-300 ${isVdone ? 'bg-emerald-50/30' : ''}">
               <td class="py-2.5 px-3 text-center no-print">
                 <input 
                   type="checkbox" 
@@ -1649,8 +1719,10 @@
                 />
               </td>
               <td class="py-2.5 px-3 text-center font-bold text-xs print-only">[   ]</td>
-              <td class="py-2.5 px-3 text-center text-xs font-mono font-medium text-slate-400">
-                ↳ ${idx + 1}.${vIdx + 1}
+              <td class="py-2.5 px-3 text-center">
+                <span class="inline-flex items-center justify-center min-w-[34px] px-1.5 py-0.5 rounded text-[11px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200">
+                  ${idx + 1}.${vIdx + 1}
+                </span>
               </td>
               <td class="py-2.5 px-3 text-center no-print">
                 <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
@@ -1658,13 +1730,26 @@
                 </div>
               </td>
               <td class="py-2.5 px-4 text-xs font-medium text-slate-700">
-                <div class="flex items-center space-x-2 pl-2">
-                  <span class="text-slate-400 font-mono text-xs select-none">↳</span>
-                  <span class="font-semibold text-slate-800 text-xs ${isVdone ? 'line-through text-slate-400' : ''}">${escapeHtml(v.sku)}</span>
+                <div class="flex items-center pl-1">
+                  <!-- Tree branch guide connector -->
+                  <div class="w-5 h-5 mr-1.5 flex items-center justify-center text-slate-400 flex-shrink-0">
+                    ${isLastVar ? `
+                      <svg class="w-4 h-4 text-slate-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 0v7a2 2 0 002 2h7" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    ` : `
+                      <svg class="w-4 h-4 text-slate-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 0v16 M5 8a2 2 0 002 2h7" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    `}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <span class="font-bold text-slate-800 text-xs ${isVdone ? 'line-through text-slate-400' : ''}">${escapeHtml(v.sku)}</span>
+                    ${v.sellerSku && v.sellerSku !== '-' ? `
+                      <div class="text-[11px] text-slate-400 mt-0.5 font-normal">Mã SKU: ${escapeHtml(v.sellerSku)}</div>
+                    ` : ''}
+                  </div>
                 </div>
-                ${v.sellerSku && v.sellerSku !== '-' ? `
-                  <div class="text-[11px] text-slate-400 mt-0.5 pl-6 font-normal">Mã SKU: ${escapeHtml(v.sellerSku)}</div>
-                ` : ''}
               </td>
               <td class="py-2.5 px-4">
                 ${pack.isBulk ? `
