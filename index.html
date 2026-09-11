@@ -489,6 +489,17 @@
               </button>
             </div>
 
+            <!-- Tree Expand/Collapse Button (Only in Grouped Mode) -->
+            <button 
+              id="toggleAllTreeBtn" 
+              onclick="toggleAllGroupsCollapse()" 
+              class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Thu gọn hoặc mở rộng toàn bộ các nhánh phân loại con"
+            >
+              <i data-lucide="chevrons-up" class="w-3.5 h-3.5 text-purple-600"></i>
+              <span id="toggleAllTreeText">Thu gọn cây</span>
+            </button>
+
             <!-- Sort Selector -->
             <div class="flex items-center">
               <select 
@@ -575,21 +586,7 @@
                 <th scope="col" class="py-3 px-3 text-center w-14">STT</th>
                 <th scope="col" class="py-3 px-3 text-center w-16 no-print">Ảnh</th>
                 <th scope="col" class="py-3 px-4 min-w-[300px]">Tên sản phẩm</th>
-                <th scope="col" class="py-3 px-4 min-w-[200px]">
-                  <div class="flex items-center justify-between gap-2">
-                    <span>Quy cách / Phân loại</span>
-                    <button 
-                      type="button" 
-                      id="toggleAllTreeBtn" 
-                      onclick="toggleAllGroupsCollapse()" 
-                      class="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md transition-all shadow-2xs no-print cursor-pointer"
-                      title="Thu gọn hoặc mở rộng tất cả các nhánh phân loại con"
-                    >
-                      <i data-lucide="chevrons-up" class="w-3 h-3"></i>
-                      <span id="toggleAllTreeText">Thu gọn cây</span>
-                    </button>
-                  </div>
-                </th>
+                <th scope="col" class="py-3 px-4 min-w-[160px]">Quy cách / Phân loại</th>
                 <th scope="col" class="py-3 px-4 text-center min-w-[130px] font-bold text-slate-800">TỔNG SỐ LƯỢNG</th>
                 <th scope="col" class="py-3 px-3 text-center min-w-[95px] no-print">Xem đơn</th>
                 <th scope="col" class="py-3 px-4 min-w-[180px] no-print">Nguồn từng file PDF</th>
@@ -966,6 +963,10 @@
           groupBtn.innerHTML = '<i data-lucide="layers" class="w-3.5 h-3.5 text-slate-400"></i><span>Gom Nhóm</span>';
         }
         lucide.createIcons();
+      }
+      const toggleAllBtn = document.getElementById('toggleAllTreeBtn');
+      if (toggleAllBtn) {
+        toggleAllBtn.classList.toggle('hidden', mode !== 'grouped');
       }
       updateFulfillmentProgress();
       renderCurrentView();
@@ -1624,14 +1625,14 @@
           `;
         }
 
-        // Case B: Multi-Variant Product (Collapsible Tree View)
+        // Case B: Multi-Variant Product (Collapsible Tree Card View)
         const isCollapsed = collapsedGroupKeys.has(group.productName);
 
         const parentRow = `
           <tr 
             onclick="toggleGroupCollapse('${escapeQuotes(group.productName)}')"
-            class="bg-slate-50/90 border-t-2 border-slate-200/90 hover:bg-slate-100/80 transition-colors cursor-pointer select-none ${isAllDone ? 'bg-emerald-50/50' : ''}"
-            title="${isCollapsed ? 'Nhấn để mở rộng cây phân loại con' : 'Nhấn để thu gọn cây phân loại con'}"
+            class="bg-slate-50/90 border-t-2 border-slate-200/90 hover:bg-purple-50/20 transition-colors cursor-pointer select-none ${isAllDone ? 'bg-emerald-50/50' : ''}"
+            title="${isCollapsed ? 'Bấm để mở rộng cây phân loại' : 'Bấm để thu gọn cây phân loại'}"
           >
             <td class="py-3 px-3 text-center no-print" onclick="event.stopPropagation()">
               <input 
@@ -1644,9 +1645,9 @@
             </td>
             <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
             <td class="py-3 px-3 text-center text-xs font-bold text-slate-700">
-              <div class="inline-flex items-center justify-center gap-1">
-                <span class="w-5 h-5 rounded hover:bg-slate-200/80 text-slate-600 flex items-center justify-center transition-transform">
-                  <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3.5 h-3.5 text-slate-700"></i>
+              <div class="inline-flex items-center justify-center gap-1.5">
+                <span class="w-5 h-5 rounded-md ${isCollapsed ? 'bg-slate-200/70 text-slate-600' : 'bg-purple-100 text-purple-700'} flex items-center justify-center transition-all">
+                  <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3.5 h-3.5"></i>
                 </span>
                 <span>${idx + 1}</span>
               </div>
@@ -1672,10 +1673,10 @@
               ` : ''}
             </td>
             <td class="py-3 px-4">
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-2xs ${isCollapsed ? 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200' : 'bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100'}">
-                <i data-lucide="${isCollapsed ? 'folder' : 'folder-open'}" class="w-3.5 h-3.5 ${isCollapsed ? 'text-slate-500' : 'text-purple-600'}"></i>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-2xs ${isCollapsed ? 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200' : 'bg-purple-100/90 text-purple-800 border border-purple-300 hover:bg-purple-200'}">
+                <i data-lucide="${isCollapsed ? 'folder' : 'folder-open'}" class="w-3.5 h-3.5 ${isCollapsed ? 'text-slate-500' : 'text-purple-700'}"></i>
                 <span>Gộp ${group.variants.length} phân loại</span>
-                <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3 h-3 ml-0.5 opacity-60"></i>
+                <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3 h-3 ml-0.5 opacity-70"></i>
               </div>
             </td>
             <td class="py-3 px-4 text-center">
@@ -1703,89 +1704,115 @@
           return parentRow;
         }
 
-        const childRows = group.variants.map((v, vIdx) => {
-          const isVdone = checkedItemKeys.has(v.key);
-          const pack = parseSkuPackagingType(v.sku);
-          const isLastVar = (vIdx === group.variants.length - 1);
+        const childPanel = `
+          <tr class="bg-slate-50/50 border-b border-slate-200 no-print">
+            <td colspan="9" class="p-0">
+              <div class="py-3 px-3 sm:px-6 bg-slate-50/70 flex items-start">
+                <!-- Visual Tree Branch L-Connector Line -->
+                <div class="flex-shrink-0 w-8 flex justify-center pt-2 select-none" aria-hidden="true">
+                  <svg class="w-6 h-7 text-purple-400" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M6 0v18a4 4 0 004 4h14" stroke-linecap="round"/>
+                  </svg>
+                </div>
 
-          return `
-            <tr class="bg-slate-50/25 hover:bg-purple-50/30 transition-colors border-l-4 border-l-purple-300 ${isVdone ? 'bg-emerald-50/30' : ''}">
-              <td class="py-2.5 px-3 text-center no-print">
-                <input 
-                  type="checkbox" 
-                  ${isVdone ? 'checked' : ''} 
-                  onchange="toggleItemDone('${escapeQuotes(v.key)}')" 
-                  class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
-                />
-              </td>
-              <td class="py-2.5 px-3 text-center font-bold text-xs print-only">[   ]</td>
-              <td class="py-2.5 px-3 text-center">
-                <span class="inline-flex items-center justify-center min-w-[34px] px-1.5 py-0.5 rounded text-[11px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200">
-                  ${idx + 1}.${vIdx + 1}
-                </span>
-              </td>
-              <td class="py-2.5 px-3 text-center no-print">
-                <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
-                  <i data-lucide="${pack.isBulk ? 'boxes' : 'package'}" class="w-3.5 h-3.5 ${pack.isBulk ? 'text-purple-600' : 'text-slate-400'}"></i>
-                </div>
-              </td>
-              <td class="py-2.5 px-4 text-xs font-medium text-slate-700">
-                <div class="flex items-center pl-1">
-                  <!-- Tree branch guide connector -->
-                  <div class="w-5 h-5 mr-1.5 flex items-center justify-center text-slate-400 flex-shrink-0">
-                    ${isLastVar ? `
-                      <svg class="w-4 h-4 text-slate-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 0v7a2 2 0 002 2h7" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    ` : `
-                      <svg class="w-4 h-4 text-slate-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 0v16 M5 8a2 2 0 002 2h7" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    `}
+                <!-- Indented Tree Card Container -->
+                <div class="flex-1 min-w-0 bg-white rounded-xl border border-purple-200 shadow-xs overflow-hidden">
+                  <!-- Header of Tree Card -->
+                  <div class="bg-purple-50/80 px-3.5 py-2 border-b border-purple-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2 font-bold text-purple-950">
+                      <i data-lucide="git-branch" class="w-3.5 h-3.5 text-purple-600 rotate-180"></i>
+                      <span>Chi tiết ${group.variants.length} nhánh phân loại của "${escapeHtml(group.productName)}":</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-purple-700 bg-white px-2 py-0.5 rounded-md border border-purple-200 shadow-2xs">
+                      ⚡ Tổng nhánh: <strong>${group.totalQty}</strong> cái
+                    </span>
                   </div>
-                  <div class="flex-1 min-w-0">
-                    <span class="font-bold text-slate-800 text-xs ${isVdone ? 'line-through text-slate-400' : ''}">${escapeHtml(v.sku)}</span>
-                    ${v.sellerSku && v.sellerSku !== '-' ? `
-                      <div class="text-[11px] text-slate-400 mt-0.5 font-normal">Mã SKU: ${escapeHtml(v.sellerSku)}</div>
-                    ` : ''}
-                  </div>
-                </div>
-              </td>
-              <td class="py-2.5 px-4">
-                ${pack.isBulk ? `
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs">
-                    <i data-lucide="boxes" class="w-3 h-3 mr-1 text-purple-600"></i>
-                    Thùng nguyên (${pack.packSize} ${pack.rest || 'món'})
-                  </span>
-                ` : `
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                    Chai / Gói lẻ
-                  </span>
-                `}
-              </td>
-              <td class="py-2.5 px-4 text-center">
-                <span class="inline-flex items-center justify-center min-w-[42px] px-2.5 py-0.5 rounded-lg text-sm font-bold bg-white text-rose-700 border border-rose-200 shadow-2xs tabular-nums">
-                  ${v.totalQty}
-                </span>
-              </td>
-              <td class="py-2.5 px-3 text-center no-print">
-                <button 
-                  onclick='showOrderListModal("${escapeQuotes(v.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(v.orderIds)})' 
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
-                >
-                  ${v.orderIds.length} đơn
-                </button>
-              </td>
-              <td class="py-2.5 px-4 no-print">
-                <div class="flex flex-wrap items-center">
-                  ${renderFileBadges(v.byFile)}
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
 
-        return parentRow + childRows;
+                  <!-- Table of Child Variants -->
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead class="bg-slate-50/90 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-100">
+                        <tr>
+                          <th scope="col" class="py-2 px-3 text-center w-12">Lấy</th>
+                          <th scope="col" class="py-2 px-2 text-center w-14">Nhánh</th>
+                          <th scope="col" class="py-2 px-3 min-w-[220px]">Phân loại chi tiết (SKU)</th>
+                          <th scope="col" class="py-2 px-3 min-w-[150px]">Quy cách đóng gói</th>
+                          <th scope="col" class="py-2 px-3 text-center min-w-[110px] font-bold text-slate-800">SL CẦN LẤY</th>
+                          <th scope="col" class="py-2 px-3 text-center min-w-[90px]">Xem đơn</th>
+                          <th scope="col" class="py-2 px-3 min-w-[160px]">Nguồn từng file PDF</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100 text-slate-800">
+                        ${group.variants.map((v, vIdx) => {
+                          const isVdone = checkedItemKeys.has(v.key);
+                          const pack = parseSkuPackagingType(v.sku);
+                          return `
+                            <tr class="hover:bg-purple-50/30 transition-colors ${isVdone ? 'bg-emerald-50/40' : 'bg-white'}">
+                              <td class="py-2.5 px-3 text-center">
+                                <input 
+                                  type="checkbox" 
+                                  ${isVdone ? 'checked' : ''} 
+                                  onchange="toggleItemDone('${escapeQuotes(v.key)}')" 
+                                  class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                                />
+                              </td>
+                              <td class="py-2.5 px-2 text-center">
+                                <span class="inline-flex items-center justify-center min-w-[34px] px-1.5 py-0.5 rounded text-[11px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200">
+                                  ${idx + 1}.${vIdx + 1}
+                                </span>
+                              </td>
+                              <td class="py-2.5 px-3 font-semibold text-slate-900">
+                                <div class="flex items-center gap-1.5">
+                                  <i data-lucide="${pack.isBulk ? 'boxes' : 'package'}" class="w-3.5 h-3.5 flex-shrink-0 ${pack.isBulk ? 'text-purple-600' : 'text-slate-400'}"></i>
+                                  <span class="${isVdone ? 'line-through text-slate-400' : ''}">${escapeHtml(v.sku)}</span>
+                                </div>
+                                ${v.sellerSku && v.sellerSku !== '-' ? `
+                                  <div class="text-[11px] text-slate-400 font-normal mt-0.5 pl-5">Mã SKU: ${escapeHtml(v.sellerSku)}</div>
+                                ` : ''}
+                              </td>
+                              <td class="py-2.5 px-3">
+                                ${pack.isBulk ? `
+                                  <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs">
+                                    <i data-lucide="boxes" class="w-3 h-3 mr-1 text-purple-600"></i>
+                                    Thùng nguyên (${pack.packSize} ${pack.rest || 'món'})
+                                  </span>
+                                ` : `
+                                  <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                    Chai / Gói lẻ
+                                  </span>
+                                `}
+                              </td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="inline-flex items-center justify-center min-w-[42px] px-2.5 py-0.5 rounded-lg text-sm font-bold bg-white text-rose-700 border border-rose-200 shadow-2xs tabular-nums">
+                                  ${v.totalQty}
+                                </span>
+                              </td>
+                              <td class="py-2.5 px-3 text-center">
+                                <button 
+                                  onclick='showOrderListModal("${escapeQuotes(v.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(v.orderIds)})' 
+                                  class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors"
+                                >
+                                  ${v.orderIds.length} đơn
+                                </button>
+                              </td>
+                              <td class="py-2.5 px-3">
+                                <div class="flex flex-wrap items-center">
+                                  ${renderFileBadges(v.byFile)}
+                                </div>
+                              </td>
+                            </tr>
+                          `;
+                        }).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+
+        return parentRow + childPanel;
       }).join('');
     }
 
