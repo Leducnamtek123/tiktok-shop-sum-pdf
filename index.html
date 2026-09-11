@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TikTok Shop Picking Consolidator - Gộp Phiếu Nhặt Hàng</title>
+  <title>Gộp Phiếu Nhặt Hàng TikTok Shop - Tự Động & Chính Xác</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -119,18 +119,18 @@
       <div class="flex items-center space-x-2">
         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-          Bảo Mật Nội Bộ (Client-Side)
+          Xử Lý Nội Bộ Trên Máy
         </span>
-        <span class="text-slate-500 hidden md:inline">Toàn bộ file PDF được đọc trên trình duyệt của bạn, không gửi đơn hàng ra ngoài</span>
+        <span class="text-slate-500 hidden md:inline">Toàn bộ file PDF được đọc trực tiếp trên trình duyệt, tuyệt đối bảo mật thông tin đơn hàng</span>
       </div>
       <div class="flex items-center space-x-3 text-slate-500 text-[11px]">
         <span class="flex items-center">
           <i data-lucide="check-circle" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
-          Chuẩn TikTok Shop 200 đơn/tờ
+          Định dạng chuẩn TikTok Shop 200 đơn/file
         </span>
         <span class="flex items-center">
           <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
-          Xử lý 1.000 đơn &lt; 2s
+          Cộng dồn 1.000 đơn &lt; 2 giây
         </span>
       </div>
     </div>
@@ -147,10 +147,10 @@
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <h1 class="font-bold text-base text-slate-900 leading-tight tracking-tight">TikTok Picking Consolidator</h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-rose-50 text-rose-700 border border-rose-200">PRO</span>
+            <h1 class="font-bold text-base text-slate-900 leading-tight tracking-tight">Bộ Gộp Phiếu Nhặt Hàng TikTok Shop</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-rose-50 text-rose-700 border border-rose-200">BẢN CHUẨN</span>
           </div>
-          <p class="text-xs text-slate-500">Gộp & cộng dồn danh sách nhặt hàng TikTok Shop tự động</p>
+          <p class="text-xs text-slate-500">Tự động nhận diện món trùng & cộng dồn số lượng lấy hàng</p>
         </div>
       </div>
 
@@ -205,17 +205,17 @@
           
           <div class="max-w-lg">
             <p class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-              Kéo thả các file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4">Picking list (.pdf)</span> vào đây
+              Kéo thả các file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4">Phiếu nhặt hàng (.pdf)</span> vào đây
             </p>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-              Hoặc bấm vào để chọn cùng lúc nhiều file từ máy tính (<span class="font-medium text-slate-700">Picking list_1, list_2, list_3...</span>)
+              Hoặc bấm vào để chọn cùng lúc nhiều file từ máy tính (<span class="font-medium text-slate-700">Phiếu 1, Phiếu 2, Phiếu 3...</span>)
             </p>
           </div>
 
           <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
               <i data-lucide="combine" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
-              Tự nhận diện sản phẩm trùng
+              Tự nhận diện món trùng
             </span>
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
               <i data-lucide="image" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
@@ -223,7 +223,7 @@
             </span>
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
               <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
-              Xuất Excel chuẩn
+              Xuất file Excel chuẩn
             </span>
           </div>
         </div>
@@ -330,7 +330,7 @@
       <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-xs">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Mặt hàng (SKU)</p>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Mặt hàng cần lấy</p>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statSkus">0</h3>
           </div>
           <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
@@ -376,7 +376,7 @@
             <input 
               type="text" 
               id="searchInput" 
-              placeholder="Tìm theo tên sản phẩm, SKU, hoặc mã đơn (Ctrl+K)..." 
+              placeholder="Tìm theo tên sản phẩm, quy cách, hoặc mã đơn TikTok (Ctrl+K)..." 
               class="w-full pl-10 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white transition-all"
             />
             <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
@@ -450,7 +450,7 @@
             class="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all active:scale-[0.98]"
           >
             <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5"></i>
-            Xuất Excel
+            Xuất file Excel
           </button>
 
           <!-- Print A4 Button -->
@@ -478,7 +478,7 @@
           </button>
         </div>
         <div>
-          <span>Bấm vào mã đơn để xem danh sách chi tiết</span>
+          <span>Bấm vào nút "Xem đơn" để xem toàn bộ danh sách mã đơn</span>
         </div>
       </div>
 
@@ -493,9 +493,9 @@
                 <th scope="col" class="py-3.5 px-3 text-center w-12">STT</th>
                 <th scope="col" class="py-3.5 px-3 text-center w-16 no-print">Ảnh</th>
                 <th scope="col" class="py-3.5 px-4 min-w-[280px]">Tên sản phẩm</th>
-                <th scope="col" class="py-3.5 px-4 min-w-[150px]">Phân loại (SKU)</th>
-                <th scope="col" class="py-3.5 px-4 text-center min-w-[110px] text-rose-700 font-bold bg-rose-50/70">TỔNG SL</th>
-                <th scope="col" class="py-3.5 px-3 text-center min-w-[90px] no-print">Mã đơn</th>
+                <th scope="col" class="py-3.5 px-4 min-w-[150px]">Quy cách / Phân loại</th>
+                <th scope="col" class="py-3.5 px-4 text-center min-w-[120px] text-rose-700 font-bold bg-rose-50/70">TỔNG SỐ LƯỢNG</th>
+                <th scope="col" class="py-3.5 px-3 text-center min-w-[90px] no-print">Xem đơn</th>
                 <th scope="col" class="py-3.5 px-4 min-w-[180px] no-print">Nguồn từng file PDF</th>
               </tr>
             </thead>
@@ -606,7 +606,7 @@
 
   <!-- Footer (no-print) -->
   <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
-    <p>TikTok Shop Picking Consolidator • Thiết kế tối ưu cho hoạt động kho hàng & đóng gói</p>
+    <p>Hệ Thống Gộp Phiếu Nhặt Hàng TikTok Shop • Tối ưu hóa vận hành & nhặt hàng</p>
   </footer>
 
   <!-- Application Logic -->
@@ -1369,7 +1369,7 @@
       if (!aggregatedItems.length) return;
 
       const fileCols = globalStats.fileNames;
-      const headers = ["STT", "Tên sản phẩm", "Phân loại (SKU)", "Mã Seller SKU", "TỔNG SỐ LƯỢNG", "Đã nhặt (Kho kiểm)"];
+      const headers = ["STT", "Tên sản phẩm", "Quy cách / Phân loại", "Mã SKU Shop", "TỔNG SỐ LƯỢNG", "Đã nhặt (Kho kiểm)"];
       if (fileCols.length > 1) {
         fileCols.forEach(f => headers.push(`SL (${f})`));
       }
@@ -1423,10 +1423,10 @@
       }
 
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Picking List Tong");
+      XLSX.utils.book_append_sheet(wb, ws, "Danh Sach Nhat Hang");
 
       const todayStr = new Date().toISOString().slice(0, 10);
-      XLSX.writeFile(wb, `Picking_List_Tong_Hop_${todayStr}.xlsx`);
+      XLSX.writeFile(wb, `Bang_Tong_Hop_Nhat_Hang_${todayStr}.xlsx`);
     }
 
     // Load Sample Test Data
