@@ -918,12 +918,17 @@
         cardViewWrapper.classList.add('hidden');
         viewTableBtn.className = "p-1.5 rounded-md text-xs font-semibold bg-white text-slate-900 shadow-2xs transition-all";
         viewCardBtn.className = "p-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all";
+        viewTableBtn.innerHTML = '<i data-lucide="table" class="w-3.5 h-3.5 text-rose-600"></i>';
+        viewCardBtn.innerHTML = '<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-slate-400"></i>';
       } else {
         tableViewWrapper.classList.add('hidden');
         cardViewWrapper.classList.remove('hidden');
         viewCardBtn.className = "p-1.5 rounded-md text-xs font-semibold bg-white text-slate-900 shadow-2xs transition-all";
         viewTableBtn.className = "p-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all";
+        viewCardBtn.innerHTML = '<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-rose-600"></i>';
+        viewTableBtn.innerHTML = '<i data-lucide="table" class="w-3.5 h-3.5 text-slate-400"></i>';
       }
+      lucide.createIcons();
       renderCurrentView();
     };
 
@@ -932,16 +937,19 @@
       groupViewMode = mode;
       const groupBtn = document.getElementById('groupModeBtn');
       const flatBtn = document.getElementById('flatModeBtn');
-      if (mode === 'grouped') {
-        groupBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1.5";
-        groupBtn.querySelector('i').className = "w-3.5 h-3.5 text-rose-600";
-        flatBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5";
-        flatBtn.querySelector('i').className = "w-3.5 h-3.5 text-slate-400";
-      } else {
-        flatBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1.5";
-        flatBtn.querySelector('i').className = "w-3.5 h-3.5 text-rose-600";
-        groupBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5";
-        groupBtn.querySelector('i').className = "w-3.5 h-3.5 text-slate-400";
+      if (groupBtn && flatBtn) {
+        if (mode === 'grouped') {
+          groupBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1.5";
+          flatBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5";
+          groupBtn.innerHTML = '<i data-lucide="layers" class="w-3.5 h-3.5 text-rose-600"></i><span>Gom Nhóm</span>';
+          flatBtn.innerHTML = '<i data-lucide="list" class="w-3.5 h-3.5 text-slate-400"></i><span>Tách Dòng</span>';
+        } else {
+          flatBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-2xs transition-all flex items-center gap-1.5";
+          groupBtn.className = "px-2.5 py-1.5 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5";
+          flatBtn.innerHTML = '<i data-lucide="list" class="w-3.5 h-3.5 text-rose-600"></i><span>Tách Dòng</span>';
+          groupBtn.innerHTML = '<i data-lucide="layers" class="w-3.5 h-3.5 text-slate-400"></i><span>Gom Nhóm</span>';
+        }
+        lucide.createIcons();
       }
       updateFulfillmentProgress();
       renderCurrentView();
@@ -1407,22 +1415,22 @@
 
     // Filter Logic: Grouped Products
     function getFilteredGroups() {
-      const keyword = searchInput.value.trim().toLowerCase();
+      const keyword = (searchInput.value || '').trim().toLowerCase();
       return groupedProducts.filter(group => {
         // Search matches product name, sku, sellerSku, or order IDs
         const matchSearch = !keyword || 
-          group.productName.toLowerCase().includes(keyword) || 
-          group.variants.some(v => 
-            v.sku.toLowerCase().includes(keyword) || 
-            v.sellerSku.toLowerCase().includes(keyword) ||
-            v.orderIds.some(id => id.toLowerCase().includes(keyword))
-          );
+          (group.productName && group.productName.toLowerCase().includes(keyword)) || 
+          (group.variants && group.variants.some(v => 
+            (v.sku && v.sku.toLowerCase().includes(keyword)) || 
+            (v.sellerSku && v.sellerSku.toLowerCase().includes(keyword)) ||
+            (v.orderIds && v.orderIds.some(id => (id || '').toLowerCase().includes(keyword)))
+          ));
         if (!matchSearch) return false;
 
-        const isGroupAllDone = group.variants.every(v => checkedItemKeys.has(v.key));
+        const isGroupAllDone = group.variants && group.variants.every(v => checkedItemKeys.has(v.key));
         if (currentFilter === 'pending' && isGroupAllDone) return false;
         if (currentFilter === 'done' && !isGroupAllDone) return false;
-        if (currentFilter === 'bulk' && (!group.hasBulk && group.variants.length <= 1)) return false;
+        if (currentFilter === 'bulk' && (!group.hasBulk && (!group.variants || group.variants.length <= 1))) return false;
 
         return true;
       });
@@ -1430,13 +1438,13 @@
 
     // Filter Logic: Flat Items
     function getFilteredFlatItems() {
-      const keyword = searchInput.value.trim().toLowerCase();
+      const keyword = (searchInput.value || '').trim().toLowerCase();
       return aggregatedItems.filter(item => {
         const matchSearch = !keyword || 
-          item.productName.toLowerCase().includes(keyword) || 
-          item.sku.toLowerCase().includes(keyword) ||
-          item.sellerSku.toLowerCase().includes(keyword) ||
-          item.orderIds.some(id => id.toLowerCase().includes(keyword));
+          (item.productName && item.productName.toLowerCase().includes(keyword)) || 
+          (item.sku && item.sku.toLowerCase().includes(keyword)) ||
+          (item.sellerSku && item.sellerSku.toLowerCase().includes(keyword)) ||
+          (item.orderIds && item.orderIds.some(id => (id || '').toLowerCase().includes(keyword)));
         if (!matchSearch) return false;
 
         const isDone = checkedItemKeys.has(item.key);
@@ -1745,8 +1753,8 @@
               ${item.sellerSku && item.sellerSku !== '-' ? `<span class="text-[11px] text-slate-400 font-normal mt-0.5 block">Mã SKU: ${escapeHtml(item.sellerSku)}</span>` : ''}
             </td>
             <td class="py-3 px-4">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
-                ${pack.isBulk ? `📦 Thùng (${pack.packSize}) • ` : ''}${escapeHtml(item.sku)}
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
+                ${pack.isBulk ? `<i data-lucide="boxes" class="w-3.5 h-3.5 mr-1.5 text-purple-600"></i>` : ''}${escapeHtml(item.sku)}
               </span>
             </td>
             <td class="py-3 px-4 text-center">
@@ -1914,8 +1922,8 @@
                   ${escapeHtml(item.productName)}
                 </h4>
                 <div class="mt-1 flex flex-wrap items-center gap-1.5">
-                  <span class="px-2 py-0.5 rounded text-xs font-semibold ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
-                    ${pack.isBulk ? `📦 ${escapeHtml(item.sku)}` : escapeHtml(item.sku)}
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
+                    ${pack.isBulk ? `<i data-lucide="boxes" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>` : ''}${escapeHtml(item.sku)}
                   </span>
                 </div>
               </div>
