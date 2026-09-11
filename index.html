@@ -884,54 +884,82 @@
       <!-- Modal Body (Scrollable) -->
       <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
         
-        <!-- Add New Combo Form -->
+        <!-- Add / Edit Combo Form -->
         <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4.5 space-y-3">
-          <div class="font-bold text-slate-900 text-xs flex items-center">
-            <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
-            Thêm Quy Tắc Combo / Quy Cách Mới
+          <input type="hidden" id="editingComboId" value="" />
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="font-bold text-slate-900 text-xs flex items-center" id="formHeaderTitle">
+              <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+              Thêm Quy Tắc Combo / Quy Cách Mới
+            </div>
+            <!-- Quick Picker from Loaded Files -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-500 text-[11px] hidden sm:inline">Chọn nhanh:</span>
+              <select id="quickProductSelect" onchange="onQuickProductSelected(this.value)" class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[11px] text-slate-700 font-medium max-w-[220px] focus:outline-none focus:ring-1 focus:ring-rose-500 cursor-pointer shadow-2xs">
+                <option value="">-- Chọn từ sản phẩm trong file --</option>
+              </select>
+            </div>
           </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">Tên Combo / Quy cách hiển thị:</label>
-              <input type="text" id="newComboName" placeholder="VD: Combo Phục hồi (Thùng 3 cặp)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              <label class="block font-semibold text-slate-700 mb-1">Tên Combo / Quy cách hiển thị: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Thùng 3 cặp)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
             </div>
             <div>
               <label class="block font-semibold text-slate-700 mb-1">Từ khóa sản phẩm áp dụng:</label>
-              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi (để trống = tất cả)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi (để trống = mọi sản phẩm)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
             </div>
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">Từ khóa SKU / Phân loại:</label>
-              <input type="text" id="newComboSkuKey" placeholder="VD: 3 cặp, Thùng 3, Thùng 6..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              <label class="block font-semibold text-slate-700 mb-1">Từ khóa SKU / Phân loại: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newComboSkuKey" placeholder="VD: Thùng cặp, 3 cặp, Thùng 6 chai..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
             </div>
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="block font-semibold text-slate-700 mb-1">Số lượng lẻ:</label>
+                <label class="block font-semibold text-slate-700 mb-1">Số lượng lẻ: <span class="text-rose-500">*</span></label>
                 <input type="number" id="newComboPackSize" min="1" value="3" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-bold text-rose-600" />
               </div>
               <div>
                 <label class="block font-semibold text-slate-700 mb-1">Đơn vị quy đổi:</label>
-                <input type="text" id="newComboUnit" placeholder="VD: Cặp 100ml, Chai..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+                <input type="text" id="newComboUnit" placeholder="VD: Cặp 100ml, Chai, Gói..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
               </div>
             </div>
           </div>
-          <div class="text-right pt-1">
-            <button onclick="handleAddNewCombo()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
-              <i data-lucide="check" class="w-3.5 h-3.5 mr-1.5"></i>
-              Lưu Quy Tắc Này
-            </button>
+          <div class="flex items-center justify-between pt-1">
+            <div id="comboFormMessage" class="text-[11px] text-slate-500 italic"></div>
+            <div class="flex items-center gap-2">
+              <button id="btnCancelEditCombo" onclick="cancelEditCombo()" class="hidden px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 transition-all cursor-pointer">
+                Hủy sửa
+              </button>
+              <button id="btnSaveCombo" onclick="handleAddNewCombo()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+                <i data-lucide="check" class="w-3.5 h-3.5 mr-1.5"></i>
+                <span id="btnSaveComboText">Lưu Quy Tắc Này</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Current Combo Rules List -->
         <div>
-          <div class="flex items-center justify-between mb-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
             <span class="font-bold text-slate-900 text-xs flex items-center">
               <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-blue-600"></i>
               Danh Sách Quy Tắc Đang Áp Dụng (<span id="comboListCount">0</span>)
             </span>
-            <button onclick="resetDefaultCombos()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold transition-all cursor-pointer">
-              Khôi phục 3 combo chuẩn shop
-            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="exportComboRules()" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs" title="Tải file JSON dự phòng">
+                <i data-lucide="download" class="w-3 h-3 mr-1 text-slate-500"></i>
+                Xuất JSON
+              </button>
+              <label class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs" title="Nạp file JSON đã lưu">
+                <i data-lucide="upload" class="w-3 h-3 mr-1 text-slate-500"></i>
+                Nhập JSON
+                <input type="file" id="importComboInput" accept=".json" onchange="importComboRules(event)" class="hidden" />
+              </label>
+              <button onclick="clearAllComboRules()" class="text-[11px] text-rose-600 hover:text-rose-800 font-semibold transition-all cursor-pointer px-1.5 py-1">
+                Xóa tất cả
+              </button>
+            </div>
           </div>
           <div id="comboRulesList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
             <!-- Rendered by JS -->
@@ -941,10 +969,13 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/70 flex justify-between items-center">
-        <span class="text-[11px] text-slate-500">Tự động lưu vào trình duyệt (localStorage), không mất khi tải lại trang</span>
-        <button onclick="closeComboModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
-          Đóng &amp; Áp Dụng
+      <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/70 flex flex-wrap justify-between items-center gap-2">
+        <div id="comboSyncStatus" class="text-[11px] text-slate-600 flex items-center">
+          <i data-lucide="cloud" class="w-3.5 h-3.5 mr-1 text-blue-500"></i>
+          <span>Đã kết nối lưu trữ máy chủ &amp; trình duyệt</span>
+        </div>
+        <button onclick="closeComboModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs">
+          Đóng &amp; Áp Dụng Ngay
         </button>
       </div>
 
@@ -987,39 +1018,95 @@
     let orderInfoMap = {};
     let currentMainTab = 'picking'; // 'picking' or 'shipping'
 
-    // Combo & Packaging Rules (Persisted in localStorage)
-    const DEFAULT_COMBO_RULES = [
-      { id: 'combo_1', name: 'Combo Phục hồi (Thùng 3 cặp)', productKeyword: 'Combo Phục hồi', skuKeyword: '3 cặp', packSize: 3, unit: 'Cặp 100ml' },
-      { id: 'combo_2', name: 'Calcifort-B12 (Thùng 6 chai)', productKeyword: 'Calcifort-B12', skuKeyword: 'Thùng 6 chai', packSize: 6, unit: 'Chai 100ml' },
-      { id: 'combo_3', name: 'Quy cách Thùng 12 gói', productKeyword: '', skuKeyword: 'Thùng 12', packSize: 12, unit: 'Gói' }
-    ];
-
+    // Combo & Packaging Rules (Stored on Server & local storage)
     let comboRules = [];
 
-    function loadComboRules() {
+    // Load combo rules from server API first, with localStorage fallback
+    async function loadComboRules() {
+      let loadedFromServer = false;
       try {
-        const stored = localStorage.getItem('tiktok_shop_combo_rules_v2');
-        if (stored) {
-          comboRules = JSON.parse(stored);
-        } else {
-          comboRules = [...DEFAULT_COMBO_RULES];
-          saveComboRules(comboRules);
+        const resp = await fetch('/api/combos', { cache: 'no-store' });
+        if (resp.ok) {
+          const serverRules = await resp.json();
+          if (Array.isArray(serverRules) && serverRules.length > 0) {
+            comboRules = serverRules;
+            loadedFromServer = true;
+            try {
+              localStorage.setItem('tiktok_shop_combo_rules_v3', JSON.stringify(comboRules));
+            } catch (e) {}
+          }
         }
       } catch (e) {
-        comboRules = [...DEFAULT_COMBO_RULES];
+        console.warn('Không thể kết nối máy chủ API combos, sử dụng bộ nhớ trình duyệt...', e);
       }
+
+      if (!loadedFromServer) {
+        try {
+          const stored = localStorage.getItem('tiktok_shop_combo_rules_v3');
+          if (stored) {
+            comboRules = JSON.parse(stored);
+          } else {
+            // Also check previous version if any
+            const prev = localStorage.getItem('tiktok_shop_combo_rules_v2');
+            if (prev) {
+              comboRules = JSON.parse(prev);
+            } else {
+              comboRules = [];
+            }
+          }
+        } catch (e) {
+          comboRules = [];
+        }
+      }
+
       updateComboBadge();
+      updateSyncStatusText(loadedFromServer ? 'Đã đồng bộ từ máy chủ' : 'Đang sử dụng dữ liệu trình duyệt');
     }
 
-    function saveComboRules(rules) {
-      comboRules = rules;
+    // Save combo rules to both localStorage and server API
+    async function saveComboRules(rules) {
+      comboRules = Array.isArray(rules) ? rules : [];
+      
+      // 1. Save to localStorage immediately
       try {
-        localStorage.setItem('tiktok_shop_combo_rules_v2', JSON.stringify(comboRules));
+        localStorage.setItem('tiktok_shop_combo_rules_v3', JSON.stringify(comboRules));
       } catch (e) {
-        console.error('Lỗi lưu combo rules:', e);
+        console.error('Lỗi lưu localStorage:', e);
       }
+
       updateComboBadge();
       renderComboRulesList();
+      updateSyncStatusText('Đang lưu lên máy chủ...');
+
+      // 2. Sync to Server API
+      try {
+        const resp = await fetch('/api/combos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(comboRules)
+        });
+        if (resp.ok) {
+          const nowStr = new Date().toLocaleTimeString('vi-VN');
+          updateSyncStatusText(`Đã lưu vĩnh viễn trên máy chủ lúc ${nowStr}`, 'success');
+        } else {
+          updateSyncStatusText('Đã lưu trên máy (Máy chủ phản hồi ' + resp.status + ')', 'warn');
+        }
+      } catch (e) {
+        updateSyncStatusText('Đã lưu trên trình duyệt (Máy chủ ngoại tuyến)', 'warn');
+      }
+    }
+
+    function updateSyncStatusText(msg, type = 'info') {
+      const statusEl = document.getElementById('comboSyncStatus');
+      if (!statusEl) return;
+      if (type === 'success') {
+        statusEl.innerHTML = `<span class="inline-flex items-center text-emerald-600 font-semibold"><i data-lucide="cloud-check" class="w-3.5 h-3.5 mr-1 text-emerald-500"></i> ${escapeHtml(msg)}</span>`;
+      } else if (type === 'warn') {
+        statusEl.innerHTML = `<span class="inline-flex items-center text-amber-600 font-semibold"><i data-lucide="hard-drive" class="w-3.5 h-3.5 mr-1 text-amber-500"></i> ${escapeHtml(msg)}</span>`;
+      } else {
+        statusEl.innerHTML = `<span class="inline-flex items-center text-slate-500"><i data-lucide="cloud" class="w-3.5 h-3.5 mr-1 text-blue-500"></i> ${escapeHtml(msg)}</span>`;
+      }
+      lucide.createIcons();
     }
 
     function updateComboBadge() {
@@ -1031,12 +1118,14 @@
 
     function openComboModal() {
       document.getElementById('comboModal').classList.remove('hidden');
+      populateQuickProductSelect();
       renderComboRulesList();
       lucide.createIcons();
     }
 
     function closeComboModal() {
       document.getElementById('comboModal').classList.add('hidden');
+      cancelEditCombo();
       if (lastParsedFilesData && lastParsedFilesData.length > 0) {
         processAggregatedData(lastParsedFilesData);
       } else if (groupedProducts.length > 0) {
@@ -1051,7 +1140,73 @@
       }
     }
 
+    // Populate the quick picker dropdown from loaded files
+    function populateQuickProductSelect() {
+      const select = document.getElementById('quickProductSelect');
+      if (!select) return;
+      
+      select.innerHTML = '<option value="">-- Chọn từ sản phẩm trong file --</option>';
+      
+      const options = [];
+      if (groupedProducts && groupedProducts.length > 0) {
+        groupedProducts.forEach(g => {
+          g.variants.forEach(v => {
+            options.push({
+              productName: g.productName,
+              sku: v.sku,
+              label: `${g.productName.slice(0, 35)}... [${v.sku}]`
+            });
+          });
+        });
+      } else if (shippingOrders && shippingOrders.length > 0) {
+        const seen = new Set();
+        shippingOrders.forEach(o => {
+          (o.items || []).forEach(it => {
+            const key = it.name + '|||' + it.sku;
+            if (!seen.has(key)) {
+              seen.add(key);
+              options.push({
+                productName: it.name,
+                sku: it.sku,
+                label: `${it.name.slice(0, 35)}... [${it.sku}]`
+              });
+            }
+          });
+        });
+      }
+
+      options.forEach((opt, idx) => {
+        const el = document.createElement('option');
+        el.value = idx;
+        el.textContent = opt.label;
+        select.appendChild(el);
+      });
+      window._quickProductOptions = options;
+    }
+
+    function onQuickProductSelected(idxStr) {
+      if (idxStr === '' || !window._quickProductOptions) return;
+      const opt = window._quickProductOptions[parseInt(idxStr, 10)];
+      if (!opt) return;
+
+      document.getElementById('newComboName').value = `${opt.productName.slice(0, 25)} (${opt.sku})`;
+      document.getElementById('newComboProdKey').value = opt.productName.slice(0, 30);
+      document.getElementById('newComboSkuKey').value = opt.sku;
+
+      // Guess pack size if sku has numbers
+      const numMatch = opt.sku.match(/\d+/);
+      if (numMatch) {
+        const num = parseInt(numMatch[0], 10);
+        if (num > 1 && num <= 100) {
+          document.getElementById('newComboPackSize').value = num;
+        }
+      }
+      document.getElementById('newComboUnit').value = 'Món lẻ';
+      document.getElementById('newComboPackSize').focus();
+    }
+
     function handleAddNewCombo() {
+      const editId = (document.getElementById('editingComboId').value || '').trim();
       const name = (document.getElementById('newComboName').value || '').trim();
       const prodKey = (document.getElementById('newComboProdKey').value || '').trim();
       const skuKey = (document.getElementById('newComboSkuKey').value || '').trim();
@@ -1060,75 +1215,227 @@
 
       if (!name) {
         alert('Vui lòng nhập tên Combo / Quy cách!');
+        document.getElementById('newComboName').focus();
         return;
       }
       if (!skuKey) {
         alert('Vui lòng nhập từ khóa SKU / Phân loại (ví dụ: 3 cặp, Thùng 6 chai...)!');
+        document.getElementById('newComboSkuKey').focus();
         return;
       }
 
-      const newRule = {
-        id: 'rule_' + Date.now(),
-        name,
-        productKeyword: prodKey,
-        skuKeyword: skuKey,
-        packSize,
-        unit
-      };
+      if (editId) {
+        // Edit existing rule
+        const idx = comboRules.findIndex(r => r.id === editId);
+        if (idx >= 0) {
+          comboRules[idx] = {
+            ...comboRules[idx],
+            name,
+            productKeyword: prodKey,
+            skuKeyword: skuKey,
+            packSize,
+            unit,
+            updatedAt: Date.now()
+          };
+          showToast('Đã cập nhật quy tắc combo thành công!');
+        }
+        cancelEditCombo();
+      } else {
+        // Add new rule
+        const newRule = {
+          id: 'rule_' + Date.now(),
+          name,
+          productKeyword: prodKey,
+          skuKeyword: skuKey,
+          packSize,
+          unit,
+          createdAt: Date.now()
+        };
+        comboRules.unshift(newRule);
+        showToast('Đã lưu quy tắc Combo mới thành công!');
+      }
 
-      comboRules.unshift(newRule);
       saveComboRules(comboRules);
 
+      // Reset form
       document.getElementById('newComboName').value = '';
       document.getElementById('newComboProdKey').value = '';
       document.getElementById('newComboSkuKey').value = '';
       document.getElementById('newComboPackSize').value = '3';
       document.getElementById('newComboUnit').value = '';
+      document.getElementById('quickProductSelect').value = '';
+    }
 
-      showToast('Đã lưu quy tắc Combo mới thành công!');
+    function editComboRule(id) {
+      const rule = comboRules.find(r => r.id === id);
+      if (!rule) return;
+
+      document.getElementById('editingComboId').value = rule.id;
+      document.getElementById('newComboName').value = rule.name || '';
+      document.getElementById('newComboProdKey').value = rule.productKeyword || '';
+      document.getElementById('newComboSkuKey').value = rule.skuKeyword || '';
+      document.getElementById('newComboPackSize').value = rule.packSize || 1;
+      document.getElementById('newComboUnit').value = rule.unit || '';
+
+      document.getElementById('formHeaderTitle').innerHTML = `
+        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+        <span>Đang Chỉnh Sửa: <strong class="text-blue-700">${escapeHtml(rule.name)}</strong></span>
+      `;
+      document.getElementById('btnSaveComboText').textContent = 'Cập Nhật Quy Tắc';
+      document.getElementById('btnCancelEditCombo').classList.remove('hidden');
+
+      lucide.createIcons();
+      document.getElementById('newComboName').focus();
+    }
+
+    function cancelEditCombo() {
+      document.getElementById('editingComboId').value = '';
+      document.getElementById('newComboName').value = '';
+      document.getElementById('newComboProdKey').value = '';
+      document.getElementById('newComboSkuKey').value = '';
+      document.getElementById('newComboPackSize').value = '3';
+      document.getElementById('newComboUnit').value = '';
+      document.getElementById('quickProductSelect').value = '';
+
+      document.getElementById('formHeaderTitle').innerHTML = `
+        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+        <span>Thêm Quy Tắc Combo / Quy Cách Mới</span>
+      `;
+      document.getElementById('btnSaveComboText').textContent = 'Lưu Quy Tắc Này';
+      document.getElementById('btnCancelEditCombo').classList.add('hidden');
+      lucide.createIcons();
     }
 
     function deleteComboRule(id) {
-      if (!confirm('Bạn có chắc muốn xóa quy tắc combo này?')) return;
+      const rule = comboRules.find(r => r.id === id);
+      const name = rule ? rule.name : 'quy tắc này';
+      if (!confirm(`Bạn có chắc muốn xóa "${name}"?`)) return;
       comboRules = comboRules.filter(r => r.id !== id);
       saveComboRules(comboRules);
       showToast('Đã xóa quy tắc combo!');
     }
 
-    function resetDefaultCombos() {
-      if (!confirm('Khôi phục lại 3 quy tắc combo chuẩn shop?')) return;
-      saveComboRules([...DEFAULT_COMBO_RULES]);
-      showToast('Đã khôi phục 3 combo chuẩn shop!');
+    function clearAllComboRules() {
+      if (!comboRules.length) {
+        showToast('Danh sách combo đang trống!');
+        return;
+      }
+      if (!confirm(`Bạn có chắc muốn XÓA TẤT CẢ ${comboRules.length} quy tắc combo? Hành động này sẽ xóa dữ liệu trên cả máy chủ!`)) return;
+      saveComboRules([]);
+      cancelEditCombo();
+      showToast('Đã xóa toàn bộ danh sách quy tắc combo!');
+    }
+
+    function exportComboRules() {
+      if (!comboRules.length) {
+        alert('Danh sách combo đang trống! Hãy thêm ít nhất 1 quy tắc trước khi xuất.');
+        return;
+      }
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(comboRules, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `tiktok_shop_combos_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast(`Đã xuất ${comboRules.length} quy tắc combo thành file JSON!`);
+    }
+
+    function importComboRules(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) {
+            alert('File JSON không hợp lệ (phải là danh sách mảng các quy tắc)!');
+            return;
+          }
+          const valid = imported.filter(r => r && r.skuKeyword);
+          if (valid.length === 0) {
+            alert('Không tìm thấy quy tắc hợp lệ trong file JSON!');
+            return;
+          }
+          if (confirm(`Tìm thấy ${valid.length} quy tắc trong file. Bạn muốn GỘP THÊM vào danh sách hiện tại (Chọn OK) hay THAY THẾ TOÀN BỘ (Chọn Cancel)?`)) {
+            const existingKeys = new Set(comboRules.map(r => (r.productKeyword || '') + '|||' + r.skuKeyword));
+            valid.forEach(r => {
+              const k = (r.productKeyword || '') + '|||' + r.skuKeyword;
+              if (!existingKeys.has(k)) {
+                r.id = r.id || ('rule_' + Date.now() + Math.random().toString(36).substr(2, 4));
+                comboRules.push(r);
+              }
+            });
+          } else {
+            valid.forEach((r, idx) => {
+              r.id = r.id || ('rule_' + Date.now() + '_' + idx);
+            });
+            comboRules = valid;
+          }
+          saveComboRules(comboRules);
+          showToast(`Đã nạp thành công ${valid.length} quy tắc combo!`);
+        } catch (err) {
+          alert('Lỗi đọc file JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
     }
 
     function renderComboRulesList() {
       const container = document.getElementById('comboRulesList');
       if (!container) return;
       if (comboRules.length === 0) {
-        container.innerHTML = '<div class="p-4 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">Chưa có quy tắc combo nào. Hãy nhập ở bảng phía trên!</div>';
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 space-y-1.5">
+            <i data-lucide="sparkles" class="w-6 h-6 mx-auto text-slate-300"></i>
+            <div class="font-bold text-slate-600 text-xs">Chưa có quy tắc combo nào được lưu</div>
+            <div class="text-[11px] text-slate-400">Hãy thêm quy tắc ở form phía trên hoặc bấm "Chọn nhanh" từ file PDF đã nạp.</div>
+          </div>
+        `;
+        lucide.createIcons();
         return;
       }
+
       container.innerHTML = comboRules.map(rule => `
         <div class="bg-white p-3 rounded-xl border border-slate-200/90 flex items-center justify-between gap-3 shadow-2xs hover:border-slate-300 transition-all">
-          <div class="space-y-0.5">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-slate-900 text-xs">${escapeHtml(rule.name)}</span>
+          <div class="space-y-0.5 min-w-0 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-bold text-slate-900 text-xs truncate">${escapeHtml(rule.name)}</span>
               <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-purple-50 text-purple-700 border border-purple-200">
-                1 quy cách = ${rule.packSize} ${escapeHtml(rule.unit)}
+                1 quy cách = ${rule.packSize} ${escapeHtml(rule.unit || 'món lẻ')}
               </span>
             </div>
-            <div class="text-[11px] text-slate-500">
-              ${rule.productKeyword ? `<span class="font-medium text-slate-700">Sản phẩm:</span> "${escapeHtml(rule.productKeyword)}" &bull; ` : '<span class="text-slate-400">Mọi sản phẩm &bull; </span>'}
-              <span class="font-medium text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 px-1 py-0.5 rounded text-rose-600 font-mono text-[10px]">${escapeHtml(rule.skuKeyword)}</code>
+            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5">
+              ${rule.productKeyword ? `<span class="font-medium text-slate-700">Sản phẩm:</span> <span class="bg-slate-50 px-1 rounded text-slate-800">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-400">Mọi sản phẩm &bull; </span>'}
+              <span class="font-medium text-slate-700">Khớp SKU:</span> <code class="bg-rose-50 border border-rose-200/60 px-1 py-0.5 rounded text-rose-700 font-mono text-[10px]">${escapeHtml(rule.skuKeyword)}</code>
             </div>
           </div>
-          <button onclick="deleteComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Xóa quy tắc này">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
+          <div class="flex items-center gap-1">
+            <button onclick="editComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer" title="Chỉnh sửa quy tắc này">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Xóa quy tắc này">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
         </div>
       `).join('');
       lucide.createIcons();
     }
+
+    // Expose all modal and combo functions to window
+    window.openComboModal = openComboModal;
+    window.closeComboModal = closeComboModal;
+    window.handleAddNewCombo = handleAddNewCombo;
+    window.editComboRule = editComboRule;
+    window.cancelEditCombo = cancelEditCombo;
+    window.deleteComboRule = deleteComboRule;
+    window.clearAllComboRules = clearAllComboRules;
+    window.exportComboRules = exportComboRules;
+    window.importComboRules = importComboRules;
+    window.onQuickProductSelected = onQuickProductSelected;
+    window.populateQuickProductSelect = populateQuickProductSelect;
 
     // Packaging Parsing & Smart Conversion Utilities
     function parseSkuPackagingType(skuStr, productName = '') {
