@@ -1120,10 +1120,15 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-6 sm:px-7 py-4 border-t border-slate-200 bg-white flex items-center justify-between">
-        <button onclick="downloadCurrentLabelImage()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold text-xs flex items-center cursor-pointer transition-all shadow-2xs">
-          <i data-lucide="download" class="w-3.5 h-3.5 mr-1.5"></i> Tải ảnh tem (JPG)
-        </button>
+      <div class="px-6 sm:px-7 py-4 border-t border-slate-200 bg-white flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="downloadCurrentLabelPdf()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center cursor-pointer transition-all shadow-2xs">
+            <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5"></i> Xuất / In tem này (PDF)
+          </button>
+          <button onclick="downloadCurrentLabelImage()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold text-xs flex items-center cursor-pointer transition-all shadow-2xs">
+            <i data-lucide="download" class="w-3.5 h-3.5 mr-1.5"></i> Tải ảnh tem (JPG)
+          </button>
+        </div>
         <button onclick="closeShippingLabelModal()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs cursor-pointer transition-all shadow-2xs">
           Đóng
         </button>
@@ -1942,6 +1947,7 @@
       sortedShippingOrders = [];
       currentShippingFile = null;
       currentShippingPdfDoc = null;
+      if (typeof shippingFilesMap !== 'undefined') shippingFilesMap.clear();
       orderToTrackingMap = {};
       orderInfoMap = {};
       productImageMap.clear();
@@ -2225,6 +2231,7 @@
     let shippingOrders = [];
     let sortedShippingOrders = [];
     let currentShippingFile = null;
+    let shippingFilesMap = new Map(); // fileName -> File
     let shippingFilter = 'all'; // 'all', 'single', 'multi'
     let shippingSearchQuery = '';
     let productImageMap = new Map();
@@ -2247,6 +2254,7 @@
     async function processShippingLabelFile(file, onProgress) {
       try {
         currentShippingFile = file;
+        shippingFilesMap.set(file.name, file);
         if (!onProgress) {
           progressContainer.classList.remove('hidden');
           setProgressState({
@@ -2335,6 +2343,8 @@
               receiver,
               weight,
               thumbnailUrl: thumbDataUrl,
+              sourceFile: file,
+              sourceFileName: file.name,
               pages: [pageIdx],
               pageNumbers: [pNum],
               slipWords: [...slipWords],
@@ -2344,6 +2354,8 @@
           } else {
             ordersDict[orderId].pages.push(pageIdx);
             ordersDict[orderId].pageNumbers.push(pNum);
+            ordersDict[orderId].sourceFile = file;
+            ordersDict[orderId].sourceFileName = file.name;
             ordersDict[orderId].slipWords.push(...slipWords);
             ordersDict[orderId].rawTexts.push(fullText);
             if (!ordersDict[orderId].thumbnailUrl && thumbDataUrl) {
@@ -2679,17 +2691,40 @@
       });
 
       let html = '';
+      window.__shippingGroupOrders = {};
+      window.__shippingSkuOrders = {};
+      let grpCounter = 0;
+
       for (const [prodName, ordersInGrp] of Object.entries(groups)) {
+        grpCounter++;
+        const currentGrpId = grpCounter;
+        window.__shippingGroupOrders[currentGrpId] = ordersInGrp;
+
         const isMultiGroup = prodName.includes('ĐƠN NHIỀU MÓN');
         const cleanedProdName = isMultiGroup ? prodName : cleanItemProductName(prodName);
         const totalGrpQty = ordersInGrp.reduce((sum, o) => sum + o.totalQty, 0);
 
-        const skuCounts = {};
+        const skuGroups = {};
         ordersInGrp.forEach(o => {
-          const s = o.isMultiItem ? "Nhiều món hỗn hợp" : o.primarySku;
-          skuCounts[s] = (skuCounts[s] || 0) + 1;
+          const s = o.isMultiItem ? "Nhiều món hỗn hợp" : (cleanSku(o.primarySku) || "Mặc định");
+          if (!skuGroups[s]) skuGroups[s] = [];
+          skuGroups[s].push(o);
         });
-        const skuSummary = Object.entries(skuCounts).map(([sku, cnt]) => `${cnt} đơn ${sku}`).join(' &bull; ');
+
+        const skuPillsHtml = Object.entries(skuGroups).map(([sku, ords]) => {
+          const skuKey = `${currentGrpId}___${sku}`;
+          window.__shippingSkuOrders[skuKey] = ords;
+          return `
+            <button 
+              type="button"
+              onclick="downloadSpecificSkuPdf('${currentGrpId}', '${escapeQuotes(sku)}')" 
+              class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-800 border border-slate-200/90 px-2.5 py-1 rounded-lg text-slate-700 font-semibold text-xs transition-all cursor-pointer group" 
+              title="Nhấp để chỉ xuất file PDF ${ords.length} đơn phân loại: ${escapeQuotes(sku)}">
+              <i data-lucide="printer" class="w-3 h-3 text-slate-400 group-hover:text-emerald-600"></i>
+              <span>${ords.length} đơn <span class="font-normal text-slate-500 group-hover:text-emerald-700">${escapeHtml(sku)}</span></span>
+            </button>
+          `;
+        }).join(' ');
 
         // Look up real product image cropped from picking list
         const prodImg = isMultiGroup ? null : (
@@ -2722,18 +2757,27 @@
                       ${ordersInGrp.length} đơn hàng
                     </span>
                   </div>
-                  <div class="text-xs text-slate-600 font-medium flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span class="bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-lg text-slate-700 font-semibold">${skuSummary}</span>
+                  <div class="text-xs text-slate-600 font-medium flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-0.5">
+                    ${skuPillsHtml}
                     <span>&bull;</span>
-                    <span>Tổng SL lấy: <strong class="text-slate-900 font-bold">${totalGrpQty} món</strong></span>
+                    <span class="text-slate-700">Tổng SL lấy: <strong class="text-slate-900 font-bold">${totalGrpQty} món</strong></span>
                   </div>
                 </div>
               </div>
-              <div class="sm:text-right shrink-0 pl-18 sm:pl-0">
-                <div class="inline-flex flex-col sm:items-end bg-slate-50 border border-slate-200/80 px-4 py-2 rounded-xl">
+              <div class="sm:text-right shrink-0 pl-18 sm:pl-0 flex flex-wrap items-center sm:justify-end gap-2.5">
+                <div class="inline-flex flex-col sm:items-end bg-slate-50 border border-slate-200/80 px-3.5 py-1.5 rounded-xl">
                   <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Thứ tự in mới</span>
                   <span class="text-xs font-black font-mono text-emerald-700">#${ordersInGrp[0].newSeq} &rarr; #${ordersInGrp[ordersInGrp.length - 1].newSeq}</span>
                 </div>
+                <button 
+                  type="button"
+                  id="btnDownloadGrp_${currentGrpId}"
+                  onclick="downloadGroupPdf(${currentGrpId}, '${escapeQuotes(cleanedProdName)}')" 
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer shrink-0" 
+                  title="Chỉ in/xuất các tem của riêng món này (${ordersInGrp.length} đơn)">
+                  <i data-lucide="printer" class="w-4 h-4"></i>
+                  <span>In món này (${ordersInGrp.length})</span>
+                </button>
               </div>
             </div>
 
@@ -2889,9 +2933,14 @@
                                 Mới: ${pageDisplay}
                               </span>
                             </div>
-                            <button onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
-                              <i data-lucide="eye" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i> Xem tem
-                            </button>
+                            <div class="inline-flex items-center gap-1.5 justify-end">
+                              <button onclick="downloadSingleOrderPdf('${escapeQuotes(o.orderId)}')" class="inline-flex items-center px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer" title="In riêng tem đơn này">
+                                <i data-lucide="printer" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> In
+                              </button>
+                              <button onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" class="inline-flex items-center px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
+                                <i data-lucide="eye" class="w-3.5 h-3.5 mr-1 text-rose-600"></i> Xem tem
+                              </button>
+                            </div>
                           </div>
                           ${isMultiPage ? '<div class="text-[10px] text-amber-700 font-bold mt-1 text-right">Đơn 2 trang</div>' : ''}
                         </td>
@@ -2933,18 +2982,17 @@
       renderShippingUI();
     }
 
-    // Export Reordered PDF via pdf-lib
-    async function downloadReorderedPdf() {
-      if (!currentShippingFile || sortedShippingOrders.length === 0) {
-        alert('Chưa có file mã vận đơn nào được tải lên!');
+    // Generalized Export Orders to PDF via pdf-lib
+    async function exportOrdersToPdf(ordersToExport, outputFileName = 'Shipping_Labels.pdf', btnElement = null) {
+      if (!ordersToExport || ordersToExport.length === 0) {
+        alert('Không có mã vận đơn nào để xuất PDF!');
         return;
       }
 
-      const btn = document.getElementById('btnDownloadReorderedPdf');
-      const origHtml = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `
+      const origHtml = btnElement ? btnElement.innerHTML : '';
+      if (btnElement) {
+        btnElement.disabled = true;
+        btnElement.innerHTML = `
           <svg class="w-4 h-4 mr-1.5 animate-spin text-white inline shrink-0" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
             <path class="opacity-95" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
@@ -2953,46 +3001,143 @@
         `;
       }
 
-      showToast('Đang tạo và sắp xếp các trang PDF theo thứ tự món...');
+      showToast(`Đang xử lý ${ordersToExport.length} đơn hàng...`);
 
       try {
-        const arrayBuffer = await currentShippingFile.arrayBuffer();
-        const srcDoc = await PDFLib.PDFDocument.load(arrayBuffer);
         const dstDoc = await PDFLib.PDFDocument.create();
+        const docCache = new Map(); // key -> { doc, pageCount }
 
-        // Collect all page indices in the newly sorted order
-        const sortedIndices = [];
-        sortedShippingOrders.forEach(o => {
-          o.pages.forEach(pIdx => sortedIndices.push(pIdx));
-        });
+        const getSourceDoc = async (file) => {
+          if (!file) return null;
+          const key = file.name + '_' + file.size;
+          if (docCache.has(key)) return docCache.get(key);
+          try {
+            const ab = await file.arrayBuffer();
+            const doc = await PDFLib.PDFDocument.load(ab, { ignoreEncryption: true });
+            const info = { doc, pageCount: doc.getPageCount() };
+            docCache.set(key, info);
+            return info;
+          } catch (e) {
+            console.error('Không thể load file PDF nguồn: ' + file.name, e);
+            return null;
+          }
+        };
 
-        const copiedPages = await dstDoc.copyPages(srcDoc, sortedIndices);
-        copiedPages.forEach(p => dstDoc.addPage(p));
+        const fallbackFile = currentShippingFile || (shippingFilesMap.size > 0 ? Array.from(shippingFilesMap.values())[0] : null);
+        let totalCopiedPages = 0;
+
+        for (const o of ordersToExport) {
+          const file = o.sourceFile || (o.sourceFileName ? shippingFilesMap.get(o.sourceFileName) : null) || fallbackFile;
+          if (!file) continue;
+
+          const srcInfo = await getSourceDoc(file);
+          if (!srcInfo) continue;
+
+          const { doc: srcDoc, pageCount } = srcInfo;
+
+          // Strictly filter indices so NO invalid index can reach copyPages
+          const validIndices = [];
+          if (Array.isArray(o.pages)) {
+            for (const pIdx of o.pages) {
+              if (typeof pIdx === 'number' && !isNaN(pIdx) && pIdx >= 0 && pIdx < pageCount) {
+                validIndices.push(pIdx);
+              } else {
+                console.warn(`Bỏ qua page index ${pIdx} không hợp lệ của đơn ${o.orderId} (tổng trang file: ${pageCount})`);
+              }
+            }
+          }
+
+          if (validIndices.length > 0) {
+            try {
+              const copiedPages = await dstDoc.copyPages(srcDoc, validIndices);
+              copiedPages.forEach(p => dstDoc.addPage(p));
+              totalCopiedPages += copiedPages.length;
+            } catch (copyErr) {
+              console.error(`Lỗi copy trang [${validIndices}] cho đơn ${o.orderId}:`, copyErr);
+            }
+          }
+        }
+
+        if (totalCopiedPages === 0) {
+          throw new Error('Không thể trích xuất trang tem nào từ file nguồn. Vui lòng kiểm tra lại file tem vận đơn đã nạp!');
+        }
 
         const newPdfBytes = await dstDoc.save();
         const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const origBase = currentShippingFile.name.replace(/\.pdf$/i, '');
-        a.download = `${origBase}_DA_SAP_XEP_THEO_MON.pdf`;
+        const cleanOutName = outputFileName.endsWith('.pdf') ? outputFileName : `${outputFileName}.pdf`;
+        a.download = cleanOutName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showToast('Đã tải xuống file PDF sắp xếp thành công!');
+        showToast(`Đã xuất thành công ${ordersToExport.length} đơn (${totalCopiedPages} trang tem)!`);
       } catch (err) {
         console.error('Lỗi khi ghép PDF:', err);
         alert('Lỗi tạo file PDF: ' + err.message);
       } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = origHtml;
+        if (btnElement) {
+          btnElement.disabled = false;
+          btnElement.innerHTML = origHtml;
           lucide.createIcons();
         }
       }
     }
+
+    // Export Reordered PDF (All orders sorted by product)
+    async function downloadReorderedPdf() {
+      if (!sortedShippingOrders || sortedShippingOrders.length === 0) {
+        alert('Chưa có dữ liệu mã vận đơn nào để xuất PDF!');
+        return;
+      }
+      const btn = document.getElementById('btnDownloadReorderedPdf');
+      const fallbackFile = currentShippingFile || (shippingFilesMap.size > 0 ? Array.from(shippingFilesMap.values())[0] : null);
+      const baseName = (fallbackFile?.name || 'Shipping_labels').replace(/\.pdf$/i, '').replace(/_DA_SAP_XEP_THEO_MON.*$/i, '');
+      const outName = `${baseName}_DA_SAP_XEP_THEO_MON.pdf`;
+      await exportOrdersToPdf(sortedShippingOrders, outName, btn);
+    }
+
+    // Export a specific product group
+    window.downloadGroupPdf = async function(grpId, prodName = '') {
+      const orders = window.__shippingGroupOrders ? window.__shippingGroupOrders[grpId] : null;
+      if (!orders || orders.length === 0) {
+        alert('Không tìm thấy đơn hàng trong nhóm này!');
+        return;
+      }
+      const btn = document.getElementById(`btnDownloadGrp_${grpId}`);
+      const cleanTitle = (prodName || 'Nhom_mon').replace(/[^a-zA-Z0-9\u00C0-\u1EF9]/gi, '_').substring(0, 35);
+      const outName = `TEM_${cleanTitle}_${orders.length}_don.pdf`;
+      await exportOrdersToPdf(orders, outName, btn);
+    };
+
+    // Export a specific SKU variant within a group
+    window.downloadSpecificSkuPdf = async function(grpId, sku) {
+      const key = `${grpId}___${sku}`;
+      const orders = window.__shippingSkuOrders ? window.__shippingSkuOrders[key] : null;
+      if (!orders || orders.length === 0) {
+        alert('Không tìm thấy đơn hàng cho phân loại này!');
+        return;
+      }
+      const safeSku = (sku || 'SKU').replace(/[^a-zA-Z0-9\u00C0-\u1EF9]/gi, '_').substring(0, 25);
+      const outName = `TEM_${safeSku}_${orders.length}_don.pdf`;
+      await exportOrdersToPdf(orders, outName, null);
+    };
+
+    // Export single order
+    window.downloadSingleOrderPdf = async function(orderId) {
+      const o = (sortedShippingOrders || []).find(item => item.orderId === orderId) || 
+                (shippingOrders || []).find(item => item.orderId === orderId) ||
+                orderInfoMap[orderId];
+      if (!o) {
+        alert('Không tìm thấy thông tin đơn hàng này!');
+        return;
+      }
+      const outName = `TEM_${o.tracking || o.orderId}.pdf`;
+      await exportOrdersToPdf([o], outName, null);
+    };
 
     // Export Shipping Excel
     function exportShippingExcel() {
@@ -3162,11 +3307,17 @@
       const n = removedFile.name.toLowerCase();
       const isShip = n.includes('shipping label') || n.includes('packing slip') || n.includes('van_don') || n.includes('vandon');
       if (isShip) {
-        const remainingShip = loadedFiles.some(f => {
-          const fn = f.name.toLowerCase();
-          return fn.includes('shipping label') || fn.includes('packing slip') || fn.includes('van_don') || fn.includes('vandon');
-        });
-        if (!remainingShip) {
+        shippingFilesMap.delete(removedFile.name);
+        shippingOrders = shippingOrders.filter(o => o.sourceFileName !== removedFile.name);
+        sortedShippingOrders = sortedShippingOrders.filter(o => o.sourceFileName !== removedFile.name);
+
+        if (shippingFilesMap.size > 0) {
+          currentShippingFile = Array.from(shippingFilesMap.values())[0];
+          sortAndRenderShippingOrders();
+          const badge = document.getElementById('shippingBadge');
+          if (badge) badge.textContent = `${shippingOrders.length} đơn`;
+        } else {
+          currentShippingFile = null;
           shippingOrders = [];
           sortedShippingOrders = [];
           orderToTrackingMap = {};
@@ -4518,6 +4669,12 @@
       link.href = canvas.toDataURL('image/jpeg', 0.95);
       link.click();
       showToast('Đã tải ảnh tem vận đơn chất lượng cao!');
+    };
+
+    window.downloadCurrentLabelPdf = async function() {
+      const ord = window._currentModalOrder;
+      if (!ord) return;
+      await exportOrdersToPdf([ord], `TEM_${ord.tracking || ord.orderId}.pdf`);
     };
 
     function showToast(msg) {
