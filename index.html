@@ -69,40 +69,93 @@
       background: #94a3b8;
     }
 
-    /* Print Stylesheet for A4 Paper */
+    /* Professional A4 Print Stylesheet - 1:1 TikTok Shop Picking List Replica */
     @media print {
-      body {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 8mm 10mm 8mm;
+      }
+      html, body {
         background: #ffffff !important;
         color: #0f172a !important;
-        font-size: 10pt !important;
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 8.5pt !important;
+        line-height: 1.3 !important;
         padding: 0 !important;
         margin: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
-      .no-print {
+      .no-print, header, nav, #dropZone, #fileChipsContainer, #progressContainer, 
+      #statsSection, #fulfillmentSection, #resultSection, #toast, .modal-backdrop {
         display: none !important;
       }
       .print-only {
         display: block !important;
       }
-      table {
+      #printContainer {
+        display: block !important;
+        width: 100% !important;
+      }
+
+      /* TikTok Shop Table Print Styling */
+      .tiktok-print-table {
         width: 100% !important;
         border-collapse: collapse !important;
+        margin-top: 6px !important;
+        font-size: 8.5pt !important;
       }
-      th, td {
-        border: 1px solid #94a3b8 !important;
-        padding: 6px 8px !important;
-        font-size: 9pt !important;
-      }
-      th {
-        background-color: #f1f5f9 !important;
+      .tiktok-print-table th {
+        background-color: #f8fafc !important;
         color: #0f172a !important;
         font-weight: 700 !important;
+        font-size: 7.5pt !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
+        border-top: 1.5pt solid #0f172a !important;
+        border-bottom: 1.5pt solid #0f172a !important;
+        border-left: none !important;
+        border-right: none !important;
+        padding: 5px 6px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
-      .print-qty {
-        font-weight: 800 !important;
-        font-size: 11pt !important;
-        color: #000000 !important;
-        text-align: center !important;
+      .tiktok-print-table td {
+        border-left: none !important;
+        border-right: none !important;
+        border-top: none !important;
+        border-bottom: 0.5pt solid #e2e8f0 !important;
+        padding: 5px 6px !important;
+        vertical-align: top !important;
+      }
+      .tiktok-print-table tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      .tiktok-print-table tr.group-border-bottom td {
+        border-bottom: 1.25pt solid #94a3b8 !important;
+      }
+      .tiktok-print-img {
+        width: 44px !important;
+        height: 44px !important;
+        object-fit: contain !important;
+        border: 0.5pt solid #cbd5e1 !important;
+        border-radius: 4px !important;
+        background: #ffffff !important;
+        display: block !important;
+        margin: 0 auto !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .tiktok-print-footer {
+        margin-top: 14px !important;
+        border-top: 1.5pt solid #0f172a !important;
+        padding-top: 8px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
     }
 
@@ -170,17 +223,9 @@
   <!-- Main App Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- Print Header (Only visible when printing) -->
-    <div class="print-only mb-6">
-      <div class="flex justify-between items-start border-b-2 border-slate-900 pb-3">
-        <div>
-          <h1 class="text-xl font-bold uppercase tracking-tight text-slate-900">PHIẾU NHẶT HÀNG TỔNG HỢP (PICKING LIST TỔNG)</h1>
-          <p class="text-xs text-slate-600 mt-1" id="printSubTitle">Ngày in: ...</p>
-        </div>
-        <div class="text-right text-xs" id="printStats">
-          <!-- Injected via JS -->
-        </div>
-      </div>
+    <!-- Dedicated 1:1 TikTok Shop Print Container (Only visible during print) -->
+    <div id="printContainer" class="print-only hidden">
+      <!-- Dynamically populated via preparePrintContent() when user prints -->
     </div>
 
     <!-- Drop Zone Section (no-print) -->
@@ -855,11 +900,14 @@
     exportExcelBtn.addEventListener('click', exportExcel);
 
     printBtn.addEventListener('click', () => {
-      document.getElementById('printSubTitle').textContent = 
-        `Ngày in: ${new Date().toLocaleString('vi-VN')} | Nguồn: ${globalStats.totalFiles} file PDF (${globalStats.totalOrders} đơn hàng)`;
-      document.getElementById('printStats').innerHTML = 
-        `<p><strong>Sản phẩm:</strong> ${globalStats.uniqueProducts} (${globalStats.uniqueSkus} SKU) | <strong>TỔNG SL:</strong> <span class="text-base font-bold">${globalStats.totalQty}</span></p>`;
-      window.print();
+      if (!groupedProducts.length && !aggregatedItems.length) {
+        showToast('Vui lòng tải hoặc nạp ít nhất 1 file PDF để in phiếu!');
+        return;
+      }
+      preparePrintContent();
+      setTimeout(() => {
+        window.print();
+      }, 50);
     });
 
     // View Switching
@@ -2064,6 +2112,213 @@
         progressContainer.classList.add('hidden');
       }
     };
+
+    // Render Compact Order IDs for TikTok Shop Print Layout
+    function renderPrintOrderIds(orderIds) {
+      if (!orderIds || orderIds.length === 0) return '<span style="color: #94a3b8;">-</span>';
+      const isMultiCol = orderIds.length > 5;
+      return `
+        <div style="display: grid; grid-template-columns: repeat(${isMultiCol ? '2' : '1'}, minmax(0, 1fr)); gap: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 6.8pt; color: #334155; line-height: 1.2;">
+          ${orderIds.map(id => `<div>${id}</div>`).join('')}
+        </div>
+      `;
+    }
+
+    // Prepare 1:1 TikTok Shop Print Layout (Header, Images, Packaging, Order IDs, Footer)
+    function preparePrintContent() {
+      const printContainer = document.getElementById('printContainer');
+      if (!printContainer) return;
+
+      const nowStr = new Date().toLocaleString('vi-VN', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const isGrouped = (groupViewMode === 'grouped');
+      const itemsToPrint = isGrouped ? getFilteredGroups() : getFilteredFlatItems();
+
+      let tableRowsHtml = '';
+
+      if (isGrouped) {
+        tableRowsHtml = itemsToPrint.map((group, idx) => {
+          const imgHtml = group.imageUrl 
+            ? `<img src="${group.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
+            : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
+
+          // Case 1: Single Variant Product
+          if (group.isSingleVariant) {
+            const v = group.variants[0];
+            const pack = parseSkuPackagingType(v.sku);
+            const orderIdsHtml = renderPrintOrderIds(v.orderIds);
+
+            return `
+              <tr class="group-border-bottom">
+                <td style="text-align: center; font-weight: 700; color: #475569; width: 30px;">${idx + 1}</td>
+                <td style="text-align: center; width: 50px;">${imgHtml}</td>
+                <td style="vertical-align: top;">
+                  <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
+                  ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
+                </td>
+                <td style="vertical-align: top; width: 135px; color: #1e293b; font-weight: 500; font-size: 8pt;">
+                  <div>${escapeHtml(v.sku)}</div>
+                  ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+                </td>
+                <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 60px; vertical-align: top;">
+                  ${group.totalQty}
+                </td>
+                <td style="vertical-align: top; width: 165px;">
+                  ${orderIdsHtml}
+                </td>
+              </tr>
+            `;
+          }
+
+          // Case 2: Multi-Variant: Parent with rowspan for STT, image, and product name
+          const varCount = group.variants.length;
+          let groupHtml = '';
+
+          const conversionBadge = group.packagingInfo ? `
+            <div style="font-size: 7.5pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 6px; margin-top: 3px; display: inline-block; line-height: 1.25;">
+              ⚡ <strong>Lấy:</strong> ${escapeHtml(group.packagingInfo.actualPickText)} ➔ <strong>Quy đổi:</strong> ${escapeHtml(group.packagingInfo.equivalentText)}
+            </div>
+          ` : '';
+
+          group.variants.forEach((v, vIdx) => {
+            const isFirstVar = (vIdx === 0);
+            const isLastVar = (vIdx === varCount - 1);
+            const pack = parseSkuPackagingType(v.sku);
+            const orderIdsHtml = renderPrintOrderIds(v.orderIds);
+            const trClass = isLastVar ? 'group-border-bottom' : '';
+
+            if (isFirstVar) {
+              groupHtml += `
+                <tr class="${trClass}">
+                  <td rowspan="${varCount}" style="text-align: center; font-weight: 700; color: #475569; width: 30px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${idx + 1}</td>
+                  <td rowspan="${varCount}" style="text-align: center; width: 50px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${imgHtml}</td>
+                  <td rowspan="${varCount}" style="vertical-align: top; border-bottom: 1.25pt solid #94a3b8; padding-right: 8px;">
+                    <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
+                    ${conversionBadge}
+                  </td>
+                  <td style="vertical-align: top; width: 135px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    <div>${escapeHtml(v.sku)}</div>
+                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+                  </td>
+                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 60px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${v.totalQty}
+                  </td>
+                  <td style="vertical-align: top; width: 165px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${orderIdsHtml}
+                  </td>
+                </tr>
+              `;
+            } else {
+              groupHtml += `
+                <tr class="${trClass}">
+                  <td style="vertical-align: top; width: 135px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    <div>${escapeHtml(v.sku)}</div>
+                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+                  </td>
+                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 60px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${v.totalQty}
+                  </td>
+                  <td style="vertical-align: top; width: 165px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${orderIdsHtml}
+                  </td>
+                </tr>
+              `;
+            }
+          });
+
+          return groupHtml;
+        }).join('');
+
+      } else {
+        // Flat Mode
+        tableRowsHtml = itemsToPrint.map((item, idx) => {
+          const pack = parseSkuPackagingType(item.sku);
+          const imgHtml = item.imageUrl 
+            ? `<img src="${item.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
+            : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
+          const orderIdsHtml = renderPrintOrderIds(item.orderIds);
+
+          return `
+            <tr class="group-border-bottom">
+              <td style="text-align: center; font-weight: 700; color: #475569; width: 30px;">${idx + 1}</td>
+              <td style="text-align: center; width: 50px;">${imgHtml}</td>
+              <td style="vertical-align: top;">
+                <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(item.productName)}</div>
+                ${item.sellerSku && item.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(item.sellerSku)}</div>` : ''}
+              </td>
+              <td style="vertical-align: top; width: 135px; color: #1e293b; font-weight: 500; font-size: 8pt;">
+                <div>${escapeHtml(item.sku)}</div>
+                ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+              </td>
+              <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 60px; vertical-align: top;">
+                ${item.totalQty}
+              </td>
+              <td style="vertical-align: top; width: 165px;">
+                ${orderIdsHtml}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      printContainer.innerHTML = `
+        <!-- Top Brand Header (TikTok Shop Replica) -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2pt solid #0f172a; padding-bottom: 8px; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 32px; object-fit: contain;" />
+            <div style="border-left: 1.5pt solid #cbd5e1; padding-left: 10px;">
+              <h1 style="font-size: 13pt; font-weight: 900; text-transform: uppercase; color: #0f172a; margin: 0; line-height: 1.1;">
+                Picking List • Phiếu Nhặt Hàng Tổng Hợp
+              </h1>
+              <p style="font-size: 7.5pt; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 3px 0 0 0;">
+                Hệ Thống Tự Động Gom Món &amp; Cộng Dồn Số Lượng TikTok Shop
+              </p>
+            </div>
+          </div>
+          <div style="text-align: right; font-size: 8pt; color: #334155; line-height: 1.35;">
+            <div><strong>Thời gian in:</strong> ${nowStr}</div>
+            <div><strong>Nguồn:</strong> ${globalStats.totalFiles} file PDF (${globalStats.totalOrders} đơn hàng)</div>
+            <div style="margin-top: 2px; font-size: 8.5pt;">
+              <strong>Mặt hàng:</strong> <span style="font-weight: 700;">${globalStats.uniqueProducts}</span> (${globalStats.uniqueSkus} SKU) | 
+              <strong>TỔNG SL LẤY:</strong> <span style="font-weight: 900; font-size: 11pt; color: #be123c;">${globalStats.totalQty}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table (1:1 TikTok Shop Layout with Images and Order IDs) -->
+        <table class="tiktok-print-table">
+          <thead>
+            <tr>
+              <th style="width: 30px; text-align: center;">No</th>
+              <th style="width: 50px; text-align: center;">Ảnh</th>
+              <th style="text-align: left;">Tên sản phẩm</th>
+              <th style="width: 135px; text-align: left;">SKU / Phân loại</th>
+              <th style="width: 60px; text-align: center;">SL Lấy</th>
+              <th style="width: 165px; text-align: left;">Mã đơn hàng (Order ID)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRowsHtml}
+          </tbody>
+        </table>
+
+        <!-- Bottom Footer (Official TikTok Shop branding) -->
+        <div class="tiktok-print-footer">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 22px; object-fit: contain;" />
+            <span style="font-size: 7.5pt; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.04em;">
+              TikTok Shop Logistics • Phiếu Nhặt Hàng Chuẩn Kho Vận
+            </span>
+          </div>
+          <div style="font-size: 8pt; color: #475569; font-weight: 600;">
+            <span>Chữ ký thủ kho kiểm hàng: ....................................................</span>
+          </div>
+        </div>
+      `;
+    }
 
     function escapeHtml(str) {
       return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
