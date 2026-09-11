@@ -1,41 +1,39 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-slate-900">
+<html lang="vi" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TikTok Shop Picking Consolidator - Gộp Phiếu Nhặt Hàng Chuyên Nghiệp</title>
+  <title>TikTok Shop Picking Consolidator - Gộp Phiếu Nhặt Hàng</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Local Assets for 100% Offline & Fast Processing -->
+  <!-- Local Assets for 100% Offline & High-Speed Processing -->
   <script src="assets/pdf.min.js"></script>
   <script src="assets/xlsx.full.min.js"></script>
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Google Fonts: 100% Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
             sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
           },
           colors: {
             brand: {
-              50: '#ecfdf5',
-              100: '#d1fae5',
-              500: '#10b981',
-              600: '#059669',
-              700: '#047857',
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
             },
             crimson: {
               50: '#fff1f2',
@@ -51,13 +49,17 @@
   </script>
 
   <style>
-    /* Custom Scrollbars */
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    
+    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: #f8fafc;
     }
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
@@ -71,7 +73,7 @@
     @media print {
       body {
         background: #ffffff !important;
-        color: #000000 !important;
+        color: #0f172a !important;
         font-size: 10pt !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -82,21 +84,18 @@
       .print-only {
         display: block !important;
       }
-      .page-break {
-        page-break-after: always;
-      }
       table {
         width: 100% !important;
         border-collapse: collapse !important;
       }
       th, td {
-        border: 1px solid #1f2937 !important;
-        padding: 5px 7px !important;
+        border: 1px solid #94a3b8 !important;
+        padding: 6px 8px !important;
         font-size: 9pt !important;
       }
       th {
-        background-color: #f3f4f6 !important;
-        color: #000000 !important;
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
         font-weight: 700 !important;
       }
       .print-qty {
@@ -110,72 +109,77 @@
     .print-only {
       display: none;
     }
-
-    /* Subtle grid pattern */
-    .bg-grid-pattern {
-      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
   </style>
 </head>
-<body class="h-full bg-slate-950 font-sans text-slate-100 antialiased flex flex-col selection:bg-rose-500 selection:text-white">
+<body class="min-h-full bg-[#f8fafc] text-slate-900 antialiased flex flex-col selection:bg-rose-500 selection:text-white">
 
-  <!-- Top Announcement Bar (no-print) -->
-  <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5 py-1.5 px-4 text-center text-xs text-slate-400 font-medium no-print flex items-center justify-center space-x-2">
-    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
-      Client-Side Engine
-    </span>
-    <span>Xử lý 100% nội bộ trên trình duyệt • Không tải dữ liệu đơn hàng ra bên ngoài • Tuyệt đối bảo mật</span>
+  <!-- Top Banner (no-print) -->
+  <div class="bg-white border-b border-slate-200/80 py-2 px-4 text-xs text-slate-600 font-medium no-print">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+          Bảo Mật Nội Bộ (Client-Side)
+        </span>
+        <span class="text-slate-500 hidden md:inline">Toàn bộ file PDF được đọc trên trình duyệt của bạn, không gửi đơn hàng ra ngoài</span>
+      </div>
+      <div class="flex items-center space-x-3 text-slate-500 text-[11px]">
+        <span class="flex items-center">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+          Chuẩn TikTok Shop 200 đơn/tờ
+        </span>
+        <span class="flex items-center">
+          <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+          Xử lý 1.000 đơn &lt; 2s
+        </span>
+      </div>
+    </div>
   </div>
 
-  <!-- App Header (no-print) -->
-  <header class="bg-slate-900/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-40 no-print">
+  <!-- Main App Header (no-print) -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
       <!-- Brand Logo -->
-      <div class="flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-rose-400 p-[1px] shadow-lg shadow-rose-950/40">
-          <div class="w-full h-full bg-slate-900 rounded-[11px] flex items-center justify-center text-rose-400">
-            <i data-lucide="boxes" class="w-5 h-5"></i>
-          </div>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-md shadow-rose-500/20">
+          <i data-lucide="boxes" class="w-5 h-5"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <h1 class="font-bold text-base text-white tracking-tight leading-tight">TikTok Picking Consolidator</h1>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">PRO</span>
+            <h1 class="font-bold text-base text-slate-900 leading-tight tracking-tight">TikTok Picking Consolidator</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-rose-50 text-rose-700 border border-rose-200">PRO</span>
           </div>
-          <p class="text-xs text-slate-400">Gộp & cộng dồn tự động danh sách nhặt hàng TikTok Shop</p>
+          <p class="text-xs text-slate-500">Gộp & cộng dồn danh sách nhặt hàng TikTok Shop tự động</p>
         </div>
       </div>
 
-      <!-- Quick Status & Actions -->
-      <div class="flex items-center space-x-3">
-        <a 
-          href="javascript:void(0)" 
+      <!-- Quick Actions -->
+      <div class="flex items-center space-x-2">
+        <button 
           onclick="loadSampleData()"
-          class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-700 hover:text-white border border-white/10 transition-all active:scale-[0.98]"
+          class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition-all border border-slate-200/80 active:scale-[0.98]"
         >
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1.5 text-amber-400"></i>
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1.5 text-amber-600"></i>
           Nạp thử file mẫu 09-06
-        </a>
+        </button>
       </div>
 
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- Main App Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- Print-Only Header (Formatted for A4) -->
+    <!-- Print Header (Only visible when printing) -->
     <div class="print-only mb-6">
-      <div class="flex justify-between items-start border-b-2 border-black pb-3">
+      <div class="flex justify-between items-start border-b-2 border-slate-900 pb-3">
         <div>
-          <h1 class="text-xl font-black uppercase tracking-tight text-black">BẢNG TỔNG HỢP LẤY HÀNG (PICKING LIST TỔNG)</h1>
-          <p class="text-xs text-gray-700 mt-1" id="printSubTitle">Ngày in: ...</p>
+          <h1 class="text-xl font-bold uppercase tracking-tight text-slate-900">PHIẾU NHẶT HÀNG TỔNG HỢP (PICKING LIST TỔNG)</h1>
+          <p class="text-xs text-slate-600 mt-1" id="printSubTitle">Ngày in: ...</p>
         </div>
         <div class="text-right text-xs" id="printStats">
-          <!-- Populated by JS -->
+          <!-- Injected via JS -->
         </div>
       </div>
     </div>
@@ -184,7 +188,7 @@
     <section class="no-print">
       <div 
         id="dropZone"
-        class="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-700 hover:border-rose-500/80 bg-slate-900/60 hover:bg-slate-900/90 transition-all duration-200 cursor-pointer group p-8 sm:p-10 text-center shadow-xl shadow-black/20"
+        class="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 hover:border-rose-500 bg-white hover:bg-rose-50/20 transition-all duration-200 cursor-pointer group p-8 sm:p-10 text-center shadow-xs"
       >
         <input 
           type="file" 
@@ -194,63 +198,63 @@
           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
         
-        <div class="flex flex-col items-center justify-center space-y-4">
-          <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center group-hover:scale-105 group-hover:bg-rose-500/20 transition-all duration-200">
-            <i data-lucide="file-up" class="w-8 h-8"></i>
+        <div class="flex flex-col items-center justify-center space-y-3.5">
+          <div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center group-hover:scale-105 group-hover:bg-rose-100 transition-all duration-200 shadow-xs">
+            <i data-lucide="upload-cloud" class="w-7 h-7"></i>
           </div>
           
-          <div class="max-w-md">
-            <p class="text-base sm:text-lg font-semibold text-white tracking-tight">
-              Kéo thả các file <span class="text-rose-400 underline decoration-rose-500/40 underline-offset-4 font-mono">Picking list (.pdf)</span> vào đây
+          <div class="max-w-lg">
+            <p class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+              Kéo thả các file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4">Picking list (.pdf)</span> vào đây
             </p>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">
-              Hoặc bấm vào để chọn nhiều file cùng lúc từ máy tính (<span class="font-mono text-slate-300">Picking list_1, 2, 3...</span>)
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              Hoặc bấm vào để chọn cùng lúc nhiều file từ máy tính (<span class="font-medium text-slate-700">Picking list_1, list_2, list_3...</span>)
             </p>
           </div>
 
-          <div class="flex flex-wrap justify-center items-center gap-2 pt-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800/80 text-slate-300 border border-white/5">
-              <i data-lucide="zap" class="w-3.5 h-3.5 mr-1.5 text-amber-400"></i>
-              Tự cộng dồn số lượng
+          <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+              <i data-lucide="combine" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
+              Tự nhận diện sản phẩm trùng
             </span>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800/80 text-slate-300 border border-white/5">
-              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 mr-1.5 text-emerald-400"></i>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+              <i data-lucide="image" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
+              Tách ảnh sản phẩm sắc nét
+            </span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
               Xuất Excel chuẩn
-            </span>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800/80 text-slate-300 border border-white/5">
-              <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5 text-cyan-400"></i>
-              In khổ A4 đi kho
             </span>
           </div>
         </div>
       </div>
 
       <!-- Processing Progress Bar -->
-      <div id="progressContainer" class="hidden mt-4 bg-slate-900 border border-white/10 p-4 rounded-xl shadow-lg">
-        <div class="flex justify-between items-center text-xs font-medium text-slate-300 mb-2 font-mono">
+      <div id="progressContainer" class="hidden mt-4 bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
           <span id="progressText" class="flex items-center">
-            <i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-400"></i>
-            Đang đọc và tách số lượng từ file PDF...
+            <i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i>
+            Đang trích xuất dữ liệu và ảnh từ file PDF...
           </span>
-          <span id="progressPercent" class="font-bold text-rose-400">0%</span>
+          <span id="progressPercent" class="font-bold text-rose-600">0%</span>
         </div>
-        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-          <div id="progressBar" class="bg-gradient-to-r from-rose-500 to-rose-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+          <div id="progressBar" class="bg-gradient-to-r from-rose-500 to-rose-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
       </div>
 
       <!-- File Chips Bar -->
-      <div id="fileChipsContainer" class="hidden mt-4 p-3.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+      <div id="fileChipsContainer" class="hidden mt-4 p-3.5 rounded-xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center mr-1">
-            <i data-lucide="folder-check" class="w-3.5 h-3.5 mr-1 text-emerald-400"></i>
-            Nguồn PDF:
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center mr-1">
+            <i data-lucide="folder-check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+            File đã nạp:
           </span>
           <div id="fileChipsList" class="flex flex-wrap gap-2"></div>
         </div>
         <button 
           id="clearBtn" 
-          class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all active:scale-[0.98]"
+          class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all active:scale-[0.98]"
         >
           <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i>
           Xóa tất cả
@@ -258,29 +262,29 @@
       </div>
     </section>
 
-    <!-- Fulfillment Progress Bar (Sticky when items loaded) -->
+    <!-- Fulfillment Progress Bar (Sticky / Highlight) -->
     <section id="fulfillmentSection" class="hidden no-print">
-      <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-white/10 p-4 rounded-2xl shadow-xl">
+      <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2.5">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
-              <i data-lucide="check-check" class="w-4 h-4"></i>
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center font-bold">
+              <i data-lucide="check-check" class="w-5 h-5"></i>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center">
                 Tiến độ nhặt hàng kho thực tế
-                <span id="fulfillmentBadge" class="ml-2 px-2 py-0.5 text-[11px] font-mono font-bold rounded-full bg-slate-800 text-slate-300 border border-white/5">0 / 0</span>
+                <span id="fulfillmentBadge" class="ml-2.5 px-2.5 py-0.5 text-xs font-bold rounded-full bg-slate-100 text-slate-800 border border-slate-200">0 / 0</span>
               </h3>
-              <p class="text-xs text-slate-400">Tích chọn từng món trên màn hình để nhân viên kho kiểm soát hàng đã lấy vào xe đẩy</p>
+              <p class="text-xs text-slate-500">Tích chọn các món đã lấy vào xe đẩy để thủ kho kiểm soát không bị sót hàng</p>
             </div>
           </div>
           <div class="text-right flex items-center sm:block justify-between">
-            <span class="text-xs text-slate-400 sm:block">Đã gom hoàn tất:</span>
-            <span id="fulfillmentPercent" class="text-lg sm:text-xl font-black font-mono text-emerald-400">0%</span>
+            <span class="text-xs text-slate-500 sm:block">Đã gom hoàn tất:</span>
+            <span id="fulfillmentPercent" class="text-xl sm:text-2xl font-black text-emerald-600">0%</span>
           </div>
         </div>
-        <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
-          <div id="fulfillmentBar" class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div id="fulfillmentBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
       </div>
     </section>
@@ -289,70 +293,70 @@
     <section id="statsSection" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-4 no-print">
       
       <!-- Card 1: Total Files -->
-      <div class="bg-slate-900/90 border border-white/10 p-4 sm:p-5 rounded-2xl shadow-lg relative overflow-hidden group">
+      <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-xs">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Số file PDF gộp</p>
-            <h3 class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 tabular-nums" id="statFiles">0</h3>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Số file PDF</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statFiles">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
             <i data-lucide="files" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 flex items-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></span>
-          TikTok giới hạn 200 đơn/file
+        <div class="mt-3 text-[11px] text-slate-500 flex items-center">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+          TikTok tối đa 200 đơn/file
         </div>
       </div>
 
       <!-- Card 2: Total Orders -->
-      <div class="bg-slate-900/90 border border-white/10 p-4 sm:p-5 rounded-2xl shadow-lg relative overflow-hidden group">
+      <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-xs">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Tổng số đơn hàng</p>
-            <h3 class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 tabular-nums" id="statOrders">0</h3>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Tổng số đơn hàng</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statOrders">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
-            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          <div class="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 flex items-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-purple-400 mr-1.5"></span>
-          Tổng đơn TikTok đã khai báo
+        <div class="mt-3 text-[11px] text-slate-500 flex items-center">
+          <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5"></span>
+          Đã trích xuất chính xác
         </div>
       </div>
 
       <!-- Card 3: SKU Count -->
-      <div class="bg-slate-900/90 border border-white/10 p-4 sm:p-5 rounded-2xl shadow-lg relative overflow-hidden group">
+      <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-xs">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Mặt hàng (SKU)</p>
-            <h3 class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 tabular-nums" id="statSkus">0</h3>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Mặt hàng (SKU)</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tabular-nums" id="statSkus">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
             <i data-lucide="layers" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 flex items-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"></span>
-          Đã gộp các mã trùng lặp
+        <div class="mt-3 text-[11px] text-slate-500 flex items-center">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+          Đã gộp trùng lặp
         </div>
       </div>
 
       <!-- Card 4: Total Quantity (Hero Metric) -->
-      <div class="bg-gradient-to-br from-rose-600 to-rose-700 border border-rose-500/40 p-4 sm:p-5 rounded-2xl shadow-xl shadow-rose-950/40 relative overflow-hidden group text-white">
+      <div class="bg-rose-600 text-white p-4 sm:p-5 rounded-2xl shadow-md shadow-rose-600/20 border border-rose-500">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-[11px] font-bold uppercase tracking-wider text-rose-100">TỔNG SỐ LƯỢNG LẤY</p>
-            <h3 class="text-3xl sm:text-4xl font-black font-mono mt-1 tabular-nums tracking-tight" id="statTotalQty">0</h3>
+            <p class="text-xs font-bold uppercase tracking-wider text-rose-100">TỔNG SỐ LƯỢNG LẤY</p>
+            <h3 class="text-3xl sm:text-4xl font-black mt-1 tabular-nums" id="statTotalQty">0</h3>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm text-white flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center">
             <i data-lucide="package-check" class="w-5 h-5"></i>
           </div>
         </div>
-        <div class="mt-3 text-[11px] text-rose-100/80 font-medium flex items-center">
+        <div class="mt-3 text-[11px] text-rose-100/90 font-medium flex items-center">
           <span class="w-1.5 h-1.5 rounded-full bg-white mr-1.5"></span>
-          Tổng số món đồ cần nhặt
+          Tổng số món hàng cần nhặt
         </div>
       </div>
 
@@ -362,9 +366,9 @@
     <section id="resultSection" class="hidden space-y-4">
       
       <!-- Action Toolbar (no-print) -->
-      <div class="bg-slate-900 border border-white/10 p-4 rounded-2xl shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-4 no-print">
+      <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4 no-print">
         
-        <!-- Left: Search & Filter Pills -->
+        <!-- Search & Filter Controls -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
           <!-- Search input -->
           <div class="relative flex-1 max-w-md">
@@ -372,10 +376,10 @@
             <input 
               type="text" 
               id="searchInput" 
-              placeholder="Tìm kiếm nhanh tên thuốc, sản phẩm, SKU (Ctrl+K)..." 
-              class="w-full pl-10 pr-9 py-2 bg-slate-800/90 border border-white/10 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all font-sans"
+              placeholder="Tìm theo tên sản phẩm, SKU, hoặc mã đơn (Ctrl+K)..." 
+              class="w-full pl-10 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white transition-all"
             />
-            <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+            <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -385,37 +389,37 @@
             <button 
               onclick="setFilter('all')" 
               id="filter-all" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-rose-600 text-white"
+              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-rose-600 text-white shadow-xs"
             >
               Tất cả (<span id="count-all">0</span>)
             </button>
             <button 
               onclick="setFilter('pending')" 
               id="filter-pending" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700"
+              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
             >
               Chưa nhặt (<span id="count-pending">0</span>)
             </button>
             <button 
               onclick="setFilter('done')" 
               id="filter-done" 
-              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700"
+              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
             >
               Đã xong (<span id="count-done">0</span>)
             </button>
           </div>
         </div>
 
-        <!-- Right: View Switcher & Primary Action Buttons -->
+        <!-- View Switcher & Action Buttons -->
         <div class="flex flex-wrap items-center gap-2.5">
           
           <!-- View Mode Toggle -->
-          <div class="bg-slate-800 p-1 rounded-xl border border-white/5 flex items-center">
+          <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center">
             <button 
               id="viewTableBtn" 
               onclick="switchView('table')" 
-              title="Chế độ Bảng đầy đủ" 
-              class="p-1.5 rounded-lg text-xs font-medium bg-slate-700 text-white transition-all"
+              title="Chế độ Bảng chuẩn" 
+              class="p-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-xs transition-all"
             >
               <i data-lucide="table" class="w-4 h-4"></i>
             </button>
@@ -423,7 +427,7 @@
               id="viewCardBtn" 
               onclick="switchView('card')" 
               title="Chế độ Thẻ nhặt kho lớn (Cho điện thoại/tablet)" 
-              class="p-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all"
+              class="p-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all"
             >
               <i data-lucide="layout-grid" class="w-4 h-4"></i>
             </button>
@@ -432,7 +436,7 @@
           <!-- Sort Selector -->
           <select 
             id="sortSelector" 
-            class="bg-slate-800 border border-white/10 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-rose-500 font-medium"
+            class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-rose-500 font-semibold cursor-pointer"
             onchange="handleSortChange(this.value)"
           >
             <option value="qty-desc">Số lượng: Cao → Thấp</option>
@@ -443,18 +447,18 @@
           <!-- Export Excel Button -->
           <button 
             id="exportExcelBtn" 
-            class="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/30 transition-all active:scale-[0.98]"
+            class="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-all active:scale-[0.98]"
           >
             <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5"></i>
-            Xuất Excel (.xlsx)
+            Xuất Excel
           </button>
 
           <!-- Print A4 Button -->
           <button 
             id="printBtn" 
-            class="inline-flex items-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs sm:text-sm font-bold shadow-lg shadow-black/30 transition-all active:scale-[0.98]"
+            class="inline-flex items-center px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-xs transition-all active:scale-[0.98]"
           >
-            <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+            <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-rose-400"></i>
             In phiếu A4
           </button>
 
@@ -462,69 +466,147 @@
 
       </div>
 
+      <!-- Batch Actions Bar -->
+      <div class="flex items-center justify-between px-2 text-xs text-slate-500 no-print">
+        <div class="flex items-center space-x-3">
+          <button onclick="checkAll(true)" class="hover:text-slate-900 font-semibold hover:underline">
+            Tích chọn tất cả là đã lấy
+          </button>
+          <span>•</span>
+          <button onclick="checkAll(false)" class="hover:text-slate-900 font-semibold hover:underline">
+            Bỏ chọn tất cả
+          </button>
+        </div>
+        <div>
+          <span>Bấm vào mã đơn để xem danh sách chi tiết</span>
+        </div>
+      </div>
+
       <!-- VIEW 1: TABLE VIEW (Default) -->
-      <div id="tableViewWrapper" class="bg-slate-900 border border-white/10 rounded-2xl shadow-xl overflow-hidden">
+      <div id="tableViewWrapper" class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm" id="itemsTable">
-            <thead class="bg-slate-850 text-slate-300 font-semibold uppercase text-[11px] tracking-wider border-b border-white/10">
+            <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[11px] tracking-wider border-b border-slate-200">
               <tr>
-                <th scope="col" class="py-3 px-3 text-center w-12 no-print">Lấy</th>
-                <th scope="col" class="py-3 px-3 text-center w-12 print-only">Kiểm</th>
-                <th scope="col" class="py-3 px-3 text-center w-12">STT</th>
-                <th scope="col" class="py-3 px-4 min-w-[300px]">Tên sản phẩm</th>
-                <th scope="col" class="py-3 px-4 min-w-[160px]">Phân loại (SKU)</th>
-                <th scope="col" class="py-3 px-3 text-center min-w-[100px]">Seller SKU</th>
-                <th scope="col" class="py-3 px-4 text-center min-w-[130px] text-rose-400 font-bold bg-rose-500/10">TỔNG SL</th>
-                <th scope="col" class="py-3 px-4 min-w-[180px] no-print">Nguồn từng file PDF</th>
+                <th scope="col" class="py-3.5 px-3 text-center w-12 no-print">Lấy</th>
+                <th scope="col" class="py-3.5 px-3 text-center w-12 print-only">Kiểm</th>
+                <th scope="col" class="py-3.5 px-3 text-center w-12">STT</th>
+                <th scope="col" class="py-3.5 px-3 text-center w-16 no-print">Ảnh</th>
+                <th scope="col" class="py-3.5 px-4 min-w-[280px]">Tên sản phẩm</th>
+                <th scope="col" class="py-3.5 px-4 min-w-[150px]">Phân loại (SKU)</th>
+                <th scope="col" class="py-3.5 px-4 text-center min-w-[110px] text-rose-700 font-bold bg-rose-50/70">TỔNG SL</th>
+                <th scope="col" class="py-3.5 px-3 text-center min-w-[90px] no-print">Mã đơn</th>
+                <th scope="col" class="py-3.5 px-4 min-w-[180px] no-print">Nguồn từng file PDF</th>
               </tr>
             </thead>
-            <tbody id="tableBody" class="divide-y divide-white/5 text-slate-200">
+            <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-800">
               <!-- Rendered by JS -->
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- VIEW 2: CARD VIEW (Optimized for handheld mobile warehouse pickers) -->
-      <div id="cardViewWrapper" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 no-print">
+      <!-- VIEW 2: CARD VIEW (Optimized for Mobile Warehouse Pickers) -->
+      <div id="cardViewWrapper" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 no-print">
         <!-- Rendered by JS -->
       </div>
 
       <!-- Empty State for Search -->
-      <div id="emptySearch" class="hidden p-12 text-center bg-slate-900 border border-white/10 rounded-2xl">
-        <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3">
+      <div id="emptySearch" class="hidden p-12 text-center bg-white border border-slate-200 rounded-2xl">
+        <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
           <i data-lucide="package-x" class="w-6 h-6"></i>
         </div>
-        <p class="text-sm font-semibold text-white">Không tìm thấy sản phẩm phù hợp</p>
-        <p class="text-xs text-slate-400 mt-1">Hãy thử kiểm tra lại từ khóa tìm kiếm hoặc bấm chuyển bộ lọc</p>
+        <p class="text-sm font-bold text-slate-900">Không tìm thấy sản phẩm phù hợp</p>
+        <p class="text-xs text-slate-500 mt-1">Hãy thử kiểm tra lại từ khóa hoặc chuyển bộ lọc</p>
       </div>
 
     </section>
 
-    <!-- Guide & Info Footer (no-print) -->
-    <section class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 shadow-sm text-xs text-slate-400 space-y-3 no-print">
-      <div class="flex items-center space-x-2 text-slate-300 font-semibold">
-        <i data-lucide="lightbulb" class="w-4 h-4 text-amber-400"></i>
-        <span>Mẹo vận hành cho chủ Shop và Thủ kho:</span>
+    <!-- Guide & Warehouse Info Footer (no-print) -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs text-xs text-slate-600 space-y-3 no-print">
+      <div class="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+        <i data-lucide="info" class="w-4 h-4 text-rose-600"></i>
+        <span>Hướng dẫn vận hành gom đơn hiệu quả:</span>
       </div>
-      <div class="grid md:grid-cols-3 gap-4 text-slate-400">
-        <div>
-          <strong class="text-slate-300">1. Không cần mở từng file:</strong> Tải toàn bộ các file PDF từ TikTok Seller Center về thư mục Downloads, rồi kéo thả cùng lúc vào công cụ.
+      <div class="grid md:grid-cols-3 gap-5 text-slate-600">
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+          <strong class="text-slate-900 block mb-1 text-xs">1. Kéo thả 1 lượt tất cả các file:</strong>
+          Tải toàn bộ các file PDF Picking list của ngày hôm đó (mỗi file tối đa 200 đơn) rồi kéo thả cùng lúc vào web. Hệ thống tự động gộp các món giống hệt nhau.
         </div>
-        <div>
-          <strong class="text-slate-300">2. Chế độ Thẻ trên điện thoại:</strong> Mở link trên điện thoại hoặc tablet, bấm biểu tượng Thẻ để chuyển sang giao diện nút bấm to, tiện tích kiểm khi đi giữa các kệ hàng.
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+          <strong class="text-slate-900 block mb-1 text-xs">2. Nhặt hàng theo hình ảnh:</strong>
+          Nhân viên kho quan sát hình ảnh sản phẩm và số lượng màu đỏ để lấy hàng nhanh chóng, không bị nhầm lẫn giữa các quy cách chai 100ml hay thùng.
         </div>
-        <div>
-          <strong class="text-slate-300">3. In A4 tiết kiệm giấy:</strong> Bấm nút "In phiếu A4", trình duyệt tự căn vừa vặn danh mục hàng gọn gàng để in 1 tờ duy nhất thay vì in 5-10 tờ PDF riêng lẻ.
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+          <strong class="text-slate-900 block mb-1 text-xs">3. Tra cứu theo mã đơn 18 số:</strong>
+          Gõ mã đơn TikTok (ví dụ: 585908...) vào ô tìm kiếm để biết ngay đơn đó mua sản phẩm nào và số lượng bao nhiêu.
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- App Footer (no-print) -->
-  <footer class="bg-slate-950 border-t border-white/10 py-4 text-center text-xs text-slate-500 no-print">
-    <p>TikTok Shop Picking Consolidator • Hệ thống hỗ trợ tối ưu vận hành đóng gói & lấy hàng</p>
+  <!-- Order IDs Modal (no-print) -->
+  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="font-bold text-base text-slate-900" id="modalTitle">Danh sách mã đơn hàng</h3>
+          <p class="text-xs text-slate-500 mt-0.5" id="modalSubTitle">Sản phẩm: ...</p>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+        <span id="modalOrderCount">Tổng cộng: 0 mã đơn</span>
+        <button 
+          onclick="copyOrderIds()" 
+          id="copyBtn" 
+          class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] transition-all"
+        >
+          <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
+          Sao chép tất cả mã đơn
+        </button>
+      </div>
+
+      <div class="max-h-60 overflow-y-auto rounded-xl border border-slate-200 p-3 bg-slate-50">
+        <div id="modalOrderList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs font-mono text-slate-700">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <div class="text-right">
+        <button onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Zoom Modal (no-print) -->
+  <div id="imageModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeImageModal()">
+    <div class="bg-white p-3 rounded-2xl max-w-sm w-full shadow-2xl text-center space-y-3" onclick="event.stopPropagation()">
+      <div class="overflow-hidden rounded-xl bg-slate-100 border border-slate-200">
+        <img id="zoomImg" src="" alt="Ảnh sản phẩm" class="w-full h-auto object-contain max-h-[350px]" />
+      </div>
+      <p id="zoomTitle" class="text-xs font-bold text-slate-900 px-2 line-clamp-2"></p>
+      <button onclick="closeImageModal()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">
+        Đóng
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center space-x-2 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none no-print">
+    <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">Đã sao chép!</span>
+  </div>
+
+  <!-- Footer (no-print) -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+    <p>TikTok Shop Picking Consolidator • Thiết kế tối ưu cho hoạt động kho hàng & đóng gói</p>
   </footer>
 
   <!-- Application Logic -->
@@ -537,11 +619,12 @@
     // App State
     let loadedFiles = [];
     let aggregatedItems = [];
-    let globalStats = {};
+    let globalStats = { totalFiles: 0, totalOrders: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
     let checkedItemKeys = new Set();
     let currentFilter = 'all'; // 'all', 'pending', 'done'
     let currentView = 'table'; // 'table', 'card'
     let currentSort = 'qty-desc';
+    let currentModalOrders = [];
 
     // DOM Elements
     const dropZone = document.getElementById('dropZone');
@@ -569,8 +652,10 @@
     const printBtn = document.getElementById('printBtn');
     const viewTableBtn = document.getElementById('viewTableBtn');
     const viewCardBtn = document.getElementById('viewCardBtn');
+    const orderModal = document.getElementById('orderModal');
+    const imageModal = document.getElementById('imageModal');
 
-    // Initialize Lucide Icons
+    // Create Lucide Icons
     lucide.createIcons();
 
     // Setup Shortcuts (Ctrl+K or / to search)
@@ -579,14 +664,18 @@
         e.preventDefault();
         searchInput.focus();
       }
+      if (e.key === 'Escape') {
+        closeModal();
+        closeImageModal();
+      }
     });
 
-    // Drag & Drop Listeners
+    // Drag & Drop
     ['dragenter', 'dragover'].forEach(eventName => {
       dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
         e.stopPropagation();
-        dropZone.classList.add('border-rose-500', 'bg-rose-500/10');
+        dropZone.classList.add('border-rose-500', 'bg-rose-50/40');
       });
     });
 
@@ -594,29 +683,25 @@
       dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
         e.stopPropagation();
-        dropZone.classList.remove('border-rose-500', 'bg-rose-500/10');
+        dropZone.classList.remove('border-rose-500', 'bg-rose-50/40');
       });
     });
 
     dropZone.addEventListener('drop', (e) => {
       const dt = e.dataTransfer;
       const files = Array.from(dt.files).filter(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'));
-      if (files.length > 0) {
-        handleFiles(files);
-      }
+      if (files.length > 0) handleFiles(files);
     });
 
     fileInput.addEventListener('change', (e) => {
       const files = Array.from(e.target.files).filter(f => f.name.endsWith('.pdf'));
-      if (files.length > 0) {
-        handleFiles(files);
-      }
+      if (files.length > 0) handleFiles(files);
     });
 
     clearBtn.addEventListener('click', () => {
       loadedFiles = [];
       aggregatedItems = [];
-      globalStats = {};
+      globalStats = { totalFiles: 0, totalOrders: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
       checkedItemKeys.clear();
       fileInput.value = '';
       fileChipsContainer.classList.add('hidden');
@@ -643,43 +728,52 @@
 
     printBtn.addEventListener('click', () => {
       document.getElementById('printSubTitle').textContent = 
-        `Ngày in: ${new Date().toLocaleString('vi-VN')} | Nguồn: ${globalStats.totalFiles} file PDF (${globalStats.totalOrders} đơn)`;
+        `Ngày in: ${new Date().toLocaleString('vi-VN')} | Nguồn: ${globalStats.totalFiles} file PDF (${globalStats.totalOrders} đơn hàng)`;
       document.getElementById('printStats').innerHTML = 
-        `<p class="font-bold">Mặt hàng: ${globalStats.uniqueSkus} SKU | Tổng SL cần nhặt: <strong class="text-base">${globalStats.totalQty}</strong></p>`;
+        `<p><strong>Mặt hàng SKU:</strong> ${globalStats.uniqueSkus} | <strong>TỔNG SL:</strong> <span class="text-base font-bold">${globalStats.totalQty}</span></p>`;
       window.print();
     });
 
-    // Switch View
+    // View Switching
     window.switchView = function(mode) {
       currentView = mode;
       if (mode === 'table') {
         tableViewWrapper.classList.remove('hidden');
         cardViewWrapper.classList.add('hidden');
-        viewTableBtn.className = "p-1.5 rounded-lg text-xs font-medium bg-slate-700 text-white transition-all";
-        viewCardBtn.className = "p-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all";
+        viewTableBtn.className = "p-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-xs transition-all";
+        viewCardBtn.className = "p-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all";
       } else {
         tableViewWrapper.classList.add('hidden');
         cardViewWrapper.classList.remove('hidden');
-        viewCardBtn.className = "p-1.5 rounded-lg text-xs font-medium bg-slate-700 text-white transition-all";
-        viewTableBtn.className = "p-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all";
+        viewCardBtn.className = "p-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-xs transition-all";
+        viewTableBtn.className = "p-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all";
       }
       renderCurrentView();
     };
 
-    // Set Filter
+    // Filter Handling
     window.setFilter = function(filter) {
       currentFilter = filter;
       document.querySelectorAll('.filter-pill').forEach(btn => {
-        btn.className = "filter-pill px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700";
+        btn.className = "filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200";
       });
       const activeBtn = document.getElementById(`filter-${filter}`);
       if (activeBtn) {
-        activeBtn.className = "filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-rose-600 text-white";
+        activeBtn.className = "filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-rose-600 text-white shadow-xs";
       }
       renderCurrentView();
     };
 
-    // Sort Handler
+    window.checkAll = function(checked) {
+      if (checked) {
+        aggregatedItems.forEach(it => checkedItemKeys.add(it.key));
+      } else {
+        checkedItemKeys.clear();
+      }
+      updateFulfillmentProgress();
+      renderCurrentView();
+    };
+
     window.handleSortChange = function(val) {
       currentSort = val;
       sortAggregatedItems();
@@ -710,14 +804,14 @@
       let parsedFilesData = [];
       for (let i = 0; i < loadedFiles.length; i++) {
         const file = loadedFiles[i];
-        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-400"></i> Đang đọc: ${file.name} (${i + 1}/${loadedFiles.length})...`;
+        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang đọc file: ${file.name} (${i + 1}/${loadedFiles.length})...`;
         lucide.createIcons();
         const pct = Math.round(((i + 1) / loadedFiles.length) * 100);
         progressBar.style.width = `${pct}%`;
         progressPercent.textContent = `${pct}%`;
 
         try {
-          const fileData = await parsePdfFile(file);
+          const fileData = await parsePdfFileWithThumbnails(file);
           parsedFilesData.push(fileData);
         } catch (err) {
           console.error("Lỗi khi đọc file " + file.name, err);
@@ -733,10 +827,10 @@
     function updateFileChips() {
       fileChipsContainer.classList.remove('hidden');
       fileChipsList.innerHTML = loadedFiles.map((f, idx) => `
-        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono bg-slate-800 text-slate-200 border border-white/10">
-          <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5 text-rose-400"></i>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
           ${f.name}
-          <button onclick="removeFile(${idx})" class="ml-2 text-slate-400 hover:text-rose-400 transition-colors">
+          <button onclick="removeFile(${idx})" class="ml-2 text-slate-400 hover:text-rose-600 transition-colors">
             <i data-lucide="x" class="w-3 h-3"></i>
           </button>
         </span>
@@ -753,8 +847,8 @@
       }
     };
 
-    // PDF Coordinate-based Parser (100% Client-side)
-    async function parsePdfFile(file) {
+    // Client-side PDF Parser with Product Image Cropping
+    async function parsePdfFileWithThumbnails(file) {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       
@@ -775,12 +869,43 @@
       let allSkus = [];
       let currentProductNo = null;
       let productNames = {};
+      let productImages = {};
+      let allOrderIds = new Set();
 
       for (let pIdx = 1; pIdx <= pdf.numPages; pIdx++) {
         const page = await pdf.getPage(pIdx);
         const textContent = await page.getTextContent();
         const viewport = page.getViewport({ scale: 1.0 });
         const pageHeight = viewport.height;
+
+        // Render page to canvas to crop thumbnail images
+        let pageCanvas = null;
+        try {
+          const renderScale = 1.5;
+          const renderViewport = page.getViewport({ scale: renderScale });
+          pageCanvas = document.createElement('canvas');
+          pageCanvas.width = renderViewport.width;
+          pageCanvas.height = renderViewport.height;
+          const pageCtx = pageCanvas.getContext('2d');
+          await page.render({ canvasContext: pageCtx, viewport: renderViewport }).promise;
+        } catch (e) {
+          console.warn('Canvas thumbnail render skipped on page ' + pIdx, e);
+        }
+
+        // Parse words and full text
+        const fullPageText = textContent.items.map(it => it.str).join(' ');
+        
+        // Extract metadata from page 1 using regex
+        if (pIdx === 1) {
+          const orderMatch = fullPageText.match(/Order\s+quantity:\s*(\d+)/i);
+          if (orderMatch) metadata.orderQty = parseInt(orderMatch[1], 10);
+
+          const prodMatch = fullPageText.match(/Product\s+quantity:\s*(\d+)/i);
+          if (prodMatch) metadata.productQty = parseInt(prodMatch[1], 10);
+
+          const itemMatch = fullPageText.match(/Item\s+quantity:\s*(\d+)/i);
+          if (itemMatch) metadata.itemQty = parseInt(itemMatch[1], 10);
+        }
 
         let words = [];
         for (const item of textContent.items) {
@@ -789,19 +914,6 @@
           const x0 = item.transform[4];
           const top = pageHeight - item.transform[5];
           words.push({ text: str, x0, top, width: item.width, height: item.height });
-        }
-
-        // Header info on Page 1
-        if (pIdx === 1) {
-          for (let i = 0; i < words.length; i++) {
-            if (words[i].text === 'quantity:' && i > 0 && i + 1 < words.length) {
-              const prev = words[i - 1].text;
-              const val = parseInt(words[i + 1].text, 10) || 0;
-              if (prev === 'Order') metadata.orderQty = val;
-              if (prev === 'Product') metadata.productQty = val;
-              if (prev === 'Item') metadata.itemQty = val;
-            }
-          }
         }
 
         const topLimit = (pIdx === 1) ? 165 : 55;
@@ -814,7 +926,30 @@
         const noWords = bodyWords.filter(w => w.x0 >= COL_NO[0] && w.x0 <= COL_NO[1] && /^\d+$/.test(w.text));
         noWords.sort((a, b) => a.top - b.top);
 
-        // Map SKUs
+        // Crop product images for each No on this page
+        if (pageCanvas) {
+          for (const n of noWords) {
+            const nVal = parseInt(n.text, 10);
+            try {
+              const scale = 1.5;
+              const cropX = 63 * scale;
+              const cropY = (n.top - 4) * scale;
+              const cropW = 49 * scale;
+              const cropH = 49 * scale;
+
+              const thumbCanvas = document.createElement('canvas');
+              thumbCanvas.width = 80;
+              thumbCanvas.height = 80;
+              const thumbCtx = thumbCanvas.getContext('2d');
+              thumbCtx.drawImage(pageCanvas, cropX, cropY, cropW, cropH, 0, 0, 80, 80);
+              productImages[nVal] = thumbCanvas.toDataURL('image/jpeg', 0.85);
+            } catch (err) {
+              console.warn("Lỗi crop ảnh No " + nVal, err);
+            }
+          }
+        }
+
+        // Map SKU rows
         for (let qIdx = 0; qIdx < qtyWords.length; qIdx++) {
           const q = qtyWords[qIdx];
           const qTop = q.top;
@@ -825,13 +960,20 @@
 
           const nextQTop = (qIdx + 1 < qtyWords.length) ? qtyWords[qIdx + 1].top - 2 : 9999;
 
+          // SKU variant text
           const skuWords = bodyWords.filter(w => w.x0 >= COL_SKU[0] && w.x0 <= COL_SKU[1] && w.top >= qTop - 5 && w.top < nextQTop);
           skuWords.sort((a, b) => Math.abs(a.top - b.top) > 3 ? a.top - b.top : a.x0 - b.x0);
           const skuText = skuWords.map(w => w.text).join(' ').trim();
 
+          // Seller SKU
           const sellerSkuWords = bodyWords.filter(w => w.x0 >= COL_SELLER_SKU[0] && w.x0 <= COL_SELLER_SKU[1] && w.top >= qTop - 5 && w.top < nextQTop);
           sellerSkuWords.sort((a, b) => Math.abs(a.top - b.top) > 3 ? a.top - b.top : a.x0 - b.x0);
           const sellerSkuText = sellerSkuWords.map(w => w.text).join(' ').trim();
+
+          // Associated Order IDs
+          const orderWords = bodyWords.filter(w => w.x0 >= COL_ORDER_ID[0] && w.x0 <= COL_ORDER_ID[1] && w.top >= qTop - 5 && w.top < nextQTop && /^\d{15,}$/.test(w.text));
+          const rowOrderIds = orderWords.map(w => w.text);
+          rowOrderIds.forEach(id => allOrderIds.add(id));
 
           allSkus.push({
             sourceFile: file.name,
@@ -839,6 +981,7 @@
             qty: qtyVal,
             sku: skuText,
             sellerSku: sellerSkuText,
+            orderIds: rowOrderIds,
             qTop: qTop
           });
 
@@ -870,7 +1013,7 @@
         }
       }
 
-      // Assemble names
+      // Assemble full product names & attach images
       const assembledNames = {};
       for (const [nVal, wList] of Object.entries(productNames)) {
         wList.sort((a, b) => Math.abs(a.top - b.top) > 4 ? a.top - b.top : a.x0 - b.x0);
@@ -879,6 +1022,12 @@
 
       for (const item of allSkus) {
         item.productName = assembledNames[item.no] || '';
+        item.imageUrl = productImages[item.no] || null;
+      }
+
+      // If declared orderQty is 0, fallback to unique order IDs count
+      if (metadata.orderQty === 0 && allOrderIds.size > 0) {
+        metadata.orderQty = allOrderIds.size;
       }
 
       return { metadata, items: allSkus };
@@ -888,6 +1037,7 @@
     function processAggregatedData(parsedFilesData) {
       const map = new Map();
       let totalDeclaredOrders = 0;
+      let allOrdersGlobal = new Set();
 
       parsedFilesData.forEach(fd => {
         totalDeclaredOrders += fd.metadata.orderQty;
@@ -903,30 +1053,42 @@
               productName: pName,
               sku: sName,
               sellerSku: selSku,
+              imageUrl: it.imageUrl || null,
               totalQty: 0,
+              orderIds: new Set(),
               byFile: {}
             });
           }
           const record = map.get(key);
           record.totalQty += it.qty;
+          if (it.imageUrl && !record.imageUrl) record.imageUrl = it.imageUrl;
+          it.orderIds.forEach(id => {
+            record.orderIds.add(id);
+            allOrdersGlobal.add(id);
+          });
           record.byFile[it.sourceFile] = (record.byFile[it.sourceFile] || 0) + it.qty;
         });
       });
 
-      aggregatedItems = Array.from(map.values());
+      aggregatedItems = Array.from(map.values()).map(it => ({
+        ...it,
+        orderIds: Array.from(it.orderIds)
+      }));
+
       sortAggregatedItems();
 
       const totalQty = aggregatedItems.reduce((sum, it) => sum + it.totalQty, 0);
+      const ordersCount = totalDeclaredOrders > 0 ? totalDeclaredOrders : allOrdersGlobal.size;
 
       globalStats = {
         totalFiles: parsedFilesData.length,
-        totalOrders: totalDeclaredOrders,
+        totalOrders: ordersCount,
         uniqueSkus: aggregatedItems.length,
         totalQty: totalQty,
         fileNames: parsedFilesData.map(d => d.metadata.filename)
       };
 
-      // Update KPI
+      // Update KPI Cards
       document.getElementById('statFiles').textContent = globalStats.totalFiles;
       document.getElementById('statOrders').textContent = globalStats.totalOrders;
       document.getElementById('statSkus').textContent = globalStats.uniqueSkus;
@@ -950,7 +1112,6 @@
       fulfillmentPercent.textContent = `${pct}%`;
       fulfillmentBar.style.width = `${pct}%`;
 
-      // Update counts on filter pills
       document.getElementById('count-all').textContent = total;
       document.getElementById('count-pending').textContent = total - done;
       document.getElementById('count-done').textContent = done;
@@ -966,18 +1127,19 @@
       renderCurrentView();
     };
 
-    // Filter Items
+    // Filter Items (Includes Search by Order ID!)
     function getFilteredItems() {
       const keyword = searchInput.value.trim().toLowerCase();
       return aggregatedItems.filter(item => {
-        // Search filter
+        // Match Search: Product Name, SKU, Seller SKU, or exact Order ID
         const matchSearch = !keyword || 
           item.productName.toLowerCase().includes(keyword) || 
           item.sku.toLowerCase().includes(keyword) ||
-          item.sellerSku.toLowerCase().includes(keyword);
+          item.sellerSku.toLowerCase().includes(keyword) ||
+          item.orderIds.some(id => id.toLowerCase().includes(keyword));
         if (!matchSearch) return false;
 
-        // Status filter
+        // Match Status Filter
         const isDone = checkedItemKeys.has(item.key);
         if (currentFilter === 'pending' && isDone) return false;
         if (currentFilter === 'done' && !isDone) return false;
@@ -1006,43 +1168,68 @@
       lucide.createIcons();
     }
 
-    // Render Table View
+    // Render Table View (Clean Light Mode)
     function renderTable(items) {
       tableBody.innerHTML = items.map((item, idx) => {
         const isDone = checkedItemKeys.has(item.key);
         const fileBadges = Object.entries(item.byFile).map(([fname, qty]) => `
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-slate-800 text-slate-300 border border-white/5 mr-1.5 mb-1">
-            <span class="truncate max-w-[110px] mr-1" title="${fname}">${fname}</span>: <strong class="text-rose-400 font-bold ml-1">${qty}</strong>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 mr-1.5 mb-1">
+            <span class="truncate max-w-[100px] mr-1" title="${fname}">${fname}</span>: <strong class="text-rose-600 ml-1 font-bold">${qty}</strong>
           </span>
         `).join('');
 
+        const orderBtn = item.orderIds.length > 0 ? `
+          <button 
+            onclick="showOrderModal('${escapeQuotes(item.productName)}', '${escapeQuotes(item.sku)}', ${idx})"
+            class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+          >
+            ${item.orderIds.length} đơn
+          </button>
+        ` : `<span class="text-slate-400">-</span>`;
+
+        const imageThumb = item.imageUrl ? `
+          <img 
+            src="${item.imageUrl}" 
+            alt="Thumbnail" 
+            onclick="zoomImage('${item.imageUrl}', '${escapeQuotes(item.productName)}')"
+            class="w-11 h-11 rounded-lg object-contain bg-white border border-slate-200 p-0.5 cursor-zoom-in hover:scale-105 transition-transform" 
+          />
+        ` : `
+          <div class="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+            <i data-lucide="package" class="w-5 h-5"></i>
+          </div>
+        `;
+
         return `
-          <tr class="hover:bg-slate-850/60 transition-colors ${isDone ? 'bg-emerald-950/20 opacity-50' : ''}">
+          <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
             <td class="py-3 px-3 text-center no-print">
               <input 
                 type="checkbox" 
                 ${isDone ? 'checked' : ''} 
                 onchange="toggleItemDone('${escapeQuotes(item.key)}')" 
-                class="w-4 h-4 text-emerald-500 bg-slate-800 border-slate-700 rounded focus:ring-emerald-500 cursor-pointer accent-emerald-500"
+                class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
               />
             </td>
-            <td class="py-3 px-3 text-center font-mono text-xs print-only">[   ]</td>
-            <td class="py-3 px-3 text-center font-mono text-xs text-slate-400">${idx + 1}</td>
-            <td class="py-3 px-4 font-medium text-white leading-snug">
+            <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
+            <td class="py-3 px-3 text-center text-xs font-semibold text-slate-400">${idx + 1}</td>
+            <td class="py-2.5 px-3 text-center no-print">
+              <div class="flex justify-center">${imageThumb}</div>
+            </td>
+            <td class="py-3 px-4 font-semibold text-slate-900 leading-snug">
               <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(item.productName)}</div>
             </td>
             <td class="py-3 px-4">
-              <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                 ${escapeHtml(item.sku)}
               </span>
             </td>
-            <td class="py-3 px-3 text-center font-mono text-xs text-slate-400">
-              ${escapeHtml(item.sellerSku)}
-            </td>
             <td class="py-3 px-4 text-center">
-              <span class="inline-flex items-center justify-center min-w-[48px] px-3 py-1 rounded-xl text-base font-black font-mono bg-rose-500/15 text-rose-400 border border-rose-500/30 tabular-nums">
+              <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200 shadow-xs tabular-nums">
                 ${item.totalQty}
               </span>
+            </td>
+            <td class="py-3 px-3 text-center no-print">
+              ${orderBtn}
             </td>
             <td class="py-3 px-4 no-print">
               <div class="flex flex-wrap items-center">
@@ -1059,44 +1246,61 @@
       cardViewWrapper.innerHTML = items.map((item, idx) => {
         const isDone = checkedItemKeys.has(item.key);
         const fileBadges = Object.entries(item.byFile).map(([fname, qty]) => `
-          <span class="text-[11px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-white/5 mr-1 mb-1 inline-block">
-            ${fname}: <strong class="text-rose-400">${qty}</strong>
+          <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 mr-1 mb-1 inline-block font-medium">
+            ${fname}: <strong class="text-rose-600">${qty}</strong>
           </span>
         `).join('');
 
+        const imageThumb = item.imageUrl ? `
+          <img 
+            src="${item.imageUrl}" 
+            alt="Thumbnail" 
+            onclick="zoomImage('${item.imageUrl}', '${escapeQuotes(item.productName)}')"
+            class="w-16 h-16 rounded-xl object-contain bg-slate-50 border border-slate-200 p-1 flex-shrink-0 cursor-zoom-in" 
+          />
+        ` : `
+          <div class="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 flex-shrink-0">
+            <i data-lucide="package" class="w-7 h-7"></i>
+          </div>
+        `;
+
         return `
-          <div class="p-4 rounded-2xl border transition-all duration-200 ${isDone ? 'bg-emerald-950/20 border-emerald-500/30 opacity-60' : 'bg-slate-900 border-white/10 hover:border-slate-700 shadow-lg'} flex flex-col justify-between space-y-3">
+          <div class="p-4 rounded-2xl border transition-all duration-200 ${isDone ? 'bg-emerald-50/50 border-emerald-300' : 'bg-white border-slate-200 shadow-xs hover:border-slate-300'} flex flex-col justify-between space-y-3">
             
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex-1">
-                <span class="text-[10px] font-mono font-bold text-slate-500 uppercase">#${idx + 1}</span>
-                <h4 class="text-sm font-bold text-white leading-snug mt-0.5 ${isDone ? 'line-through text-slate-400' : ''}">
+            <div class="flex items-start gap-3">
+              ${imageThumb}
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#${idx + 1}</span>
+                  <span class="text-xs font-semibold text-slate-500">${item.orderIds.length} đơn</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900 leading-snug mt-0.5 line-clamp-2 ${isDone ? 'line-through text-slate-400' : ''}">
                   ${escapeHtml(item.productName)}
                 </h4>
-                <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  <span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                     ${escapeHtml(item.sku)}
                   </span>
-                  ${item.sellerSku !== '-' ? `<span class="px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-800 border border-white/5">${escapeHtml(item.sellerSku)}</span>` : ''}
                 </div>
               </div>
 
               <!-- Huge Quantity Badge -->
-              <div class="flex-shrink-0 text-center bg-rose-500/15 border border-rose-500/30 rounded-2xl px-3.5 py-2 min-w-[64px]">
-                <span class="text-[10px] font-bold text-rose-300 uppercase block tracking-wider">CẦN LẤY</span>
-                <span class="text-2xl font-black font-mono text-rose-400 leading-none tabular-nums">${item.totalQty}</span>
+              <div class="flex-shrink-0 text-center bg-rose-50 border border-rose-200 rounded-2xl px-3 py-1.5 min-w-[62px]">
+                <span class="text-[10px] font-bold text-rose-600 uppercase block tracking-tight">CẦN LẤY</span>
+                <span class="text-2xl font-black text-rose-700 leading-none tabular-nums">${item.totalQty}</span>
               </div>
             </div>
 
-            <!-- Source Files Breakdown -->
-            <div class="pt-2 border-t border-white/5 flex flex-wrap items-center">
+            <!-- Source files -->
+            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center">
               ${fileBadges}
             </div>
 
             <!-- Big Touch Action Button -->
             <button 
               onclick="toggleItemDone('${escapeQuotes(item.key)}')" 
-              class="w-full py-2.5 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center space-x-2 active:scale-[0.98] ${isDone ? 'bg-slate-800 text-slate-400 border border-white/5 hover:bg-slate-750' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/30'}"
+              class="w-full py-2.5 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center space-x-2 active:scale-[0.98] ${isDone ? 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'}"
             >
               <i data-lucide="${isDone ? 'rotate-ccw' : 'check'}" class="w-4 h-4"></i>
               <span>${isDone ? 'Bỏ đánh dấu (Lấy lại)' : 'Đã nhặt xong vào giỏ'}</span>
@@ -1105,6 +1309,59 @@
           </div>
         `;
       }).join('');
+    }
+
+    // Modal Handlers
+    window.showOrderModal = function(productName, sku, itemIndex) {
+      const item = getFilteredItems()[itemIndex];
+      if (!item) return;
+
+      currentModalOrders = item.orderIds;
+      document.getElementById('modalTitle').textContent = `${productName}`;
+      document.getElementById('modalSubTitle').textContent = `Phân loại: ${sku} • Tổng: ${item.totalQty} cái`;
+      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${item.orderIds.length} mã đơn hàng`;
+
+      const listContainer = document.getElementById('modalOrderList');
+      listContainer.innerHTML = item.orderIds.map((id, i) => `
+        <div class="flex items-center justify-between p-1.5 rounded-lg bg-white border border-slate-200">
+          <span class="font-bold text-slate-400 mr-1.5">${i + 1}.</span>
+          <span class="text-slate-800 font-medium select-all">${id}</span>
+        </div>
+      `).join('');
+
+      orderModal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.closeModal = function() {
+      orderModal.classList.add('hidden');
+    };
+
+    window.copyOrderIds = function() {
+      if (!currentModalOrders.length) return;
+      const text = currentModalOrders.join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Đã sao chép ${currentModalOrders.length} mã đơn hàng!`);
+      });
+    };
+
+    window.zoomImage = function(src, title) {
+      document.getElementById('zoomImg').src = src;
+      document.getElementById('zoomTitle').textContent = title;
+      imageModal.classList.remove('hidden');
+    };
+
+    window.closeImageModal = function() {
+      imageModal.classList.add('hidden');
+    };
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
     }
 
     // Export to Styled Excel
@@ -1153,7 +1410,6 @@
 
       const ws = XLSX.utils.aoa_to_sheet(rows);
 
-      // Auto width
       ws['!cols'] = [
         { wch: 6 },
         { wch: 48 },
@@ -1173,19 +1429,17 @@
       XLSX.writeFile(wb, `Picking_List_Tong_Hop_${todayStr}.xlsx`);
     }
 
-    // Load Sample Test Data (09-06)
+    // Load Sample Test Data
     window.loadSampleData = async function() {
       try {
         progressContainer.classList.remove('hidden');
-        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-400"></i> Đang nạp dữ liệu mẫu 09-06 Picking list...`;
+        progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-rose-600"></i> Đang nạp dữ liệu mẫu 09-06 Picking list...`;
         lucide.createIcons();
-        progressBar.style.width = '60%';
+        progressBar.style.width = '50%';
 
-        // Fetch local sample file
         const response = await fetch('09-06_11-05-12_Picking list_1.pdf');
         if (!response.ok) {
-          // If server root doesn't have it, try fetching from C: or inform user
-          alert('Hãy kéo thả trực tiếp file "09-06_11-05-12_Picking list_1.pdf" từ thư mục Downloads vào khung tải file nhé!');
+          alert('Hãy kéo thả trực tiếp file PDF từ thư mục Downloads vào khung tải file nhé!');
           progressContainer.classList.add('hidden');
           return;
         }
