@@ -868,48 +868,95 @@
   </main>
 
   <!-- Order IDs Modal (no-print) -->
-  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="if(event.target === this) closeModal()">
-    <div class="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between items-start">
-        <div>
-          <h3 class="font-bold text-base text-slate-900" id="modalTitle">Danh sách mã đơn &amp; mã vận đơn</h3>
-          <p class="text-xs text-slate-500 mt-0.5" id="modalSubTitle">Sản phẩm: ...</p>
+  <div id="orderModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="if(event.target === this) closeModal()">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      <!-- Header -->
+      <div class="px-5 sm:px-6 py-4.5 border-b border-slate-200 flex justify-between items-center bg-white shrink-0">
+        <div class="min-w-0 pr-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+              <i data-lucide="package" class="w-4 h-4"></i>
+            </span>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-snug truncate" id="modalTitle">Danh sách mã đơn &amp; mã vận đơn</h3>
+          </div>
+          <p class="text-xs text-slate-500 font-medium mt-1 pl-10.5" id="modalSubTitle">Sản phẩm: ...</p>
         </div>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 p-1 cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-all shrink-0">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-        <span id="modalOrderCount" class="font-bold text-slate-800">Tổng cộng: 0 đơn hàng</span>
+      <!-- Action Bar & Stats -->
+      <div class="px-5 sm:px-6 py-3 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5 text-xs shrink-0">
+        <div class="flex items-center gap-2">
+          <span id="modalOrderCount" class="font-bold text-slate-900 bg-white border border-slate-200 px-3 py-1 rounded-lg shadow-2xs">
+            Tổng cộng: 0 đơn hàng
+          </span>
+          <span id="modalMatchedBadge" class="hidden font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px]">
+            Đã khớp tem
+          </span>
+        </div>
         <div class="flex items-center gap-2">
           <button 
             onclick="copyTrackings()" 
-            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
+            class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             title="Sao chép toàn bộ danh sách mã vận đơn để đối soát"
           >
-            <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
+            <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i>
             Chép Mã Vận Đơn
           </button>
           <button 
             onclick="copyOrderIds()" 
-            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 text-slate-800 hover:bg-slate-300 active:scale-[0.98] transition-all cursor-pointer"
+            class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 active:scale-[0.98] transition-all cursor-pointer shadow-2xs"
             title="Sao chép toàn bộ danh sách Order ID"
           >
-            <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
+            <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i>
             Chép Order ID
           </button>
         </div>
       </div>
 
-      <div class="max-h-72 overflow-y-auto rounded-xl border border-slate-200 p-3 bg-slate-50">
-        <div id="modalOrderList" class="space-y-1.5 text-xs text-slate-700">
-          <!-- Rendered by JS -->
+      <!-- Modal Content Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50">
+        <!-- Notice if no shipping labels loaded yet -->
+        <div id="modalNoShippingNotice" class="hidden p-3.5 bg-amber-50/90 border border-amber-200 rounded-2xl flex items-start gap-3 text-xs text-amber-900">
+          <div class="w-7 h-7 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+            <i data-lucide="info" class="w-4 h-4"></i>
+          </div>
+          <div class="space-y-0.5 flex-1 min-w-0">
+            <div class="font-bold text-slate-900">Chưa tải file tem vận đơn (Shipping label)</div>
+            <p class="text-slate-600 leading-relaxed">
+              Bạn đang xem danh sách đơn từ <strong>Phiếu nhặt hàng (Picking list)</strong>. Để xem mã vận đơn, người nhận và ảnh tem A6 y hệt bên Tab 2, hãy kéo thả file <code class="bg-amber-100 px-1 py-0.2 rounded font-mono text-[11px]">Shipping label+Packing slip.pdf</code> vào trang web!
+            </p>
+          </div>
+        </div>
+
+        <!-- Orders Table Wrapper -->
+        <div id="modalOrderTableWrapper" class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100/90 text-slate-700 font-bold border-b border-slate-200 select-none text-[11px] uppercase tracking-wider">
+                <tr>
+                  <th class="py-3 px-3 text-center w-12">STT</th>
+                  <th class="py-3 px-3 w-18 text-center">Ảnh Tem</th>
+                  <th class="py-3 px-3 min-w-[170px]">Mã Vận Đơn</th>
+                  <th class="py-3 px-3 min-w-[160px]">Mã Đơn (Order ID)</th>
+                  <th class="py-3 px-3 min-w-[150px]">Người Nhận</th>
+                  <th class="py-3 px-3 min-w-[120px] text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="modalOrderList" class="divide-y divide-slate-100 text-slate-800">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <div class="text-right">
-        <button onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">
+      <!-- Footer -->
+      <div class="px-5 sm:px-6 py-3.5 border-t border-slate-200 bg-white flex items-center justify-between shrink-0">
+        <span class="text-xs text-slate-500 font-medium">Bấm "Xem tem" để mở to toàn bộ tem in A6</span>
+        <button onclick="closeModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer transition-all shadow-2xs">
           Đóng
         </button>
       </div>
@@ -917,7 +964,7 @@
   </div>
 
   <!-- Image Zoom Modal (no-print) -->
-  <div id="imageModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeImageModal()">
+  <div id="imageModal" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeImageModal()">
     <div class="bg-white p-3 rounded-2xl max-w-sm w-full shadow-2xl text-center space-y-3" onclick="event.stopPropagation()">
       <div class="overflow-hidden rounded-xl bg-slate-100 border border-slate-200">
         <img id="zoomImg" src="" alt="Ảnh sản phẩm" class="w-full h-auto object-contain max-h-[350px]" />
@@ -930,7 +977,7 @@
   </div>
 
   <!-- Dedicated Shipping Label Full Preview Modal (no-print) -->
-  <div id="shippingLabelModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="closeShippingLabelModal()">
+  <div id="shippingLabelModal" class="fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="closeShippingLabelModal()">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
       <!-- Header -->
       <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white">
@@ -2281,7 +2328,11 @@
             tracking: ord.tracking,
             receiver: ord.receiver,
             weight: ord.weight,
-            items: ord.items
+            items: ord.items,
+            thumbnailUrl: ord.thumbnailUrl,
+            newSeq: ord.newSeq,
+            pages: ord.pages,
+            pageNumbers: ord.pageNumbers
           };
         });
 
@@ -3986,58 +4037,141 @@
     window.showOrderListModal = function(title, subtitle, orderIds = [], trackingNumbers = []) {
       currentModalOrders = Array.isArray(orderIds) ? orderIds : [];
       
-      // If trackingNumbers wasn't passed or is empty, resolve from orderToTrackingMap
-      if (!trackingNumbers || trackingNumbers.length === 0) {
-        const trkSet = new Set();
-        currentModalOrders.forEach(id => {
-          const trk = orderToTrackingMap[id];
-          if (trk && trk !== '-') trkSet.add(trk);
+      // Resolve tracking numbers from orderToTrackingMap and shippingOrders
+      const trkSet = new Set();
+      currentModalOrders.forEach(id => {
+        const ord = (shippingOrders || []).find(o => o.orderId === id) || orderInfoMap[id];
+        const trk = ord?.tracking || orderToTrackingMap[id];
+        if (trk && trk !== '-') trkSet.add(trk);
+      });
+      if (Array.isArray(trackingNumbers)) {
+        trackingNumbers.forEach(t => {
+          if (t && t !== '-') trkSet.add(t);
         });
-        currentModalTrackings = Array.from(trkSet);
-      } else {
-        currentModalTrackings = Array.from(new Set(trackingNumbers.filter(t => t && t !== '-')));
+      }
+      currentModalTrackings = Array.from(trkSet);
+
+      const matchedCount = currentModalTrackings.length;
+      const totalCount = currentModalOrders.length;
+
+      document.getElementById('modalTitle').textContent = cleanItemProductName(title);
+      document.getElementById('modalSubTitle').textContent = subtitle;
+      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${totalCount} đơn hàng`;
+
+      const matchedBadge = document.getElementById('modalMatchedBadge');
+      if (matchedBadge) {
+        if (matchedCount > 0) {
+          matchedBadge.classList.remove('hidden');
+          matchedBadge.textContent = `Đã khớp ${matchedCount}/${totalCount} mã vận đơn`;
+        } else {
+          matchedBadge.classList.add('hidden');
+        }
       }
 
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalSubTitle').textContent = subtitle;
-      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${currentModalOrders.length} đơn (${currentModalTrackings.length} mã vận đơn)`;
+      const noticeEl = document.getElementById('modalNoShippingNotice');
+      if (noticeEl) {
+        if (matchedCount === 0 && (!shippingOrders || shippingOrders.length === 0)) {
+          noticeEl.classList.remove('hidden');
+        } else {
+          noticeEl.classList.add('hidden');
+        }
+      }
 
       const listContainer = document.getElementById('modalOrderList');
-      if (currentModalOrders.length === 0 && currentModalTrackings.length === 0) {
-        listContainer.innerHTML = `<div class="text-center py-4 text-slate-400">Không có dữ liệu đơn hàng</div>`;
+      if (currentModalOrders.length === 0) {
+        listContainer.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-slate-400">
+              <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+              Không có dữ liệu đơn hàng
+            </td>
+          </tr>
+        `;
       } else {
         listContainer.innerHTML = currentModalOrders.map((id, i) => {
-          const trk = orderToTrackingMap[id] || (currentModalTrackings[i] || '-');
+          const ord = (shippingOrders || []).find(o => o.orderId === id) || orderInfoMap[id] || null;
+          const trk = ord?.tracking || orderToTrackingMap[id] || '-';
+          const hasTrack = (trk && trk !== '-');
+          const thumbUrl = ord?.thumbnailUrl || null;
+          const receiver = ord?.receiver || '-';
+          const weight = ord?.weight || '';
+          const hasFullLabel = ord && ord.pages && ord.pages.length > 0;
+
           return `
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 gap-2">
-              <div class="flex items-center gap-2 min-w-0">
-                <span class="font-bold text-slate-400 font-mono text-[11px] w-6">${i + 1}.</span>
-                <div class="min-w-0">
-                  <div class="text-slate-800 font-bold font-mono text-xs select-all flex items-center gap-1.5">
-                    <span>${escapeHtml(id)}</span>
-                    <button onclick="navigator.clipboard.writeText('${escapeQuotes(id)}'); showToast('Đã chép Order ID: ${escapeQuotes(id)}');" class="text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer" title="Chép Order ID">
-                      <i data-lucide="copy" class="w-3 h-3"></i>
+            <tr class="hover:bg-slate-50/90 transition-colors">
+              <!-- STT -->
+              <td class="py-3 px-3 text-center font-bold text-slate-700">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 text-slate-800 font-mono text-[11px] font-bold">
+                  ${i + 1}
+                </span>
+              </td>
+              <!-- ẢNH TEM (A6 Preview) -->
+              <td class="py-2.5 px-3 text-center">
+                <div class="relative group cursor-pointer w-12 h-17 sm:w-14 sm:h-20 rounded-lg overflow-hidden border border-slate-200/90 bg-slate-50 shadow-2xs mx-auto shrink-0 transition-transform hover:scale-105" onclick="openShippingLabelModal('${escapeQuotes(id)}')" title="Nhấp để xem to toàn bộ tem vận đơn">
+                  ${thumbUrl ? `
+                    <img src="${thumbUrl}" class="w-full h-full object-cover" alt="Tem ${escapeQuotes(trk)}" />
+                  ` : `
+                    <div class="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 text-[10px]">
+                      <i data-lucide="file-text" class="w-4 h-4 mb-1"></i>
+                      <span>A6</span>
+                    </div>
+                  `}
+                  <div class="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[9px] font-bold transition-opacity">
+                    <i data-lucide="zoom-in" class="w-4 h-4 mb-0.5"></i>
+                    <span>Xem</span>
+                  </div>
+                </div>
+              </td>
+              <!-- MÃ VẬN ĐƠN -->
+              <td class="py-3 px-3 font-mono">
+                ${hasTrack ? `
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-black text-slate-900 text-xs sm:text-sm tracking-tight">${escapeHtml(trk)}</span>
+                    <button onclick="copyText('${escapeQuotes(trk)}')" class="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép mã vận đơn">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                     </button>
                   </div>
-                  ${trk && trk !== '-' ? `
-                    <div class="text-sky-700 font-mono text-[11px] font-semibold flex items-center gap-1 mt-0.5 select-all">
-                      <i data-lucide="truck" class="w-3 h-3 text-sky-500"></i>
-                      <span>${escapeHtml(trk)}</span>
-                      <button onclick="navigator.clipboard.writeText('${escapeQuotes(trk)}'); showToast('Đã chép Mã vận đơn: ${escapeQuotes(trk)}');" class="text-sky-400 hover:text-sky-600 p-0.5 cursor-pointer" title="Chép Mã vận đơn">
-                        <i data-lucide="copy" class="w-3 h-3"></i>
-                      </button>
-                    </div>
-                  ` : `
-                    <div class="text-slate-400 text-[10px]">Chưa có mã vận đơn</div>
-                  `}
+                  <div class="flex items-center text-[10px] text-emerald-700 font-bold mt-1 gap-1">
+                    <i data-lucide="truck" class="w-3 h-3 text-emerald-600"></i>
+                    <span>TikTok Express</span>
+                  </div>
+                ` : `
+                  <div class="space-y-0.5">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                      Chưa có mã VĐ
+                    </span>
+                    <div class="text-[10px] text-slate-400">Kéo file tem để khớp</div>
+                  </div>
+                `}
+              </td>
+              <!-- MÃ ĐƠN (ORDER ID) -->
+              <td class="py-3 px-3 font-mono text-slate-700 text-xs">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-semibold text-slate-900">${escapeHtml(id)}</span>
+                  <button onclick="copyText('${escapeQuotes(id)}')" class="text-slate-400 hover:text-slate-800 p-0.5 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép Order ID">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  </button>
                 </div>
-              </div>
-              ${trk && trk !== '-' ? `
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 flex-shrink-0">
-                  Có tem VĐ
-                </span>
-              ` : ''}
-            </div>
+              </td>
+              <!-- NGƯỜI NHẬN & TRỌNG LƯỢNG -->
+              <td class="py-3 px-3 text-slate-700">
+                <div class="font-bold text-slate-900 text-xs flex items-center gap-1">
+                  <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                  <span class="truncate max-w-[140px]" title="${escapeQuotes(receiver)}">${escapeHtml(receiver || '-')}</span>
+                </div>
+                ${weight ? `<div class="text-[11px] text-slate-500 font-medium mt-0.5 pl-4.5">${escapeHtml(weight)}</div>` : ''}
+              </td>
+              <!-- THAO TÁC -->
+              <td class="py-3 px-3 text-right">
+                ${(hasTrack || hasFullLabel || thumbUrl) ? `
+                  <button onclick="openShippingLabelModal('${escapeQuotes(id)}')" class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
+                    <i data-lucide="eye" class="w-3 h-3 mr-1 text-rose-600"></i> Xem tem
+                  </button>
+                ` : `
+                  <span class="text-[10px] text-slate-400 font-medium">Chờ file tem</span>
+                `}
+              </td>
+            </tr>
           `;
         }).join('');
       }
@@ -4066,12 +4200,8 @@
 
     window.copyTrackings = function() {
       if (!currentModalTrackings.length) {
-        const trks = currentModalOrders.map(id => orderToTrackingMap[id]).filter(t => t && t !== '-');
-        if (trks.length === 0) {
-          showToast('Không có mã vận đơn nào để sao chép!');
-          return;
-        }
-        currentModalTrackings = trks;
+        showToast('Không có mã vận đơn nào để sao chép!');
+        return;
       }
       const text = currentModalTrackings.join('\n');
       navigator.clipboard.writeText(text).then(() => {
@@ -4091,8 +4221,11 @@
 
     // Shipping Label Full Preview Modal Handlers
     window.openShippingLabelModal = async function(orderId) {
-      const ord = (shippingOrders || []).find(o => o.orderId === orderId);
-      if (!ord) return;
+      const ord = (shippingOrders || []).find(o => o.orderId === orderId) || orderInfoMap[orderId];
+      if (!ord) {
+        showToast('Chưa có thông tin tem in A6 cho đơn này (Hãy nạp file Shipping label)!');
+        return;
+      }
 
       const modal = document.getElementById('shippingLabelModal');
       if (!modal) return;
