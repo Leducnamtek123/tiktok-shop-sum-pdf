@@ -1157,8 +1157,29 @@
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
         
+        <!-- Explanation Banner: AI Auto-Detection from PDF -->
+        <div class="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold mt-0.5 shadow-2xs">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div class="space-y-0.5 min-w-0">
+              <div class="font-extrabold text-emerald-900 text-xs sm:text-sm">
+                Hệ thống ĐÃ TỰ ĐỘNG nhận diện quy cách từ file PDF!
+              </div>
+              <p class="text-emerald-800 leading-relaxed text-[11px] sm:text-xs">
+                Mọi quy cách <strong>Thùng nguyên, Hộp, Cặp, Lô</strong> (như <em>Thùng 6 chai, Thùng 12 gói, 3 cặp...</em>) đều được bóc tách và tính toán quy đổi tự động trên bảng nhặt hàng mà không bắt buộc cài thủ công.
+              </p>
+            </div>
+          </div>
+          <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="shrink-0 w-full sm:w-auto px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Tự động quét tất cả thùng/combo trong file đã nạp và đưa vào danh sách quy tắc">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+            <span>Tự Động Quét Từ File</span>
+          </button>
+        </div>
+
         <!-- Add / Edit Combo Form -->
         <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-4">
           <input type="hidden" id="editingComboId" value="" />
@@ -1221,7 +1242,11 @@
               <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-slate-800"></i>
               Danh Sách Quy Tắc Đang Áp Dụng (<span id="comboListCount">0</span>)
             </span>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="resetDefaultCombos()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 border border-amber-200 text-amber-900 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs" title="Khôi phục 3 quy tắc combo chuẩn của shop">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1 text-amber-700"></i>
+                Khôi phục 3 quy tắc chuẩn
+              </button>
               <button onclick="exportComboRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-2xs" title="Tải file JSON dự phòng">
                 <i data-lucide="download" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
                 Xuất JSON
@@ -1293,8 +1318,36 @@
     let orderInfoMap = {};
     let currentMainTab = 'picking'; // 'picking' or 'shipping'
 
+    // Default shop combo & packaging rules
+    const DEFAULT_COMBO_RULES = [
+      {
+        id: "rule_combo_phuc_hoi",
+        name: "Combo Phục hồi (Thùng 3 cặp)",
+        productKeyword: "Combo Phục hồi",
+        skuKeyword: "3 cặp",
+        packSize: 3,
+        unit: "Cặp 100ml"
+      },
+      {
+        id: "rule_calcifort_b12_thung6",
+        name: "Calcifort-B12 (Thùng 6 chai)",
+        productKeyword: "Calcifort-B12",
+        skuKeyword: "Thùng 6 chai",
+        packSize: 6,
+        unit: "Chai 100ml"
+      },
+      {
+        id: "rule_thung_12_goi",
+        name: "Quy cách Thùng 12 gói",
+        productKeyword: "",
+        skuKeyword: "Thùng 12",
+        packSize: 12,
+        unit: "Gói"
+      }
+    ];
+
     // Combo & Packaging Rules (Stored on Server & local storage)
-    let comboRules = [];
+    let comboRules = [...DEFAULT_COMBO_RULES];
 
     // Load combo rules from server API first, with localStorage fallback
     async function loadComboRules() {
@@ -1319,23 +1372,27 @@
         try {
           const stored = localStorage.getItem('tiktok_shop_combo_rules_v3');
           if (stored) {
-            comboRules = JSON.parse(stored);
-          } else {
-            // Also check previous version if any
-            const prev = localStorage.getItem('tiktok_shop_combo_rules_v2');
-            if (prev) {
-              comboRules = JSON.parse(prev);
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              comboRules = parsed;
             } else {
-              comboRules = [];
+              comboRules = [...DEFAULT_COMBO_RULES];
             }
+          } else {
+            comboRules = [...DEFAULT_COMBO_RULES];
           }
         } catch (e) {
-          comboRules = [];
+          comboRules = [...DEFAULT_COMBO_RULES];
         }
       }
 
+      if (!comboRules || comboRules.length === 0) {
+        comboRules = [...DEFAULT_COMBO_RULES];
+      }
+
       updateComboBadge();
-      updateSyncStatusText(loadedFromServer ? 'Đã đồng bộ từ máy chủ' : 'Đang sử dụng dữ liệu trình duyệt');
+      updateSyncStatusText(loadedFromServer ? 'Đã đồng bộ từ máy chủ (Lưu vĩnh viễn)' : 'Đang sử dụng dữ liệu trình duyệt');
+      renderComboRulesList();
     }
 
     // Save combo rules to both localStorage and server API
@@ -1706,6 +1763,102 @@
       lucide.createIcons();
     }
 
+    function resetDefaultCombos() {
+      if (!confirm('Khôi phục lại 3 quy tắc combo & quy cách chuẩn của shop?')) return;
+      saveComboRules([...DEFAULT_COMBO_RULES]);
+      showToast('Đã khôi phục 3 combo chuẩn shop!');
+    }
+
+    function autoScanCombosFromLoadedFiles() {
+      const candidates = [];
+      const seenKeys = new Set(comboRules.map(r => ((r.productKeyword || '').toLowerCase() + '|||' + (r.skuKeyword || '').toLowerCase())));
+
+      const examineItem = (productName, sku) => {
+        const pClean = cleanItemProductName(productName);
+        const sClean = cleanSku(sku);
+        if (!sClean || sClean.includes('Order ID:') || sClean === 'Mặc định' || sClean === '-') return;
+
+        const thungM = sClean.match(/thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+        const hopM = sClean.match(/hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+        const capM = sClean.match(/(\d+)\s*cặp\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+        const countM = sClean.match(/^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)/i);
+
+        let detected = null;
+        if (thungM) {
+          const packSize = parseInt(thungM[1], 10);
+          const unit = (thungM[2] || 'món').trim();
+          detected = {
+            name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(Thùng ${packSize} ${unit})`,
+            productKeyword: pClean.slice(0, 30),
+            skuKeyword: `Thùng ${packSize}`,
+            packSize,
+            unit
+          };
+        } else if (hopM) {
+          const packSize = parseInt(hopM[1], 10);
+          const unit = (hopM[2] || 'món').trim();
+          detected = {
+            name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(Hộp ${packSize} ${unit})`,
+            productKeyword: pClean.slice(0, 30),
+            skuKeyword: `Hộp ${packSize}`,
+            packSize,
+            unit
+          };
+        } else if (capM && parseInt(capM[1], 10) > 1) {
+          const packSize = parseInt(capM[1], 10);
+          const unit = (capM[2] || 'Cặp').trim();
+          detected = {
+            name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(${packSize} cặp)`,
+            productKeyword: pClean.slice(0, 30),
+            skuKeyword: `${packSize} cặp`,
+            packSize,
+            unit: 'Cặp 100ml'
+          };
+        } else if (countM && parseInt(countM[1], 10) > 1) {
+          const packSize = parseInt(countM[1], 10);
+          const unit = (countM[2] || 'món').trim();
+          detected = {
+            name: `${pClean ? pClean.slice(0, 24) + '... ' : ''}(Lô ${packSize} ${unit})`,
+            productKeyword: pClean.slice(0, 30),
+            skuKeyword: `${packSize} ${unit}`,
+            packSize,
+            unit
+          };
+        }
+
+        if (detected) {
+          const k = ((detected.productKeyword || '').toLowerCase() + '|||' + (detected.skuKeyword || '').toLowerCase());
+          if (!seenKeys.has(k)) {
+            seenKeys.add(k);
+            candidates.push({
+              id: 'rule_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              ...detected
+            });
+          }
+        }
+      };
+
+      if (groupedProducts && groupedProducts.length > 0) {
+        groupedProducts.forEach(g => {
+          g.variants.forEach(v => examineItem(g.productName, v.sku));
+        });
+      }
+      if (shippingOrders && shippingOrders.length > 0) {
+        shippingOrders.forEach(o => {
+          (o.items || []).forEach(it => examineItem(it.name, it.sku));
+        });
+      }
+
+      if (candidates.length === 0) {
+        showToast('Chưa tìm thấy thêm combo / quy cách mới nào từ các file đã nạp.');
+        return;
+      }
+
+      comboRules = [...candidates, ...comboRules];
+      saveComboRules(comboRules);
+      showToast(`Đã tự động nhận diện & nạp thêm ${candidates.length} quy tắc combo từ file!`);
+    }
+
     // Expose all modal and combo functions to window
     window.openComboModal = openComboModal;
     window.closeComboModal = closeComboModal;
@@ -1718,6 +1871,8 @@
     window.importComboRules = importComboRules;
     window.onQuickProductSelected = onQuickProductSelected;
     window.populateQuickProductSelect = populateQuickProductSelect;
+    window.resetDefaultCombos = resetDefaultCombos;
+    window.autoScanCombosFromLoadedFiles = autoScanCombosFromLoadedFiles;
 
     // Packaging Parsing & Smart Conversion Utilities
     function parseSkuPackagingType(skuStr, productName = '') {
