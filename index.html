@@ -10,6 +10,7 @@
   
   <!-- Local Assets for 100% Offline & High-Speed Processing -->
   <script src="assets/pdf.min.js"></script>
+  <script src="assets/pdf-lib.min.js"></script>
   <script src="assets/xlsx.full.min.js"></script>
   
   <!-- Lucide Icons -->
@@ -218,18 +219,28 @@
         />
         <div class="border-l border-slate-200 pl-3.5">
           <div class="flex items-center space-x-2">
-            <h1 class="font-bold text-base text-slate-900 leading-tight tracking-tight">Bộ Gộp Phiếu Nhặt Hàng</h1>
+            <h1 class="font-bold text-base text-slate-900 leading-tight tracking-tight">Bộ Công Cụ Kho Vận TikTok Shop</h1>
             <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200/80 rounded-md">Logistics</span>
           </div>
-          <p class="text-xs text-slate-500">Tự động nhận diện món trùng &amp; cộng dồn số lượng lấy hàng chuẩn 1:1</p>
+          <p class="text-xs text-slate-500">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món Chuẩn 1:1</p>
         </div>
       </div>
 
-      <!-- System Status (no-print) -->
-      <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">
+      <!-- Header Actions (no-print) -->
+      <div class="flex items-center space-x-2.5">
+        <button 
+          onclick="openComboModal()" 
+          class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition-all border border-slate-200 active:scale-[0.98] shadow-2xs"
+          title="Quản lý và thiết lập quy tắc quy đổi Combo &amp; Thùng"
+        >
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
+          <span>Cấu hình Combo</span>
+          <span id="comboBadgeCount" class="ml-1.5 px-1.5 py-0.2 text-[10px] font-black rounded-full bg-rose-100 text-rose-700 border border-rose-200">3</span>
+        </button>
+
+        <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">
           <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-          Đang Hoạt Động
+          Chuẩn Kho
         </span>
       </div>
 
@@ -238,6 +249,34 @@
 
   <!-- Main App Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Main Navigation Tabs (no-print) -->
+    <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print">
+      <div class="flex items-center space-x-1 sm:space-x-2">
+        <button 
+          id="tabPickingBtn" 
+          onclick="switchMainTab('picking')" 
+          class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs"
+        >
+          <i data-lucide="boxes" class="w-4 h-4 mr-2"></i>
+          <span>1. Gộp Phiếu Nhặt Hàng (Picking List)</span>
+        </button>
+        <button 
+          id="tabShippingBtn" 
+          onclick="switchMainTab('shipping')" 
+          class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80"
+        >
+          <i data-lucide="tags" class="w-4 h-4 mr-2 text-blue-600"></i>
+          <span>2. Sắp Xếp Mã Vận Đơn Theo Món</span>
+          <span id="shippingBadge" class="hidden ml-2 px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-blue-100 text-blue-700">0 đơn</span>
+        </button>
+      </div>
+
+      <div class="hidden lg:flex items-center text-xs text-slate-500 pr-2">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+        <span>Tự động nhận diện định dạng file khi kéo thả</span>
+      </div>
+    </div>
 
     <!-- Dedicated 1:1 TikTok Shop Print Container (Only visible during print) -->
     <div id="printContainer" class="print-only hidden">
@@ -263,27 +302,27 @@
             <i data-lucide="upload-cloud" class="w-7 h-7"></i>
           </div>
           
-          <div class="max-w-lg">
+          <div class="max-w-xl">
             <p class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-              Kéo thả các file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4">Phiếu nhặt hàng (.pdf)</span> vào đây
+              Kéo thả file <span class="text-rose-600 underline decoration-rose-300 underline-offset-4">Phiếu nhặt hàng</span> hoặc <span class="text-blue-600 underline decoration-blue-300 underline-offset-4">Mã vận đơn (Shipping label)</span> vào đây
             </p>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-              Hoặc bấm vào để chọn cùng lúc nhiều file từ máy tính (<span class="font-medium text-slate-700">Phiếu 1, Phiếu 2, Phiếu 3...</span>)
+              Hệ thống tự nhận diện: Gộp nhiều phiếu nhặt hàng hoặc Sắp xếp mã vận đơn theo đúng thứ tự món
             </p>
           </div>
 
           <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
               <i data-lucide="combine" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
-              Tự nhận diện món trùng
+              Gộp phiếu nhặt hàng
             </span>
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-              <i data-lucide="image" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
-              Tách ảnh sản phẩm sắc nét
+              <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
+              Sắp xếp vận đơn theo món
             </span>
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
-              Xuất file Excel chuẩn
+              <i data-lucide="file-down" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
+              Tải PDF vận đơn đã xếp
             </span>
           </div>
         </div>
@@ -631,6 +670,110 @@
 
     </section>
 
+    <!-- Dedicated Shipping Labels Section (no-print) -->
+    <section id="shippingSection" class="hidden space-y-6 no-print">
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
+            <span class="font-semibold">Tổng Đơn Hàng</span>
+            <i data-lucide="package" class="w-4 h-4 text-blue-600"></i>
+          </div>
+          <div class="text-2xl font-black text-slate-900" id="shipTotalOrders">0</div>
+          <div class="text-[11px] text-slate-400 mt-1" id="shipTotalPages">0 trang in</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
+            <span class="font-semibold">Đơn 1 Món (Dán Lô)</span>
+            <i data-lucide="zap" class="w-4 h-4 text-emerald-600"></i>
+          </div>
+          <div class="text-2xl font-black text-emerald-600" id="shipSingleOrders">0</div>
+          <div class="text-[11px] text-emerald-700/80 mt-1">Đã xếp liền theo từng món</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
+            <span class="font-semibold">Đơn Nhiều Món (Gom)</span>
+            <i data-lucide="layers" class="w-4 h-4 text-amber-600"></i>
+          </div>
+          <div class="text-2xl font-black text-amber-600" id="shipMultiOrders">0</div>
+          <div class="text-[11px] text-amber-700/80 mt-1">Gom ở nhóm riêng để đóng</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
+            <span class="font-semibold">Nhóm Sản Phẩm</span>
+            <i data-lucide="boxes" class="w-4 h-4 text-purple-600"></i>
+          </div>
+          <div class="text-2xl font-black text-purple-600" id="shipProductGroups">0</div>
+          <div class="text-[11px] text-purple-700/80 mt-1">Mỗi món 1 chuỗi tem</div>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1 bg-gradient-to-tr from-rose-500 to-rose-600 text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between">
+          <div class="text-xs font-semibold text-rose-100 flex items-center justify-between">
+            <span>Thao Tác Nhanh</span>
+            <i data-lucide="file-check-2" class="w-4 h-4"></i>
+          </div>
+          <button 
+            onclick="downloadReorderedPdf()" 
+            class="mt-2 w-full py-2 px-3 bg-white text-rose-700 hover:bg-rose-50 rounded-xl text-xs font-extrabold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>TẢI PDF ĐÃ XẾP</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Bar & Search -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Filter Buttons -->
+          <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-semibold">
+            <button onclick="filterShippingList('all')" id="shipFilterAll" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-2xs transition-all cursor-pointer">Tất cả (<span id="shipCountAll">0</span>)</button>
+            <button onclick="filterShippingList('single')" id="shipFilterSingle" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">Đơn 1 món (<span id="shipCountSingle">0</span>)</button>
+            <button onclick="filterShippingList('multi')" id="shipFilterMulti" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">Đơn nhiều món (<span id="shipCountMulti">0</span>)</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative flex-1 sm:w-72">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input 
+              type="text" 
+              id="shipSearchInput" 
+              oninput="handleShipSearch(this.value)" 
+              placeholder="Tìm mã vận đơn, Order ID, tên sản phẩm..." 
+              class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 font-medium"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button 
+            onclick="exportShippingExcel()" 
+            class="inline-flex items-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
+          >
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+            Xuất Excel Vận Đơn
+          </button>
+          <button 
+            onclick="downloadReorderedPdf()" 
+            class="inline-flex items-center px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+          >
+            <i data-lucide="file-down" class="w-4 h-4 mr-1.5"></i>
+            Tải PDF Đã Sắp Xếp Theo Món
+          </button>
+        </div>
+      </div>
+
+      <!-- Shipping Orders List Container -->
+      <div id="shippingOrdersContainer" class="space-y-4">
+        <!-- Rendered by JS -->
+      </div>
+
+    </section>
+
     <!-- Guide & Warehouse Info Footer (no-print) -->
     <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs text-xs text-slate-600 space-y-3 no-print">
       <div class="flex items-center space-x-2 text-slate-900 font-bold text-sm">
@@ -707,6 +850,96 @@
     </div>
   </div>
 
+  <!-- Combo & Packaging Rule Configuration Modal -->
+  <div id="comboModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeComboModal()">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shadow-2xs">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900">Cấu Hình Combo &amp; Quy Cách Đóng Gói</h3>
+            <p class="text-xs text-slate-500">Tự động quy đổi thùng/lốc ra món lẻ &amp; gom đơn chuẩn xác (Lưu vĩnh viễn)</p>
+          </div>
+        </div>
+        <button onclick="closeComboModal()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-all cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+        
+        <!-- Add New Combo Form -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4.5 space-y-3">
+          <div class="font-bold text-slate-900 text-xs flex items-center">
+            <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-rose-600"></i>
+            Thêm Quy Tắc Combo / Quy Cách Mới
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Tên Combo / Quy cách hiển thị:</label>
+              <input type="text" id="newComboName" placeholder="VD: Combo Phục hồi (Thùng 3 cặp)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Từ khóa sản phẩm áp dụng:</label>
+              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi (để trống = tất cả)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Từ khóa SKU / Phân loại:</label>
+              <input type="text" id="newComboSkuKey" placeholder="VD: 3 cặp, Thùng 3, Thùng 6..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Số lượng lẻ:</label>
+                <input type="number" id="newComboPackSize" min="1" value="3" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-bold text-rose-600" />
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Đơn vị quy đổi:</label>
+                <input type="text" id="newComboUnit" placeholder="VD: Cặp 100ml, Chai..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs font-medium" />
+              </div>
+            </div>
+          </div>
+          <div class="text-right pt-1">
+            <button onclick="handleAddNewCombo()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+              <i data-lucide="check" class="w-3.5 h-3.5 mr-1.5"></i>
+              Lưu Quy Tắc Này
+            </button>
+          </div>
+        </div>
+
+        <!-- Current Combo Rules List -->
+        <div>
+          <div class="flex items-center justify-between mb-2.5">
+            <span class="font-bold text-slate-900 text-xs flex items-center">
+              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+              Danh Sách Quy Tắc Đang Áp Dụng (<span id="comboListCount">0</span>)
+            </span>
+            <button onclick="resetDefaultCombos()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold transition-all cursor-pointer">
+              Khôi phục 3 combo chuẩn shop
+            </button>
+          </div>
+          <div id="comboRulesList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/70 flex justify-between items-center">
+        <span class="text-[11px] text-slate-500">Tự động lưu vào trình duyệt (localStorage), không mất khi tải lại trang</span>
+        <button onclick="closeComboModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
+          Đóng &amp; Áp Dụng
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center space-x-2 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none no-print">
     <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
@@ -729,6 +962,7 @@
     let loadedFiles = [];
     let aggregatedItems = [];
     let groupedProducts = [];
+    let lastParsedFilesData = [];
     let globalStats = { totalFiles: 0, totalOrders: 0, uniqueProducts: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
     let checkedItemKeys = new Set();
     let collapsedGroupKeys = new Set();
@@ -737,25 +971,186 @@
     let groupViewMode = 'grouped'; // 'grouped' (Parent-Child) or 'flat' (Individual SKUs)
     let currentSort = 'qty-desc';
     let currentModalOrders = [];
+    let currentMainTab = 'picking'; // 'picking' or 'shipping'
+
+    // Combo & Packaging Rules (Persisted in localStorage)
+    const DEFAULT_COMBO_RULES = [
+      { id: 'combo_1', name: 'Combo Phục hồi (Thùng 3 cặp)', productKeyword: 'Combo Phục hồi', skuKeyword: '3 cặp', packSize: 3, unit: 'Cặp 100ml' },
+      { id: 'combo_2', name: 'Calcifort-B12 (Thùng 6 chai)', productKeyword: 'Calcifort-B12', skuKeyword: 'Thùng 6 chai', packSize: 6, unit: 'Chai 100ml' },
+      { id: 'combo_3', name: 'Quy cách Thùng 12 gói', productKeyword: '', skuKeyword: 'Thùng 12', packSize: 12, unit: 'Gói' }
+    ];
+
+    let comboRules = [];
+
+    function loadComboRules() {
+      try {
+        const stored = localStorage.getItem('tiktok_shop_combo_rules_v2');
+        if (stored) {
+          comboRules = JSON.parse(stored);
+        } else {
+          comboRules = [...DEFAULT_COMBO_RULES];
+          saveComboRules(comboRules);
+        }
+      } catch (e) {
+        comboRules = [...DEFAULT_COMBO_RULES];
+      }
+      updateComboBadge();
+    }
+
+    function saveComboRules(rules) {
+      comboRules = rules;
+      try {
+        localStorage.setItem('tiktok_shop_combo_rules_v2', JSON.stringify(comboRules));
+      } catch (e) {
+        console.error('Lỗi lưu combo rules:', e);
+      }
+      updateComboBadge();
+      renderComboRulesList();
+    }
+
+    function updateComboBadge() {
+      const badge = document.getElementById('comboBadgeCount');
+      if (badge) badge.textContent = comboRules.length;
+      const countEl = document.getElementById('comboListCount');
+      if (countEl) countEl.textContent = comboRules.length;
+    }
+
+    function openComboModal() {
+      document.getElementById('comboModal').classList.remove('hidden');
+      renderComboRulesList();
+      lucide.createIcons();
+    }
+
+    function closeComboModal() {
+      document.getElementById('comboModal').classList.add('hidden');
+      if (lastParsedFilesData && lastParsedFilesData.length > 0) {
+        processAggregatedData(lastParsedFilesData);
+      } else if (groupedProducts.length > 0) {
+        groupedProducts.forEach(grp => {
+          grp.packagingInfo = analyzeProductPackaging(grp.variants);
+          grp.hasBulk = grp.packagingInfo ? grp.packagingInfo.hasBulk : false;
+        });
+        renderCurrentView();
+      }
+      if (shippingOrders.length > 0) {
+        sortAndRenderShippingOrders();
+      }
+    }
+
+    function handleAddNewCombo() {
+      const name = (document.getElementById('newComboName').value || '').trim();
+      const prodKey = (document.getElementById('newComboProdKey').value || '').trim();
+      const skuKey = (document.getElementById('newComboSkuKey').value || '').trim();
+      const packSize = parseInt(document.getElementById('newComboPackSize').value, 10) || 1;
+      const unit = (document.getElementById('newComboUnit').value || '').trim() || 'Món lẻ';
+
+      if (!name) {
+        alert('Vui lòng nhập tên Combo / Quy cách!');
+        return;
+      }
+      if (!skuKey) {
+        alert('Vui lòng nhập từ khóa SKU / Phân loại (ví dụ: 3 cặp, Thùng 6 chai...)!');
+        return;
+      }
+
+      const newRule = {
+        id: 'rule_' + Date.now(),
+        name,
+        productKeyword: prodKey,
+        skuKeyword: skuKey,
+        packSize,
+        unit
+      };
+
+      comboRules.unshift(newRule);
+      saveComboRules(comboRules);
+
+      document.getElementById('newComboName').value = '';
+      document.getElementById('newComboProdKey').value = '';
+      document.getElementById('newComboSkuKey').value = '';
+      document.getElementById('newComboPackSize').value = '3';
+      document.getElementById('newComboUnit').value = '';
+
+      showToast('Đã lưu quy tắc Combo mới thành công!');
+    }
+
+    function deleteComboRule(id) {
+      if (!confirm('Bạn có chắc muốn xóa quy tắc combo này?')) return;
+      comboRules = comboRules.filter(r => r.id !== id);
+      saveComboRules(comboRules);
+      showToast('Đã xóa quy tắc combo!');
+    }
+
+    function resetDefaultCombos() {
+      if (!confirm('Khôi phục lại 3 quy tắc combo chuẩn shop?')) return;
+      saveComboRules([...DEFAULT_COMBO_RULES]);
+      showToast('Đã khôi phục 3 combo chuẩn shop!');
+    }
+
+    function renderComboRulesList() {
+      const container = document.getElementById('comboRulesList');
+      if (!container) return;
+      if (comboRules.length === 0) {
+        container.innerHTML = '<div class="p-4 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">Chưa có quy tắc combo nào. Hãy nhập ở bảng phía trên!</div>';
+        return;
+      }
+      container.innerHTML = comboRules.map(rule => `
+        <div class="bg-white p-3 rounded-xl border border-slate-200/90 flex items-center justify-between gap-3 shadow-2xs hover:border-slate-300 transition-all">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-900 text-xs">${escapeHtml(rule.name)}</span>
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                1 quy cách = ${rule.packSize} ${escapeHtml(rule.unit)}
+              </span>
+            </div>
+            <div class="text-[11px] text-slate-500">
+              ${rule.productKeyword ? `<span class="font-medium text-slate-700">Sản phẩm:</span> "${escapeHtml(rule.productKeyword)}" &bull; ` : '<span class="text-slate-400">Mọi sản phẩm &bull; </span>'}
+              <span class="font-medium text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 px-1 py-0.5 rounded text-rose-600 font-mono text-[10px]">${escapeHtml(rule.skuKeyword)}</code>
+            </div>
+          </div>
+          <button onclick="deleteComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Xóa quy tắc này">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
 
     // Packaging Parsing & Smart Conversion Utilities
-    function parseSkuPackagingType(skuStr) {
+    function parseSkuPackagingType(skuStr, productName = '') {
       const s = (skuStr || '').trim();
-      // Match Thùng: Thùng 6 chai 100ml, Thùng 12 gói 1kg...
+      const p = (productName || '').toLowerCase();
+      const sLower = s.toLowerCase();
+
+      // Priority 1: User-configured Combo Rules
+      for (const rule of comboRules) {
+        const matchProduct = !rule.productKeyword || p.includes(rule.productKeyword.toLowerCase());
+        const matchSku = rule.skuKeyword && sLower.includes(rule.skuKeyword.toLowerCase());
+        if (matchProduct && matchSku) {
+          return {
+            isBulk: true,
+            type: 'combo',
+            packSize: rule.packSize,
+            rest: rule.unit,
+            label: `${rule.name} (${rule.packSize} ${rule.unit})`,
+            matchedRule: rule
+          };
+        }
+      }
+
+      // Priority 2: Standard regex for Thùng / Hộp
       const thungMatch = s.match(/thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
       if (thungMatch) {
         const packSize = parseInt(thungMatch[1], 10);
         const rest = (thungMatch[2] || '').trim();
         return { isBulk: true, type: 'thùng', packSize, rest, label: `Thùng (${packSize} ${rest || 'món'})` };
       }
-      // Match Hộp lớn: Hộp 10 vỉ, Hộp 20 ống...
       const hopMatch = s.match(/hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
       if (hopMatch) {
         const packSize = parseInt(hopMatch[1], 10);
         const rest = (hopMatch[2] || '').trim();
         return { isBulk: true, type: 'hộp', packSize, rest, label: `Hộp (${packSize} ${rest || 'món'})` };
       }
-      // Match Lô / Combo: 10 gói 10g...
       const countMatch = s.match(/^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)/i);
       if (countMatch && parseInt(countMatch[1], 10) > 1) {
         const packSize = parseInt(countMatch[1], 10);
@@ -770,7 +1165,7 @@
       let looseItems = [];
 
       variants.forEach(v => {
-        const pack = parseSkuPackagingType(v.sku);
+        const pack = parseSkuPackagingType(v.sku, v.productName);
         if (pack.isBulk) {
           bulkItems.push({ ...pack, variant: v, count: v.totalQty });
         } else {
@@ -1065,8 +1460,8 @@
       // Sort variants within each group: Bulk items (Thùng/Hộp) first, then loose items
       groupedProducts.forEach(grp => {
         grp.variants.sort((a, b) => {
-          const aPack = parseSkuPackagingType(a.sku);
-          const bPack = parseSkuPackagingType(b.sku);
+          const aPack = parseSkuPackagingType(a.sku, a.productName);
+          const bPack = parseSkuPackagingType(b.sku, b.productName);
           if (aPack.isBulk && !bPack.isBulk) return -1;
           if (!aPack.isBulk && bPack.isBulk) return 1;
           return b.totalQty - a.totalQty;
@@ -1074,9 +1469,618 @@
       });
     }
 
-    // Process Files
+    // Tab Navigation Switcher
+    function switchMainTab(tab) {
+      currentMainTab = tab;
+      const tabPickingBtn = document.getElementById('tabPickingBtn');
+      const tabShippingBtn = document.getElementById('tabShippingBtn');
+      const statsSection = document.getElementById('statsSection');
+      const fulfillmentSection = document.getElementById('fulfillmentSection');
+      const resultSection = document.getElementById('resultSection');
+      const shippingSection = document.getElementById('shippingSection');
+
+      if (tab === 'picking') {
+        if (tabPickingBtn) tabPickingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
+        if (tabShippingBtn) tabShippingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
+
+        if (aggregatedItems.length > 0) {
+          statsSection.classList.remove('hidden');
+          fulfillmentSection.classList.remove('hidden');
+          resultSection.classList.remove('hidden');
+        }
+        if (shippingSection) shippingSection.classList.add('hidden');
+      } else {
+        if (tabShippingBtn) tabShippingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-rose-600 text-white shadow-xs';
+        if (tabPickingBtn) tabPickingBtn.className = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80';
+
+        statsSection.classList.add('hidden');
+        fulfillmentSection.classList.add('hidden');
+        resultSection.classList.add('hidden');
+
+        if (shippingSection) {
+          shippingSection.classList.remove('hidden');
+          if (shippingOrders.length === 0) {
+            renderShippingUI();
+          }
+        }
+      }
+      lucide.createIcons();
+    }
+
+    // Shipping Label State
+    let shippingOrders = [];
+    let sortedShippingOrders = [];
+    let currentShippingFile = null;
+    let shippingFilter = 'all'; // 'all', 'single', 'multi'
+    let shippingSearchQuery = '';
+
+    // Process Shipping Label + Packing Slip PDF File
+    async function processShippingLabelFile(file) {
+      currentShippingFile = file;
+      progressContainer.classList.remove('hidden');
+      progressBar.style.width = '10%';
+      progressPercent.textContent = '10%';
+      progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-blue-600"></i> Đang tải file mã vận đơn ${escapeHtml(file.name)}...`;
+      lucide.createIcons();
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdfDoc = await loadingTask.promise;
+        const numPages = pdfDoc.numPages;
+
+        const ordersDict = {};
+        const orderSequence = [];
+
+        for (let pNum = 1; pNum <= numPages; pNum++) {
+          const pct = Math.round((pNum / numPages) * 75) + 10;
+          progressBar.style.width = `${pct}%`;
+          progressPercent.textContent = `${pct}%`;
+          progressText.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-blue-600"></i> Đang bóc tách mã vận đơn trang ${pNum} / ${numPages}...`;
+
+          const page = await pdfDoc.getPage(pNum);
+          const textContent = await page.getTextContent();
+          const viewport = page.getViewport({ scale: 1.0 });
+          const pageH = viewport.height;
+
+          const items = textContent.items.map(it => {
+            const x = it.transform[4];
+            const y = pageH - it.transform[5];
+            return { str: (it.str || '').trim(), x, y, w: it.width, h: it.height };
+          }).filter(it => it.str.length > 0);
+
+          const fullText = items.map(it => it.str).join(' ');
+
+          const mOrder = fullText.match(/Order ID:\s*(\d+)/);
+          const orderId = mOrder ? mOrder[1] : `PAGE_${pNum}`;
+
+          const mTrack = fullText.match(/\b(TTVN\d+|862\d{9}|776\d{9}|856\d{9}|\d{12})\b/);
+          const tracking = mTrack ? mTrack[1] : '-';
+
+          const mRecv = fullText.match(/Người nhận\s*([^\d\n\r]+?)(?=\s*\d|\s*Trọng lượng|\s*Order ID|$)/i);
+          const receiver = mRecv ? mRecv[1].trim() : '-';
+
+          const mWeight = fullText.match(/([\d\.]+\s*KG)/i);
+          const weight = mWeight ? mWeight[1] : '-';
+
+          const slipWords = items.filter(it => it.y >= 295 && it.y <= 385);
+          const pageIdx = pNum - 1;
+
+          if (!ordersDict[orderId]) {
+            ordersDict[orderId] = {
+              orderId,
+              tracking,
+              receiver,
+              weight,
+              pages: [pageIdx],
+              pageNumbers: [pNum],
+              slipWords: [...slipWords],
+              rawTexts: [fullText]
+            };
+            orderSequence.push(orderId);
+          } else {
+            ordersDict[orderId].pages.push(pageIdx);
+            ordersDict[orderId].pageNumbers.push(pNum);
+            ordersDict[orderId].slipWords.push(...slipWords);
+            ordersDict[orderId].rawTexts.push(fullText);
+          }
+        }
+
+        const parsedOrders = [];
+        for (const oid of orderSequence) {
+          const ord = ordersDict[oid];
+          const words = ord.slipWords;
+
+          const filtered = words.filter(w => {
+            const t = w.str;
+            if (['Product', 'Name', 'SKU', 'Seller', 'Qty', 'Total:', 'Order', 'ID:'].includes(t) || /^\d{15,}$/.test(t)) {
+              return false;
+            }
+            return true;
+          });
+
+          const linesByY = {};
+          filtered.forEach(w => {
+            const lk = Math.round(w.y / 8) * 8;
+            if (!linesByY[lk]) linesByY[lk] = [];
+            linesByY[lk].push(w);
+          });
+
+          const itemsList = [];
+          let currentName = [];
+          let currentSku = [];
+          let currentQty = 1;
+          let hasItem = false;
+
+          const sortedYKeys = Object.keys(linesByY).map(Number).sort((a, b) => a - b);
+
+          for (const lk of sortedYKeys) {
+            const lw = linesByY[lk].sort((a, b) => a.x - b.x);
+            const qtyWords = lw.filter(w => w.x >= 250 && /^\d+$/.test(w.str));
+            const nameWords = lw.filter(w => w.x < 125);
+            const skuWords = lw.filter(w => w.x >= 125 && w.x < 250 && !/^\d+$/.test(w.str));
+
+            if (qtyWords.length > 0) {
+              if (hasItem && (currentName.length > 0 || currentSku.length > 0)) {
+                itemsList.push({
+                  name: currentName.join(' ').trim(),
+                  sku: currentSku.join(' ').trim() || 'Mặc định',
+                  qty: currentQty
+                });
+                currentName = [];
+                currentSku = [];
+              }
+              currentQty = parseInt(qtyWords[0].str, 10);
+              hasItem = true;
+            }
+
+            if (nameWords.length > 0) currentName.push(...nameWords.map(w => w.str));
+            if (skuWords.length > 0) currentSku.push(...skuWords.map(w => w.str));
+          }
+
+          if (hasItem && (currentName.length > 0 || currentSku.length > 0)) {
+            itemsList.push({
+              name: currentName.join(' ').trim(),
+              sku: currentSku.join(' ').trim() || 'Mặc định',
+              qty: currentQty
+            });
+          }
+
+          if (itemsList.length === 0) {
+            const allT = ord.rawTexts.join('\n');
+            const m = allT.match(/Product Name SKU Seller SKU Qty\s*([^\n]+)/);
+            if (m) {
+              const line = m[1].trim();
+              const mEnd = line.match(/^(.*?)\s+(\d+)$/);
+              if (mEnd) {
+                itemsList.push({ name: mEnd[1].trim(), sku: 'Mặc định', qty: parseInt(mEnd[2], 10) });
+              } else {
+                itemsList.push({ name: line, sku: 'Mặc định', qty: 1 });
+              }
+            } else {
+              itemsList.push({ name: 'Sản phẩm TikTok Shop', sku: 'Mặc định', qty: 1 });
+            }
+          }
+
+          ord.items = itemsList;
+          ord.totalQty = itemsList.reduce((acc, it) => acc + it.qty, 0);
+          ord.isMultiItem = (itemsList.length > 1);
+          ord.primaryProduct = itemsList[0]?.name || 'Sản phẩm khác';
+          ord.primarySku = itemsList[0]?.sku || 'Mặc định';
+
+          parsedOrders.push(ord);
+        }
+
+        shippingOrders = parsedOrders;
+        sortAndRenderShippingOrders();
+
+        fileChipsContainer.classList.remove('hidden');
+        fileChipsList.innerHTML = `
+          <div class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <i data-lucide="tags" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i>
+            <span>${escapeHtml(file.name)} (${shippingOrders.length} đơn, ${numPages} trang in)</span>
+          </div>
+        `;
+
+        const badge = document.getElementById('shippingBadge');
+        if (badge) {
+          badge.classList.remove('hidden');
+          badge.textContent = `${shippingOrders.length} đơn`;
+        }
+
+        switchMainTab('shipping');
+        progressBar.style.width = '100%';
+        progressPercent.textContent = '100%';
+        setTimeout(() => progressContainer.classList.add('hidden'), 400);
+        showToast(`Đã bóc tách thành công ${shippingOrders.length} mã vận đơn!`);
+
+      } catch (err) {
+        console.error('Lỗi xử lý file mã vận đơn:', err);
+        alert('Có lỗi khi đọc file mã vận đơn: ' + err.message);
+        progressContainer.classList.add('hidden');
+      }
+    }
+
+    // Sort Shipping Orders by Product, SKU & Quantity
+    function sortAndRenderShippingOrders() {
+      if (shippingOrders.length === 0) return;
+
+      const singleOrders = shippingOrders.filter(o => !o.isMultiItem);
+      const multiOrders = shippingOrders.filter(o => o.isMultiItem);
+
+      // Count frequency of products
+      const prodCounts = {};
+      singleOrders.forEach(o => {
+        const p = o.primaryProduct;
+        prodCounts[p] = (prodCounts[p] || 0) + 1;
+      });
+
+      singleOrders.sort((a, b) => {
+        // 1. Most popular product first
+        const countDiff = (prodCounts[b.primaryProduct] || 0) - (prodCounts[a.primaryProduct] || 0);
+        if (countDiff !== 0) return countDiff;
+
+        // 2. Product name alphabetically
+        const nameDiff = a.primaryProduct.localeCompare(b.primaryProduct, 'vi');
+        if (nameDiff !== 0) return nameDiff;
+
+        // 3. Regular loose SKUs before bulk/thùng
+        const packA = parseSkuPackagingType(a.primarySku, a.primaryProduct);
+        const packB = parseSkuPackagingType(b.primarySku, b.primaryProduct);
+        const rankA = packA.isBulk ? 2 : 1;
+        const rankB = packB.isBulk ? 2 : 1;
+        if (rankA !== rankB) return rankA - rankB;
+
+        // 4. SKU name
+        const skuDiff = a.primarySku.localeCompare(b.primarySku, 'vi');
+        if (skuDiff !== 0) return skuDiff;
+
+        // 5. Quantity ascending
+        if (a.totalQty !== b.totalQty) return a.totalQty - b.totalQty;
+
+        // 6. Order ID
+        return a.orderId.localeCompare(b.orderId);
+      });
+
+      // Multi-item orders sorted by item count
+      multiOrders.sort((a, b) => {
+        if (a.items.length !== b.items.length) return a.items.length - b.items.length;
+        return a.primaryProduct.localeCompare(b.primaryProduct, 'vi');
+      });
+
+      sortedShippingOrders = [...singleOrders, ...multiOrders];
+
+      // Assign new sequential numbers and page spans
+      let currPage = 1;
+      sortedShippingOrders.forEach((o, idx) => {
+        o.newSeq = idx + 1;
+        const pCount = o.pages.length;
+        o.newStartPage = currPage;
+        o.newEndPage = currPage + pCount - 1;
+        currPage += pCount;
+      });
+
+      renderShippingUI();
+    }
+
+    // Render Shipping Orders UI
+    function renderShippingUI() {
+      const container = document.getElementById('shippingOrdersContainer');
+      const section = document.getElementById('shippingSection');
+      if (!container || !section) return;
+
+      if (sortedShippingOrders.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center bg-white border border-slate-200 rounded-2xl">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="tags" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-bold text-slate-900">Chưa có file mã vận đơn nào được tải lên</p>
+            <p class="text-xs text-slate-500 mt-1">Hãy kéo thả file <code>Shipping label+Packing slip.pdf</code> vào khung tải file phía trên để tự động sắp xếp theo thứ tự món!</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      section.classList.remove('hidden');
+
+      const totalOrders = sortedShippingOrders.length;
+      const totalPages = sortedShippingOrders.reduce((sum, o) => sum + o.pages.length, 0);
+      const singleOrders = sortedShippingOrders.filter(o => !o.isMultiItem);
+      const multiOrders = sortedShippingOrders.filter(o => o.isMultiItem);
+      const uniqueProds = new Set(singleOrders.map(o => o.primaryProduct)).size;
+
+      document.getElementById('shipTotalOrders').textContent = totalOrders;
+      document.getElementById('shipTotalPages').textContent = `${totalPages} trang in`;
+      document.getElementById('shipSingleOrders').textContent = singleOrders.length;
+      document.getElementById('shipMultiOrders').textContent = multiOrders.length;
+      document.getElementById('shipProductGroups').textContent = uniqueProds;
+
+      document.getElementById('shipCountAll').textContent = totalOrders;
+      document.getElementById('shipCountSingle').textContent = singleOrders.length;
+      document.getElementById('shipCountMulti').textContent = multiOrders.length;
+
+      let filtered = sortedShippingOrders;
+      if (shippingFilter === 'single') filtered = singleOrders;
+      if (shippingFilter === 'multi') filtered = multiOrders;
+
+      if (shippingSearchQuery) {
+        const q = shippingSearchQuery.toLowerCase();
+        filtered = filtered.filter(o => {
+          return o.tracking.toLowerCase().includes(q) ||
+                 o.orderId.toLowerCase().includes(q) ||
+                 o.receiver.toLowerCase().includes(q) ||
+                 o.items.some(it => it.name.toLowerCase().includes(q) || it.sku.toLowerCase().includes(q));
+        });
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-white border border-slate-200 rounded-2xl">
+            <p class="text-sm font-bold text-slate-900">Không tìm thấy mã vận đơn phù hợp</p>
+            <p class="text-xs text-slate-500 mt-1">Thử kiểm tra lại từ khóa tìm kiếm</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const groups = {};
+      filtered.forEach(o => {
+        const grpKey = o.isMultiItem ? "🧩 ĐƠN NHIỀU MÓN (ĐÓNG RIÊNG)" : o.primaryProduct;
+        if (!groups[grpKey]) groups[grpKey] = [];
+        groups[grpKey].push(o);
+      });
+
+      let html = '';
+      for (const [prodName, ordersInGrp] of Object.entries(groups)) {
+        const isMultiGroup = prodName.includes('ĐƠN NHIỀU MÓN');
+        const totalGrpQty = ordersInGrp.reduce((sum, o) => sum + o.totalQty, 0);
+
+        const skuCounts = {};
+        ordersInGrp.forEach(o => {
+          const s = o.isMultiItem ? "Nhiều món hỗn hợp" : o.primarySku;
+          skuCounts[s] = (skuCounts[s] || 0) + 1;
+        });
+        const skuSummary = Object.entries(skuCounts).map(([sku, cnt]) => `${cnt} đơn ${sku}`).join(' &bull; ');
+
+        html += `
+          <div class="bg-white border ${isMultiGroup ? 'border-amber-200/90' : 'border-slate-200'} rounded-2xl shadow-xs overflow-hidden">
+            <div class="${isMultiGroup ? 'bg-amber-50/70 border-b border-amber-200/70' : 'bg-slate-50/80 border-b border-slate-200'} px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-lg ${isMultiGroup ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'} flex items-center justify-center font-bold text-xs">
+                    <i data-lucide="${isMultiGroup ? 'layers' : 'package'}" class="w-3.5 h-3.5"></i>
+                  </span>
+                  <h4 class="font-extrabold text-sm text-slate-900">${escapeHtml(prodName)}</h4>
+                  <span class="px-2.5 py-0.5 text-xs font-black rounded-full ${isMultiGroup ? 'bg-amber-200/80 text-amber-900' : 'bg-rose-100 text-rose-800'}">
+                    ${ordersInGrp.length} đơn hàng
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 pl-8">${skuSummary} &bull; Tổng SL lấy: <strong class="text-slate-800">${totalGrpQty} món</strong></p>
+              </div>
+              <div class="text-xs text-slate-500 font-semibold sm:text-right pl-8 sm:pl-0">
+                <span>Thứ tự in mới: </span>
+                <strong class="text-emerald-700 font-bold font-mono">#${ordersInGrp[0].newSeq} &rarr; #${ordersInGrp[ordersInGrp.length - 1].newSeq}</strong>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50/50 text-slate-500 font-semibold border-b border-slate-100 select-none text-[11px] uppercase tracking-wider">
+                  <tr>
+                    <th class="py-2.5 px-3 text-center w-14">STT Mới</th>
+                    <th class="py-2.5 px-3 min-w-[150px]">Mã Vận Đơn</th>
+                    <th class="py-2.5 px-3 min-w-[155px]">Mã Đơn Hàng (Order ID)</th>
+                    <th class="py-2.5 px-3 min-w-[180px]">Người Nhận &amp; Trọng Lượng</th>
+                    <th class="py-2.5 px-3 min-w-[140px]">Quy Cách / SKU</th>
+                    <th class="py-2.5 px-3 text-center w-16">SL</th>
+                    <th class="py-2.5 px-3 min-w-[170px] text-right">Trang PDF Gốc &rarr; Mới</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${ordersInGrp.map(o => {
+                    const isMultiPage = o.pages.length > 1;
+                    const pageDisplay = (o.newStartPage === o.newEndPage) 
+                      ? `Trang ${o.newStartPage}` 
+                      : `Trang ${o.newStartPage}-${o.newEndPage}`;
+                    const origPageDisplay = o.pageNumbers.join(', ');
+
+                    return `
+                      <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="py-2.5 px-3 text-center font-bold text-slate-700">
+                          <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 text-slate-800 font-mono text-[11px] font-bold">
+                            ${o.newSeq}
+                          </span>
+                        </td>
+                        <td class="py-2.5 px-3 font-mono font-bold text-slate-900">
+                          <div class="flex items-center gap-1.5">
+                            <span>${escapeHtml(o.tracking)}</span>
+                            <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-700 p-0.5 rounded transition-all cursor-pointer" title="Sao chép mã vận đơn">
+                              <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                          </div>
+                        </td>
+                        <td class="py-2.5 px-3 font-mono text-slate-600">
+                          ${escapeHtml(o.orderId)}
+                        </td>
+                        <td class="py-2.5 px-3 text-slate-700">
+                          <div class="font-medium">${escapeHtml(o.receiver || '-')}</div>
+                          ${o.weight ? `<div class="text-[10px] text-slate-400">${escapeHtml(o.weight)}</div>` : ''}
+                        </td>
+                        <td class="py-2.5 px-3 text-slate-800">
+                          ${o.isMultiItem ? `
+                            <div class="text-amber-700 font-semibold space-y-0.5">
+                              ${o.items.map(it => `<div>&bull; ${escapeHtml(it.name)} (${escapeHtml(it.sku)}) <strong class="text-slate-900">x${it.qty}</strong></div>`).join('')}
+                            </div>
+                          ` : `
+                            <span class="font-medium">${escapeHtml(o.primarySku)}</span>
+                          `}
+                        </td>
+                        <td class="py-2.5 px-3 text-center font-extrabold text-slate-900 text-sm">
+                          ${o.totalQty}
+                        </td>
+                        <td class="py-2.5 px-3 text-right">
+                          <div class="inline-flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-slate-100 font-mono text-[10px] text-slate-600" title="Số trang trong file PDF gốc">
+                              Gốc: ${origPageDisplay}
+                            </span>
+                            <i data-lucide="arrow-right" class="w-3 h-3 text-emerald-600"></i>
+                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[10px] font-bold" title="Số trang sau khi sắp xếp lại">
+                              Mới: ${pageDisplay}
+                            </span>
+                          </div>
+                          ${isMultiPage ? '<div class="text-[10px] text-amber-600 font-bold mt-0.5">Đơn 2 trang</div>' : ''}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // Filter Shipping List
+    function filterShippingList(filter) {
+      shippingFilter = filter;
+      const btnAll = document.getElementById('shipFilterAll');
+      const btnSingle = document.getElementById('shipFilterSingle');
+      const btnMulti = document.getElementById('shipFilterMulti');
+
+      btnAll.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+      btnSingle.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+      btnMulti.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+
+      if (filter === 'all') btnAll.className = 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-2xs transition-all cursor-pointer';
+      if (filter === 'single') btnSingle.className = 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-2xs transition-all cursor-pointer';
+      if (filter === 'multi') btnMulti.className = 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-2xs transition-all cursor-pointer';
+
+      renderShippingUI();
+    }
+
+    // Search Shipping Orders
+    function handleShipSearch(query) {
+      shippingSearchQuery = (query || '').trim();
+      renderShippingUI();
+    }
+
+    // Export Reordered PDF via pdf-lib
+    async function downloadReorderedPdf() {
+      if (!currentShippingFile || sortedShippingOrders.length === 0) {
+        alert('Chưa có file mã vận đơn nào được tải lên!');
+        return;
+      }
+
+      showToast('Đang tạo và sắp xếp các trang PDF theo thứ tự món...');
+
+      try {
+        const arrayBuffer = await currentShippingFile.arrayBuffer();
+        const srcDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        const dstDoc = await PDFLib.PDFDocument.create();
+
+        // Collect all page indices in the newly sorted order
+        const sortedIndices = [];
+        sortedShippingOrders.forEach(o => {
+          o.pages.forEach(pIdx => sortedIndices.push(pIdx));
+        });
+
+        const copiedPages = await dstDoc.copyPages(srcDoc, sortedIndices);
+        copiedPages.forEach(p => dstDoc.addPage(p));
+
+        const newPdfBytes = await dstDoc.save();
+        const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const origBase = currentShippingFile.name.replace(/\.pdf$/i, '');
+        a.download = `${origBase}_DA_SAP_XEP_THEO_MON.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('Đã tải xuống file PDF sắp xếp thành công!');
+      } catch (err) {
+        console.error('Lỗi khi ghép PDF:', err);
+        alert('Lỗi tạo file PDF: ' + err.message);
+      }
+    }
+
+    // Export Shipping Excel
+    function exportShippingExcel() {
+      if (sortedShippingOrders.length === 0) {
+        alert('Chưa có dữ liệu mã vận đơn để xuất Excel!');
+        return;
+      }
+
+      const rows = [
+        ["STT IN MỚI", "MÃ VẬN ĐƠN", "MÃ ĐƠN HÀNG (ORDER ID)", "TÊN SẢN PHẨM", "PHÂN LOẠI SKU", "SỐ LƯỢNG", "NGƯỜI NHẬN", "TRỌNG LƯỢNG", "TRANG PDF GỐC", "TRANG IN MỚI", "LOẠI ĐƠN"]
+      ];
+
+      sortedShippingOrders.forEach(o => {
+        const origPagesStr = o.pageNumbers.join(', ');
+        const newPagesStr = (o.newStartPage === o.newEndPage) ? `${o.newStartPage}` : `${o.newStartPage}-${o.newEndPage}`;
+        const orderType = o.isMultiItem ? "Đơn nhiều món (hỗn hợp)" : "Đơn 1 món";
+
+        rows.push([
+          o.newSeq,
+          o.tracking,
+          o.orderId,
+          o.primaryProduct,
+          o.primarySku,
+          o.totalQty,
+          o.receiver,
+          o.weight,
+          origPagesStr,
+          newPagesStr,
+          orderType
+        ]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [
+        { wch: 12 }, { wch: 20 }, { wch: 22 }, { wch: 45 }, { wch: 22 },
+        { wch: 10 }, { wch: 20 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 25 }
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Danh Sach Van Don");
+      const origBase = (currentShippingFile?.name || 'Van_Don').replace(/\.pdf$/i, '');
+      XLSX.writeFile(wb, `${origBase}_Doi_Soat_Van_Don.xlsx`);
+      showToast('Đã xuất file Excel đối soát thành công!');
+    }
+
+    // Unified File Handler (Auto-detects Picking Lists vs Shipping Labels)
     async function handleFiles(newFiles) {
-      for (const file of newFiles) {
+      if (!newFiles || newFiles.length === 0) return;
+      const pdfFiles = Array.from(newFiles).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+      if (pdfFiles.length === 0) {
+        alert('Vui lòng chọn hoặc kéo thả các file định dạng .PDF!');
+        return;
+      }
+
+      // Check if any file is a Shipping Label + Packing Slip
+      const shippingFile = pdfFiles.find(f => {
+        const n = f.name.toLowerCase();
+        return n.includes('shipping label') || n.includes('packing slip') || n.includes('van_don') || n.includes('vandon');
+      });
+
+      if (shippingFile || currentMainTab === 'shipping') {
+        const targetFile = shippingFile || pdfFiles[0];
+        await processShippingLabelFile(targetFile);
+        return;
+      }
+
+      // Otherwise, process as Picking List files
+      switchMainTab('picking');
+      for (const file of pdfFiles) {
         if (!loadedFiles.some(f => f.name === file.name && f.size === file.size)) {
           loadedFiles.push(file);
         }
@@ -1104,6 +2108,7 @@
 
       setTimeout(() => {
         progressContainer.classList.add('hidden');
+        lastParsedFilesData = parsedFilesData;
         processAggregatedData(parsedFilesData);
       }, 300);
     }
@@ -1114,7 +2119,7 @@
         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
           <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
           ${f.name}
-          <button onclick="removeFile(${idx})" class="ml-2 text-slate-400 hover:text-rose-600 transition-colors">
+          <button onclick="removeFile(${idx})" class="ml-2 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
             <i data-lucide="x" class="w-3 h-3"></i>
           </button>
         </span>
@@ -1441,7 +2446,7 @@
 
       const bulkCount = groupViewMode === 'grouped' 
         ? groupedProducts.filter(g => g.hasBulk || g.variants.length > 1).length
-        : aggregatedItems.filter(it => parseSkuPackagingType(it.sku).isBulk).length;
+        : aggregatedItems.filter(it => parseSkuPackagingType(it.sku, it.productName).isBulk).length;
 
       if (groupViewMode === 'grouped') {
         document.getElementById('count-all').textContent = totalProducts;
@@ -1504,7 +2509,7 @@
         if (currentFilter === 'pending' && isDone) return false;
         if (currentFilter === 'done' && !isDone) return false;
         if (currentFilter === 'bulk') {
-          const pack = parseSkuPackagingType(item.sku);
+          const pack = parseSkuPackagingType(item.sku, item.productName);
           if (!pack.isBulk) return false;
         }
 
@@ -1593,7 +2598,7 @@
         if (group.isSingleVariant) {
           const v = group.variants[0];
           const isDone = checkedItemKeys.has(v.key);
-          const pack = parseSkuPackagingType(v.sku);
+          const pack = parseSkuPackagingType(v.sku, group.productName);
 
           return `
             <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
@@ -1761,7 +2766,7 @@
                       <tbody class="divide-y divide-slate-100 text-slate-800">
                         ${group.variants.map((v, vIdx) => {
                           const isVdone = checkedItemKeys.has(v.key);
-                          const pack = parseSkuPackagingType(v.sku);
+                          const pack = parseSkuPackagingType(v.sku, group.productName);
                           return `
                             <tr class="hover:bg-purple-50/30 transition-colors ${isVdone ? 'bg-emerald-50/40' : 'bg-white'}">
                               <td class="py-2.5 px-3 text-center">
@@ -1836,7 +2841,7 @@
     function renderFlatTable(items) {
       tableBody.innerHTML = items.map((item, idx) => {
         const isDone = checkedItemKeys.has(item.key);
-        const pack = parseSkuPackagingType(item.sku);
+        const pack = parseSkuPackagingType(item.sku, item.productName);
         const fileBadges = renderFileBadges(item.byFile);
 
         const orderBtn = item.orderIds.length > 0 ? `
@@ -1968,7 +2973,7 @@
               <div class="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                 ${group.variants.map(v => {
                   const isVdone = checkedItemKeys.has(v.key);
-                  const pack = parseSkuPackagingType(v.sku);
+                  const pack = parseSkuPackagingType(v.sku, group.productName);
                   return `
                     <div class="flex items-center justify-between p-1.5 px-2 rounded-lg ${isVdone ? 'bg-emerald-100/50 text-slate-400' : 'bg-white border border-slate-200 text-slate-800'} text-xs">
                       <label class="flex items-center space-x-2 cursor-pointer flex-1 min-w-0 pr-2">
@@ -2020,7 +3025,7 @@
       cardViewWrapper.innerHTML = items.map((item, idx) => {
         const isDone = checkedItemKeys.has(item.key);
         const fileBadges = renderFileBadges(item.byFile);
-        const pack = parseSkuPackagingType(item.sku);
+        const pack = parseSkuPackagingType(item.sku, item.productName);
 
         const imageThumb = item.imageUrl ? `
           <img 
@@ -2167,7 +3172,7 @@
       groupedProducts.forEach(group => {
         group.variants.forEach((v, vIdx) => {
           const isDone = checkedItemKeys.has(v.key);
-          const pack = parseSkuPackagingType(v.sku);
+          const pack = parseSkuPackagingType(v.sku, group.productName);
           const packTypeLabel = pack.isBulk ? `Thùng nguyên (${pack.packSize} ${pack.rest || 'món'})` : "Chai/Gói lẻ";
           const conversionNote = group.packagingInfo ? 
             `Lấy: ${group.packagingInfo.actualPickText} => Tương đương: ${group.packagingInfo.equivalentText}` : 
@@ -2283,7 +3288,7 @@
           // Case 1: Single Variant Product
           if (group.isSingleVariant) {
             const v = group.variants[0];
-            const pack = parseSkuPackagingType(v.sku);
+            const pack = parseSkuPackagingType(v.sku, group.productName);
             const orderIdsHtml = renderPrintOrderIds(v.orderIds);
 
             return `
@@ -2321,7 +3326,7 @@
           group.variants.forEach((v, vIdx) => {
             const isFirstVar = (vIdx === 0);
             const isLastVar = (vIdx === varCount - 1);
-            const pack = parseSkuPackagingType(v.sku);
+            const pack = parseSkuPackagingType(v.sku, group.productName);
             const orderIdsHtml = renderPrintOrderIds(v.orderIds);
             const trClass = isLastVar ? 'group-border-bottom' : '';
 
@@ -2370,7 +3375,7 @@
       } else {
         // Flat Mode
         tableRowsHtml = itemsToPrint.map((item, idx) => {
-          const pack = parseSkuPackagingType(item.sku);
+          const pack = parseSkuPackagingType(item.sku, item.productName);
           const imgHtml = item.imageUrl 
             ? `<img src="${item.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
@@ -2462,6 +3467,51 @@
     function escapeQuotes(str) {
       return (str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
+
+    // Copy text to clipboard with feedback
+    window.copyText = function(text) {
+      if (!text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`Đã sao chép: ${text}`);
+        }).catch(() => {
+          fallbackCopy(text);
+        });
+      } else {
+        fallbackCopy(text);
+      }
+    };
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(`Đã sao chép: ${text}`);
+      } catch (e) {
+        console.error(e);
+      }
+      document.body.removeChild(ta);
+    }
+
+    // Initialize rules and Lucide icons on startup
+    document.addEventListener('DOMContentLoaded', () => {
+      loadComboRules();
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+
+    try {
+      loadComboRules();
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    } catch (e) {}
   </script>
 </body>
 </html>
