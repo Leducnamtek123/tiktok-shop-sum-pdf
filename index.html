@@ -899,6 +899,92 @@
     </div>
   </div>
 
+  <!-- Dedicated Shipping Label Full Preview Modal (no-print) -->
+  <div id="shippingLabelModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="closeShippingLabelModal()">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      <!-- Header -->
+      <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
+            <i data-lucide="file-badge" class="w-4.5 h-4.5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-900" id="labelModalTracking">Mã Vận Đơn: -</h3>
+            <p class="text-xs text-slate-500 font-mono" id="labelModalOrderId">Order ID: -</p>
+          </div>
+        </div>
+        <button onclick="closeShippingLabelModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center cursor-pointer transition-all">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+          <!-- Canvas / Image Preview (6 cols) -->
+          <div class="md:col-span-6 bg-slate-100 border border-slate-200/90 rounded-2xl p-2.5 flex flex-col items-center justify-center min-h-[320px] relative shadow-inner">
+            <div id="labelModalCanvasContainer" class="w-full flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-xs">
+              <canvas id="labelModalCanvas" class="w-full h-auto max-h-[460px] object-contain"></canvas>
+            </div>
+            <div class="mt-2 text-[11px] text-slate-500 font-medium text-center">
+              Tem vận đơn TikTok Shop chuẩn khổ A6 (100x150mm)
+            </div>
+          </div>
+
+          <!-- Metadata Details (6 cols) -->
+          <div class="md:col-span-6 space-y-3.5">
+            <!-- Recipient Card -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Thông tin người nhận</span>
+              <div class="font-bold text-slate-900 text-sm" id="labelModalReceiver">-</div>
+              <div class="text-slate-600 text-xs" id="labelModalWeight">Trọng lượng: -</div>
+            </div>
+
+            <!-- Products List Card -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sản phẩm trong kiện hàng</span>
+              <div id="labelModalItemsList" class="space-y-2 max-h-[160px] overflow-y-auto">
+                <!-- dynamic items -->
+              </div>
+            </div>
+
+            <!-- Page info & Sequence -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between text-xs">
+              <div>
+                <span class="text-slate-500 block text-[10px] font-bold uppercase">Thứ tự in mới</span>
+                <span class="font-mono font-black text-emerald-700 text-sm" id="labelModalSeq">#1</span>
+              </div>
+              <div class="text-right">
+                <span class="text-slate-500 block text-[10px] font-bold uppercase">Trang PDF gốc</span>
+                <span class="font-mono font-bold text-slate-700" id="labelModalPage">Trang 1</span>
+              </div>
+            </div>
+
+            <!-- Quick Copy Buttons -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button id="btnCopyLabelTracking" class="w-full py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i> Chép Mã VĐ
+              </button>
+              <button id="btnCopyLabelOrderId" class="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5 mr-1.5"></i> Chép Order ID
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-5 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <button onclick="downloadCurrentLabelImage()" class="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-semibold text-xs flex items-center cursor-pointer transition-all">
+          <i data-lucide="download" class="w-3.5 h-3.5 mr-1.5"></i> Tải ảnh tem (JPG)
+        </button>
+        <button onclick="closeShippingLabelModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs cursor-pointer transition-all">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Combo & Packaging Rule Configuration Modal -->
   <div id="comboModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print" onclick="closeComboModal()">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
@@ -1188,11 +1274,15 @@
       const options = [];
       if (groupedProducts && groupedProducts.length > 0) {
         groupedProducts.forEach(g => {
+          const pClean = cleanItemProductName(g.productName);
+          if (!pClean || pClean.includes('Order ID:')) return;
           g.variants.forEach(v => {
+            const sClean = cleanSku(v.sku);
+            if (sClean.includes('Order ID:')) return;
             options.push({
-              productName: g.productName,
-              sku: v.sku,
-              label: `${g.productName.slice(0, 35)}... [${v.sku}]`
+              productName: pClean,
+              sku: sClean,
+              label: `${pClean.slice(0, 32)}... [${sClean}]`
             });
           });
         });
@@ -1200,13 +1290,16 @@
         const seen = new Set();
         shippingOrders.forEach(o => {
           (o.items || []).forEach(it => {
-            const key = it.name + '|||' + it.sku;
+            const pClean = cleanItemProductName(it.name);
+            const sClean = cleanSku(it.sku);
+            if (!pClean || pClean.includes('Order ID:') || sClean.includes('Order ID:')) return;
+            const key = pClean + '|||' + sClean;
             if (!seen.has(key)) {
               seen.add(key);
               options.push({
-                productName: it.name,
-                sku: it.sku,
-                label: `${it.name.slice(0, 35)}... [${it.sku}]`
+                productName: pClean,
+                sku: sClean,
+                label: `${pClean.slice(0, 32)}... [${sClean}]`
               });
             }
           });
@@ -1848,7 +1941,17 @@
       cleaned = cleaned.replace(/^Product\s+Name\s*[:\-]?\s*/i, '');
       // Remove table headers like "SKU Seller SKU Qty"
       cleaned = cleaned.replace(/SKU\s+Seller\s+SKU\s+Qty\s*/i, '');
+      // Remove leaked Order ID strings if any
+      cleaned = cleaned.replace(/Order\s+ID:\s*\d+/gi, '');
       return cleaned.trim() || 'Sản phẩm TikTok Shop';
+    }
+
+    // SKU / Variant Sanitizer
+    function cleanSku(s) {
+      if (!s) return 'Mặc định';
+      let cleaned = s.trim();
+      cleaned = cleaned.replace(/^Seller\s+SKU\s*/i, '').replace(/Seller\s+SKU/i, '').replace(/^SKU\s*/i, '').replace(/Order\s+ID:\s*\d+/gi, '').trim();
+      return cleaned || 'Mặc định';
     }
 
     // Tab Navigation Switcher
@@ -1915,6 +2018,7 @@
         const arrayBuffer = await file.arrayBuffer();
         const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         const pdfDoc = await loadingTask.promise;
+        currentShippingPdfDoc = pdfDoc;
         const numPages = pdfDoc.numPages;
 
         const ordersDict = {};
@@ -1930,6 +2034,21 @@
           const textContent = await page.getTextContent();
           const viewport = page.getViewport({ scale: 1.0 });
           const pageH = viewport.height;
+
+          // Render crisp thumbnail of shipping label (A6 proportion)
+          let thumbDataUrl = null;
+          try {
+            const thumbScale = 0.35;
+            const thumbVp = page.getViewport({ scale: thumbScale });
+            const thumbCanvas = document.createElement('canvas');
+            thumbCanvas.width = thumbVp.width;
+            thumbCanvas.height = thumbVp.height;
+            const thumbCtx = thumbCanvas.getContext('2d');
+            await page.render({ canvasContext: thumbCtx, viewport: thumbVp }).promise;
+            thumbDataUrl = thumbCanvas.toDataURL('image/jpeg', 0.8);
+          } catch (e) {
+            console.warn('Cannot render label thumb on page ' + pNum, e);
+          }
 
           const items = textContent.items.map(it => {
             const x = it.transform[4];
@@ -1951,7 +2070,7 @@
           const mWeight = fullText.match(/([\d\.]+\s*KG)/i);
           const weight = mWeight ? mWeight[1] : '-';
 
-          const slipWords = items.filter(it => it.y >= 295 && it.y <= 385);
+          const slipWords = items.filter(it => it.y >= 295 && it.y <= 395);
           const pageIdx = pNum - 1;
 
           if (!ordersDict[orderId]) {
@@ -1960,6 +2079,7 @@
               tracking,
               receiver,
               weight,
+              thumbnailUrl: thumbDataUrl,
               pages: [pageIdx],
               pageNumbers: [pNum],
               slipWords: [...slipWords],
@@ -1971,6 +2091,9 @@
             ordersDict[orderId].pageNumbers.push(pNum);
             ordersDict[orderId].slipWords.push(...slipWords);
             ordersDict[orderId].rawTexts.push(fullText);
+            if (!ordersDict[orderId].thumbnailUrl && thumbDataUrl) {
+              ordersDict[orderId].thumbnailUrl = thumbDataUrl;
+            }
           }
         }
 
@@ -1980,16 +2103,24 @@
           const words = ord.slipWords;
 
           const filtered = words.filter(w => {
-            const t = w.str;
-            if (['Product', 'Name', 'SKU', 'Seller', 'Qty', 'Total:', 'Order', 'ID:'].includes(t) || /^\d{15,}$/.test(t)) {
+            const t = w.str.trim();
+            if (!t) return false;
+            if (['Product', 'Name', 'SKU', 'Seller', 'Qty', 'Total:', 'Order', 'ID:', 'In transit by:', 'In', 'transit', 'by:'].includes(t)) {
               return false;
             }
+            if (t.includes('Seller SKU') || t.includes('Product Name') || t.includes('Qty Total') || t.includes('In transit by')) {
+              return false;
+            }
+            if (/^\d{2}\/\d{2}\/\d{4}/.test(t)) return false;
+            if (/^\d{2}:\d{2}/.test(t)) return false;
+            if (/^Order ID:\s*\d+/.test(t)) return false;
+            if (/^\d{15,}$/.test(t)) return false;
             return true;
           });
 
           const linesByY = {};
           filtered.forEach(w => {
-            const lk = Math.round(w.y / 8) * 8;
+            const lk = Math.round(w.y / 7) * 7;
             if (!linesByY[lk]) linesByY[lk] = [];
             linesByY[lk].push(w);
           });
@@ -2004,57 +2135,45 @@
 
           for (const lk of sortedYKeys) {
             const lw = linesByY[lk].sort((a, b) => a.x - b.x);
-            const qtyWords = lw.filter(w => w.x >= 250 && /^\d+$/.test(w.str));
-            const nameWords = lw.filter(w => w.x < 125);
-            const skuWords = lw.filter(w => w.x >= 125 && w.x < 250 && !/^\d+$/.test(w.str));
+            const qtyWords = lw.filter(w => w.x >= 240 && /^\d+$/.test(w.str.trim()));
+            const nameWords = lw.filter(w => w.x < 120);
+            const skuWords = lw.filter(w => w.x >= 120 && w.x < 240 && !/^\d+$/.test(w.str.trim()));
 
             if (qtyWords.length > 0) {
               if (hasItem && (currentName.length > 0 || currentSku.length > 0)) {
                 itemsList.push({
                   name: cleanItemProductName(currentName.join(' ').trim()),
-                  sku: currentSku.join(' ').trim() || 'Mặc định',
+                  sku: cleanSku(currentSku.join(' ').trim()),
                   qty: currentQty
                 });
                 currentName = [];
                 currentSku = [];
               }
-              currentQty = parseInt(qtyWords[0].str, 10);
+              currentQty = parseInt(qtyWords[0].str.trim(), 10);
               hasItem = true;
             }
 
-            if (nameWords.length > 0) currentName.push(...nameWords.map(w => w.str));
-            if (skuWords.length > 0) currentSku.push(...skuWords.map(w => w.str));
+            if (nameWords.length > 0) currentName.push(...nameWords.map(w => w.str.trim()));
+            if (skuWords.length > 0) currentSku.push(...skuWords.map(w => w.str.trim()));
           }
 
           if (hasItem && (currentName.length > 0 || currentSku.length > 0)) {
             itemsList.push({
               name: cleanItemProductName(currentName.join(' ').trim()),
-              sku: currentSku.join(' ').trim() || 'Mặc định',
+              sku: cleanSku(currentSku.join(' ').trim()),
               qty: currentQty
             });
           }
 
           if (itemsList.length === 0) {
-            const allT = ord.rawTexts.join('\n');
-            const m = allT.match(/Product Name SKU Seller SKU Qty\s*([^\n]+)/);
-            if (m) {
-              const line = m[1].trim();
-              const mEnd = line.match(/^(.*?)\s+(\d+)$/);
-              if (mEnd) {
-                itemsList.push({ name: cleanItemProductName(mEnd[1].trim()), sku: 'Mặc định', qty: parseInt(mEnd[2], 10) });
-              } else {
-                itemsList.push({ name: cleanItemProductName(line), sku: 'Mặc định', qty: 1 });
-              }
-            } else {
-              itemsList.push({ name: 'Sản phẩm TikTok Shop', sku: 'Mặc định', qty: 1 });
-            }
+            itemsList.push({ name: 'Sản phẩm TikTok Shop', sku: 'Mặc định', qty: 1 });
           }
 
           ord.items = itemsList;
           ord.totalQty = itemsList.reduce((acc, it) => acc + it.qty, 0);
           ord.isMultiItem = (itemsList.length > 1);
           ord.primaryProduct = cleanItemProductName(itemsList[0]?.name) || 'Sản phẩm khác';
-          ord.primarySku = itemsList[0]?.sku || 'Mặc định';
+          ord.primarySku = cleanSku(itemsList[0]?.sku) || 'Mặc định';
 
           parsedOrders.push(ord);
         }
@@ -2086,6 +2205,7 @@
               productName: it.name,
               sku: it.sku,
               sellerSku: '-',
+              imageUrl: ord.thumbnailUrl || null,
               orderIds: [ord.orderId],
               trackingNumbers: (ord.tracking && ord.tracking !== '-') ? [ord.tracking] : []
             });
@@ -2324,13 +2444,14 @@
               <table class="w-full text-left text-xs">
                 <thead class="bg-slate-100/90 text-slate-700 font-bold border-b border-slate-200 select-none text-[11px] uppercase tracking-wider">
                   <tr>
-                    <th class="py-3 px-4 text-center w-14">STT Mới</th>
-                    <th class="py-3 px-4 min-w-[160px]">Mã Vận Đơn</th>
-                    <th class="py-3 px-4 min-w-[165px]">Mã Đơn Hàng (Order ID)</th>
-                    <th class="py-3 px-4 min-w-[190px]">Người Nhận &amp; Trọng Lượng</th>
-                    <th class="py-3 px-4 min-w-[150px]">Quy Cách / SKU</th>
-                    <th class="py-3 px-4 text-center w-16">SL</th>
-                    <th class="py-3 px-4 min-w-[180px] text-right">Trang PDF Gốc &rarr; Mới</th>
+                    <th class="py-3 px-3 text-center w-12">STT</th>
+                    <th class="py-3 px-3 w-20 text-center">Ảnh Tem</th>
+                    <th class="py-3 px-4 min-w-[220px]">Tên Sản Phẩm &amp; Phân Loại</th>
+                    <th class="py-3 px-4 min-w-[170px]">Mã Vận Đơn</th>
+                    <th class="py-3 px-4 min-w-[150px]">Mã Đơn (Order ID)</th>
+                    <th class="py-3 px-4 min-w-[150px]">Người Nhận</th>
+                    <th class="py-3 px-3 text-center w-14">SL</th>
+                    <th class="py-3 px-4 min-w-[150px] text-right">Trang &amp; Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -2343,49 +2464,110 @@
 
                     return `
                       <tr class="hover:bg-slate-50/90 transition-colors">
-                        <td class="py-3.5 px-4 text-center font-bold text-slate-700">
+                        <td class="py-3 px-3 text-center font-bold text-slate-700">
                           <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 text-slate-800 font-mono text-[11px] font-bold">
                             ${o.newSeq}
                           </span>
                         </td>
-                        <td class="py-3.5 px-4 font-mono font-bold text-slate-900">
+                        <!-- Cột 1: HÌNH PREVIEW CỦA MÃ VẬN ĐƠN -->
+                        <td class="py-2.5 px-3 text-center">
+                          <div class="relative group cursor-pointer w-12 h-17 sm:w-14 sm:h-20 rounded-lg overflow-hidden border border-slate-200/90 bg-slate-50 shadow-2xs mx-auto shrink-0 transition-transform hover:scale-105" onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" title="Nhấp để xem to toàn bộ tem vận đơn">
+                            ${o.thumbnailUrl ? `
+                              <img src="${o.thumbnailUrl}" class="w-full h-full object-cover" alt="Tem ${escapeQuotes(o.tracking)}" />
+                            ` : `
+                              <div class="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 text-[10px]">
+                                <i data-lucide="file-text" class="w-4 h-4 mb-1"></i>
+                                <span>A6</span>
+                              </div>
+                            `}
+                            <div class="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[9px] font-bold transition-opacity">
+                              <i data-lucide="zoom-in" class="w-4 h-4 mb-0.5"></i>
+                              <span>Xem</span>
+                            </div>
+                          </div>
+                        </td>
+                        <!-- Cột 2: TÊN SẢN PHẨM & PHÂN LOẠI -->
+                        <td class="py-3 px-4 text-slate-900">
+                          ${o.isMultiItem ? `
+                            <div class="text-xs font-bold text-amber-900 mb-1 flex items-center">
+                              <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-extrabold mr-1.5">ĐƠN ${o.items.length} MÓN</span>
+                              <span>Đóng kiện phối hợp</span>
+                            </div>
+                            <div class="space-y-1.5 pl-1">
+                              ${o.items.map(it => `
+                                <div class="text-xs text-slate-800 border-l-2 border-amber-300 pl-2">
+                                  <div class="font-bold text-slate-900">${escapeHtml(cleanItemProductName(it.name))}</div>
+                                  <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-600">
+                                    <span class="px-1.5 py-0.2 rounded bg-slate-100 font-semibold text-slate-700">${escapeHtml(cleanSku(it.sku))}</span>
+                                    <span>&bull;</span>
+                                    <span class="font-black text-slate-900">x${it.qty}</span>
+                                  </div>
+                                </div>
+                              `).join('')}
+                            </div>
+                          ` : `
+                            <div class="font-extrabold text-slate-900 text-xs sm:text-sm line-clamp-2 leading-snug">${escapeHtml(cleanItemProductName(o.primaryProduct))}</div>
+                            <div class="mt-1 flex items-center gap-2 flex-wrap">
+                              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-100">
+                                ${escapeHtml(cleanSku(o.primarySku))}
+                              </span>
+                              <span class="text-[11px] text-slate-500 font-medium">SL: <strong class="text-slate-900 font-bold">${o.totalQty}</strong></span>
+                            </div>
+                          `}
+                        </td>
+                        <!-- Cột 3: MÃ VẬN ĐƠN -->
+                        <td class="py-3 px-4 font-mono">
                           <div class="flex items-center gap-1.5">
-                            <span>${escapeHtml(o.tracking)}</span>
-                            <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-800 p-0.5 rounded transition-all cursor-pointer" title="Sao chép mã vận đơn">
+                            <span class="font-black text-slate-900 text-xs sm:text-sm">${escapeHtml(o.tracking)}</span>
+                            <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép mã vận đơn">
                               <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                             </button>
                           </div>
-                        </td>
-                        <td class="py-3.5 px-4 font-mono text-slate-600">
-                          ${escapeHtml(o.orderId)}
-                        </td>
-                        <td class="py-3.5 px-4 text-slate-700">
-                          <div class="font-medium text-slate-900">${escapeHtml(o.receiver || '-')}</div>
-                          ${o.weight ? `<div class="text-[11px] text-slate-500 font-normal mt-0.5">${escapeHtml(o.weight)}</div>` : ''}
-                        </td>
-                        <td class="py-3.5 px-4 text-slate-800">
-                          ${o.isMultiItem ? `
-                            <div class="text-amber-800 font-semibold space-y-1">
-                              ${o.items.map(it => `<div>&bull; ${escapeHtml(cleanItemProductName(it.name))} (${escapeHtml(it.sku)}) <strong class="text-slate-900 font-black">x${it.qty}</strong></div>`).join('')}
-                            </div>
-                          ` : `
-                            <span class="font-medium text-slate-900">${escapeHtml(o.primarySku)}</span>
-                          `}
-                        </td>
-                        <td class="py-3.5 px-4 text-center font-black text-slate-900 text-sm">
-                          ${o.totalQty}
-                        </td>
-                        <td class="py-3.5 px-4 text-right">
-                          <div class="inline-flex items-center gap-1.5 justify-end">
-                            <span class="px-2 py-0.5 rounded bg-slate-100 font-mono text-[11px] text-slate-600 font-medium" title="Số trang trong file PDF gốc">
-                              Gốc: ${origPageDisplay}
-                            </span>
-                            <i data-lucide="arrow-right" class="w-3 h-3 text-emerald-600"></i>
-                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/90 font-mono text-[11px] font-bold" title="Số trang sau khi sắp xếp lại">
-                              Mới: ${pageDisplay}
-                            </span>
+                          <div class="flex items-center text-[10px] text-emerald-700 font-bold mt-1 gap-1">
+                            <i data-lucide="truck" class="w-3 h-3 text-emerald-600"></i>
+                            <span>TikTok Express</span>
                           </div>
-                          ${isMultiPage ? '<div class="text-[10px] text-amber-700 font-bold mt-1">Đơn 2 trang</div>' : ''}
+                        </td>
+                        <!-- Cột 4: MÃ ĐƠN HÀNG (Order ID) -->
+                        <td class="py-3 px-4 font-mono text-slate-600 text-xs">
+                          <div class="flex items-center gap-1.5">
+                            <span>${escapeHtml(o.orderId)}</span>
+                            <button onclick="copyText('${escapeQuotes(o.orderId)}')" class="text-slate-400 hover:text-slate-800 p-0.5 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép Order ID">
+                              <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                          </div>
+                        </td>
+                        <!-- Cột 5: NGƯỜI NHẬN & TRỌNG LƯỢNG -->
+                        <td class="py-3 px-4 text-slate-700">
+                          <div class="font-bold text-slate-900 text-xs flex items-center gap-1">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                            <span class="truncate max-w-[140px]" title="${escapeQuotes(o.receiver)}">${escapeHtml(o.receiver || '-')}</span>
+                          </div>
+                          ${o.weight ? `<div class="text-[11px] text-slate-500 font-medium mt-0.5 pl-4.5">${escapeHtml(o.weight)}</div>` : ''}
+                        </td>
+                        <!-- Cột 6: SL -->
+                        <td class="py-3 px-3 text-center">
+                          <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-900 text-white font-black text-xs shadow-2xs">
+                            ${o.totalQty}
+                          </span>
+                        </td>
+                        <!-- Cột 7: TRANG & THAO TÁC -->
+                        <td class="py-3 px-4 text-right">
+                          <div class="flex flex-col items-end gap-1.5">
+                            <div class="inline-flex items-center gap-1.5 justify-end">
+                              <span class="px-2 py-0.5 rounded bg-slate-100 font-mono text-[10px] text-slate-600 font-medium" title="Số trang trong file PDF gốc">
+                                Gốc: ${origPageDisplay}
+                              </span>
+                              <i data-lucide="arrow-right" class="w-3 h-3 text-emerald-600"></i>
+                              <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/90 font-mono text-[10px] font-bold" title="Số trang sau khi sắp xếp lại">
+                                Mới: ${pageDisplay}
+                              </span>
+                            </div>
+                            <button onclick="openShippingLabelModal('${escapeQuotes(o.orderId)}')" class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer">
+                              <i data-lucide="eye" class="w-3 h-3 mr-1 text-rose-600"></i> Xem tem
+                            </button>
+                          </div>
+                          ${isMultiPage ? '<div class="text-[10px] text-amber-700 font-bold mt-1 text-right">Đơn 2 trang</div>' : ''}
                         </td>
                       </tr>
                     `;
@@ -3719,6 +3901,96 @@
 
     window.closeImageModal = function() {
       imageModal.classList.add('hidden');
+    };
+
+    // Shipping Label Full Preview Modal Handlers
+    window.openShippingLabelModal = async function(orderId) {
+      const ord = (shippingOrders || []).find(o => o.orderId === orderId);
+      if (!ord) return;
+
+      const modal = document.getElementById('shippingLabelModal');
+      if (!modal) return;
+
+      document.getElementById('labelModalTracking').innerHTML = `<i data-lucide="truck" class="w-4 h-4 inline mr-1 text-emerald-600"></i> Mã VĐ: ${escapeHtml(ord.tracking)}`;
+      document.getElementById('labelModalOrderId').textContent = `Order ID: ${ord.orderId}`;
+      document.getElementById('labelModalReceiver').textContent = ord.receiver || 'Chưa có thông tin';
+      document.getElementById('labelModalWeight').textContent = `Trọng lượng: ${ord.weight || 'Không xác định'}`;
+      document.getElementById('labelModalSeq').textContent = `#${ord.newSeq || 1}`;
+      document.getElementById('labelModalPage').textContent = `Trang ${ord.pageNumbers ? ord.pageNumbers.join(', ') : '1'}`;
+
+      // Render items list inside modal
+      const itemsContainer = document.getElementById('labelModalItemsList');
+      if (itemsContainer) {
+        itemsContainer.innerHTML = (ord.items || []).map(it => `
+          <div class="p-2 bg-white rounded-lg border border-slate-200/80 flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 text-xs">${escapeHtml(cleanItemProductName(it.name))}</div>
+              <div class="text-[11px] text-rose-700 font-semibold mt-0.5">${escapeHtml(cleanSku(it.sku))}</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono font-black text-xs shrink-0">x${it.qty}</span>
+          </div>
+        `).join('');
+      }
+
+      // Setup copy buttons
+      const btnTrack = document.getElementById('btnCopyLabelTracking');
+      if (btnTrack) {
+        btnTrack.onclick = () => copyText(ord.tracking);
+      }
+      const btnOrd = document.getElementById('btnCopyLabelOrderId');
+      if (btnOrd) {
+        btnOrd.onclick = () => copyText(ord.orderId);
+      }
+
+      // Render high-res label canvas
+      const canvas = document.getElementById('labelModalCanvas');
+      if (canvas) {
+        let rendered = false;
+        if (currentShippingPdfDoc && ord.pages && ord.pages.length > 0) {
+          try {
+            const pageNum = ord.pages[0] + 1;
+            const page = await currentShippingPdfDoc.getPage(pageNum);
+            const renderScale = 1.8;
+            const viewport = page.getViewport({ scale: renderScale });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            rendered = true;
+          } catch (err) {
+            console.warn('Không thể render canvas nét cao, dùng ảnh thumbnail:', err);
+          }
+        }
+        if (!rendered && ord.thumbnailUrl) {
+          const img = new Image();
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img, 0, 0);
+          };
+          img.src = ord.thumbnailUrl;
+        }
+      }
+
+      window._currentModalOrder = ord;
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.closeShippingLabelModal = function() {
+      const modal = document.getElementById('shippingLabelModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.downloadCurrentLabelImage = function() {
+      const canvas = document.getElementById('labelModalCanvas');
+      const ord = window._currentModalOrder;
+      if (!canvas || !ord) return;
+      const link = document.createElement('a');
+      link.download = `Tem_${ord.tracking || ord.orderId}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+      showToast('Đã tải ảnh tem vận đơn chất lượng cao!');
     };
 
     function showToast(msg) {
