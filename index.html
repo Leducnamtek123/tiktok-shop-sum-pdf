@@ -339,7 +339,7 @@
         </div>
         <div class="mt-3 text-[11px] text-slate-500 flex items-center">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
-          Đã gộp trùng lặp
+          <span id="statSkusSub">Đã gộp trùng lặp</span>
         </div>
       </div>
 
@@ -407,12 +407,41 @@
             >
               Đã xong (<span id="count-done">0</span>)
             </button>
+            <button 
+              onclick="setFilter('bulk')" 
+              id="filter-bulk" 
+              class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200"
+            >
+              📦 Thùng &amp; Lẻ (<span id="count-bulk">0</span>)
+            </button>
           </div>
         </div>
 
         <!-- View Switcher & Action Buttons -->
         <div class="flex flex-wrap items-center gap-2.5">
           
+          <!-- Grouping Mode Switcher -->
+          <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center">
+            <button 
+              id="groupModeBtn" 
+              onclick="toggleGroupMode('grouped')" 
+              title="Gom nhóm Sản phẩm Cha &amp; Phân loại Con (Thông minh)" 
+              class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition-all flex items-center gap-1.5"
+            >
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-rose-600"></i>
+              <span>Gom Nhóm</span>
+            </button>
+            <button 
+              id="flatModeBtn" 
+              onclick="toggleGroupMode('flat')" 
+              title="Tách rời từng dòng SKU độc lập" 
+              class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5"
+            >
+              <i data-lucide="list" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>Tách Dòng</span>
+            </button>
+          </div>
+
           <!-- View Mode Toggle -->
           <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center">
             <button 
@@ -619,12 +648,102 @@
     // App State
     let loadedFiles = [];
     let aggregatedItems = [];
-    let globalStats = { totalFiles: 0, totalOrders: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
+    let groupedProducts = [];
+    let globalStats = { totalFiles: 0, totalOrders: 0, uniqueProducts: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
     let checkedItemKeys = new Set();
-    let currentFilter = 'all'; // 'all', 'pending', 'done'
+    let currentFilter = 'all'; // 'all', 'pending', 'done', 'bulk'
     let currentView = 'table'; // 'table', 'card'
+    let groupViewMode = 'grouped'; // 'grouped' (Parent-Child) or 'flat' (Individual SKUs)
     let currentSort = 'qty-desc';
     let currentModalOrders = [];
+
+    // Packaging Parsing & Smart Conversion Utilities
+    function parseSkuPackagingType(skuStr) {
+      const s = (skuStr || '').trim();
+      // Match Thùng: Thùng 6 chai 100ml, Thùng 12 gói 1kg...
+      const thungMatch = s.match(/thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+      if (thungMatch) {
+        const packSize = parseInt(thungMatch[1], 10);
+        const rest = (thungMatch[2] || '').trim();
+        return { isBulk: true, type: 'thùng', packSize, rest, label: `Thùng (${packSize} ${rest || 'món'})` };
+      }
+      // Match Hộp lớn: Hộp 10 vỉ, Hộp 20 ống...
+      const hopMatch = s.match(/hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+      if (hopMatch) {
+        const packSize = parseInt(hopMatch[1], 10);
+        const rest = (hopMatch[2] || '').trim();
+        return { isBulk: true, type: 'hộp', packSize, rest, label: `Hộp (${packSize} ${rest || 'món'})` };
+      }
+      // Match Lô / Combo: 10 gói 10g...
+      const countMatch = s.match(/^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)/i);
+      if (countMatch && parseInt(countMatch[1], 10) > 1) {
+        const packSize = parseInt(countMatch[1], 10);
+        const rest = (countMatch[2] || '').trim();
+        return { isBulk: true, type: 'lô', packSize, rest, label: `Lô ${packSize} ${rest || 'món'}` };
+      }
+      return { isBulk: false, type: 'lẻ', packSize: 1, rest: '', label: 'Lẻ' };
+    }
+
+    function analyzeProductPackaging(variants) {
+      let bulkItems = [];
+      let looseItems = [];
+
+      variants.forEach(v => {
+        const pack = parseSkuPackagingType(v.sku);
+        if (pack.isBulk) {
+          bulkItems.push({ ...pack, variant: v, count: v.totalQty });
+        } else {
+          looseItems.push({ ...pack, variant: v, count: v.totalQty, name: v.sku });
+        }
+      });
+
+      if (bulkItems.length === 0) {
+        return null;
+      }
+
+      // Physical picking breakdown: "1 thùng (6 chai 100ml) + 16 Chai 100ml"
+      const pickParts = [];
+      bulkItems.forEach(b => {
+        pickParts.push(`${b.count} ${b.type} (${b.packSize} ${b.rest || 'cái'})`);
+      });
+      looseItems.forEach(l => {
+        pickParts.push(`${l.count} ${l.name}`);
+      });
+
+      // Equivalent conversion: "22 Chai 100ml"
+      let eqDescriptions = [];
+      let accountedLooseKeys = new Set();
+
+      bulkItems.forEach(b => {
+        const bRestLower = (b.rest || '').toLowerCase().replace(/\s+/g, '');
+        let matchedLooseCount = 0;
+        let unitLabel = b.rest || 'cái';
+
+        looseItems.forEach((l, lIdx) => {
+          const lNameLower = l.name.toLowerCase().replace(/\s+/g, '');
+          if (bRestLower && (lNameLower.includes(bRestLower) || bRestLower.includes(lNameLower))) {
+            matchedLooseCount += l.count;
+            accountedLooseKeys.add(lIdx);
+            unitLabel = l.name;
+          }
+        });
+
+        const totalEq = (b.count * b.packSize) + matchedLooseCount;
+        eqDescriptions.push(`${totalEq} ${unitLabel}`);
+      });
+
+      looseItems.forEach((l, lIdx) => {
+        if (!accountedLooseKeys.has(lIdx)) {
+          eqDescriptions.push(`${l.count} ${l.name}`);
+        }
+      });
+
+      return {
+        hasBulk: true,
+        actualPickText: pickParts.join(' + '),
+        equivalentText: eqDescriptions.join(' + ')
+      };
+    }
 
     // DOM Elements
     const dropZone = document.getElementById('dropZone');
@@ -701,7 +820,8 @@
     clearBtn.addEventListener('click', () => {
       loadedFiles = [];
       aggregatedItems = [];
-      globalStats = { totalFiles: 0, totalOrders: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
+      groupedProducts = [];
+      globalStats = { totalFiles: 0, totalOrders: 0, uniqueProducts: 0, uniqueSkus: 0, totalQty: 0, fileNames: [] };
       checkedItemKeys.clear();
       fileInput.value = '';
       fileChipsContainer.classList.add('hidden');
@@ -730,7 +850,7 @@
       document.getElementById('printSubTitle').textContent = 
         `Ngày in: ${new Date().toLocaleString('vi-VN')} | Nguồn: ${globalStats.totalFiles} file PDF (${globalStats.totalOrders} đơn hàng)`;
       document.getElementById('printStats').innerHTML = 
-        `<p><strong>Mặt hàng SKU:</strong> ${globalStats.uniqueSkus} | <strong>TỔNG SL:</strong> <span class="text-base font-bold">${globalStats.totalQty}</span></p>`;
+        `<p><strong>Sản phẩm:</strong> ${globalStats.uniqueProducts} (${globalStats.uniqueSkus} SKU) | <strong>TỔNG SL:</strong> <span class="text-base font-bold">${globalStats.totalQty}</span></p>`;
       window.print();
     });
 
@@ -748,6 +868,26 @@
         viewCardBtn.className = "p-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-xs transition-all";
         viewTableBtn.className = "p-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all";
       }
+      renderCurrentView();
+    };
+
+    // Grouping Mode Switching (Grouped vs Flat)
+    window.toggleGroupMode = function(mode) {
+      groupViewMode = mode;
+      const groupBtn = document.getElementById('groupModeBtn');
+      const flatBtn = document.getElementById('flatModeBtn');
+      if (mode === 'grouped') {
+        groupBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition-all flex items-center gap-1.5";
+        groupBtn.querySelector('i').className = "w-3.5 h-3.5 text-rose-600";
+        flatBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5";
+        flatBtn.querySelector('i').className = "w-3.5 h-3.5 text-slate-400";
+      } else {
+        flatBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition-all flex items-center gap-1.5";
+        flatBtn.querySelector('i').className = "w-3.5 h-3.5 text-rose-600";
+        groupBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1.5";
+        groupBtn.querySelector('i').className = "w-3.5 h-3.5 text-slate-400";
+      }
+      updateFulfillmentProgress();
       renderCurrentView();
     };
 
@@ -774,6 +914,19 @@
       renderCurrentView();
     };
 
+    window.toggleGroupDone = function(productName) {
+      const grp = groupedProducts.find(g => g.productName === productName);
+      if (!grp) return;
+      const isAllDone = grp.variants.every(v => checkedItemKeys.has(v.key));
+      if (isAllDone) {
+        grp.variants.forEach(v => checkedItemKeys.delete(v.key));
+      } else {
+        grp.variants.forEach(v => checkedItemKeys.add(v.key));
+      }
+      updateFulfillmentProgress();
+      renderCurrentView();
+    };
+
     window.handleSortChange = function(val) {
       currentSort = val;
       sortAggregatedItems();
@@ -783,11 +936,25 @@
     function sortAggregatedItems() {
       if (currentSort === 'qty-desc') {
         aggregatedItems.sort((a, b) => b.totalQty - a.totalQty);
+        groupedProducts.sort((a, b) => b.totalQty - a.totalQty);
       } else if (currentSort === 'qty-asc') {
         aggregatedItems.sort((a, b) => a.totalQty - b.totalQty);
+        groupedProducts.sort((a, b) => a.totalQty - b.totalQty);
       } else if (currentSort === 'name-asc') {
         aggregatedItems.sort((a, b) => a.productName.localeCompare(b.productName, 'vi'));
+        groupedProducts.sort((a, b) => a.productName.localeCompare(b.productName, 'vi'));
       }
+
+      // Sort variants within each group: Bulk items (Thùng/Hộp) first, then loose items
+      groupedProducts.forEach(grp => {
+        grp.variants.sort((a, b) => {
+          const aPack = parseSkuPackagingType(a.sku);
+          const bPack = parseSkuPackagingType(b.sku);
+          if (aPack.isBulk && !bPack.isBulk) return -1;
+          if (!aPack.isBulk && bPack.isBulk) return 1;
+          return b.totalQty - a.totalQty;
+        });
+      });
     }
 
     // Process Files
@@ -1033,7 +1200,7 @@
       return { metadata, items: allSkus };
     }
 
-    // Consolidate Data
+    // Consolidate Data & Build Parent-Child Hierarchy
     function processAggregatedData(parsedFilesData) {
       const map = new Map();
       let totalDeclaredOrders = 0;
@@ -1075,14 +1242,51 @@
         orderIds: Array.from(it.orderIds)
       }));
 
+      // Group items by Parent Product Name
+      const prodMap = new Map();
+      aggregatedItems.forEach(item => {
+        const pName = item.productName.trim();
+        if (!prodMap.has(pName)) {
+          prodMap.set(pName, {
+            productName: pName,
+            imageUrl: item.imageUrl || null,
+            totalQty: 0,
+            orderIds: new Set(),
+            variants: [],
+            byFile: {}
+          });
+        }
+        const grp = prodMap.get(pName);
+        grp.totalQty += item.totalQty;
+        if (item.imageUrl && !grp.imageUrl) grp.imageUrl = item.imageUrl;
+        item.orderIds.forEach(id => grp.orderIds.add(id));
+        grp.variants.push(item);
+        Object.entries(item.byFile).forEach(([f, q]) => {
+          grp.byFile[f] = (grp.byFile[f] || 0) + q;
+        });
+      });
+
+      groupedProducts = Array.from(prodMap.values()).map(grp => {
+        const packInfo = analyzeProductPackaging(grp.variants);
+        return {
+          ...grp,
+          orderIds: Array.from(grp.orderIds),
+          packagingInfo: packInfo,
+          isSingleVariant: grp.variants.length === 1,
+          hasBulk: packInfo ? packInfo.hasBulk : false
+        };
+      });
+
       sortAggregatedItems();
 
       const totalQty = aggregatedItems.reduce((sum, it) => sum + it.totalQty, 0);
       const ordersCount = totalDeclaredOrders > 0 ? totalDeclaredOrders : allOrdersGlobal.size;
+      const bulkCount = groupedProducts.filter(g => g.hasBulk || g.variants.length > 1).length;
 
       globalStats = {
         totalFiles: parsedFilesData.length,
         totalOrders: ordersCount,
+        uniqueProducts: groupedProducts.length,
         uniqueSkus: aggregatedItems.length,
         totalQty: totalQty,
         fileNames: parsedFilesData.map(d => d.metadata.filename)
@@ -1091,7 +1295,11 @@
       // Update KPI Cards
       document.getElementById('statFiles').textContent = globalStats.totalFiles;
       document.getElementById('statOrders').textContent = globalStats.totalOrders;
-      document.getElementById('statSkus').textContent = globalStats.uniqueSkus;
+      document.getElementById('statSkus').textContent = `${globalStats.uniqueProducts} món`;
+      const statSkusSub = document.getElementById('statSkusSub');
+      if (statSkusSub) {
+        statSkusSub.textContent = `${globalStats.uniqueSkus} SKU (${bulkCount} có Thùng/Lẻ)`;
+      }
       document.getElementById('statTotalQty').textContent = globalStats.totalQty;
 
       statsSection.classList.remove('hidden');
@@ -1104,17 +1312,31 @@
 
     // Fulfillment Progress Tracking
     function updateFulfillmentProgress() {
-      const total = aggregatedItems.length;
-      const done = checkedItemKeys.size;
-      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      const totalSkus = aggregatedItems.length;
+      const doneSkus = checkedItemKeys.size;
+      const totalProducts = groupedProducts.length;
+      const doneProducts = groupedProducts.filter(g => g.variants.every(v => checkedItemKeys.has(v.key))).length;
+      const pct = totalSkus > 0 ? Math.round((doneSkus / totalSkus) * 100) : 0;
 
-      fulfillmentBadge.textContent = `${done} / ${total} món`;
+      fulfillmentBadge.textContent = `${doneProducts}/${totalProducts} món (${doneSkus}/${totalSkus} SKU)`;
       fulfillmentPercent.textContent = `${pct}%`;
       fulfillmentBar.style.width = `${pct}%`;
 
-      document.getElementById('count-all').textContent = total;
-      document.getElementById('count-pending').textContent = total - done;
-      document.getElementById('count-done').textContent = done;
+      const bulkCount = groupViewMode === 'grouped' 
+        ? groupedProducts.filter(g => g.hasBulk || g.variants.length > 1).length
+        : aggregatedItems.filter(it => parseSkuPackagingType(it.sku).isBulk).length;
+
+      if (groupViewMode === 'grouped') {
+        document.getElementById('count-all').textContent = totalProducts;
+        document.getElementById('count-pending').textContent = totalProducts - doneProducts;
+        document.getElementById('count-done').textContent = doneProducts;
+      } else {
+        document.getElementById('count-all').textContent = totalSkus;
+        document.getElementById('count-pending').textContent = totalSkus - doneSkus;
+        document.getElementById('count-done').textContent = doneSkus;
+      }
+      const countBulkEl = document.getElementById('count-bulk');
+      if (countBulkEl) countBulkEl.textContent = bulkCount;
     }
 
     window.toggleItemDone = function(key) {
@@ -1127,11 +1349,33 @@
       renderCurrentView();
     };
 
-    // Filter Items (Includes Search by Order ID!)
-    function getFilteredItems() {
+    // Filter Logic: Grouped Products
+    function getFilteredGroups() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      return groupedProducts.filter(group => {
+        // Search matches product name, sku, sellerSku, or order IDs
+        const matchSearch = !keyword || 
+          group.productName.toLowerCase().includes(keyword) || 
+          group.variants.some(v => 
+            v.sku.toLowerCase().includes(keyword) || 
+            v.sellerSku.toLowerCase().includes(keyword) ||
+            v.orderIds.some(id => id.toLowerCase().includes(keyword))
+          );
+        if (!matchSearch) return false;
+
+        const isGroupAllDone = group.variants.every(v => checkedItemKeys.has(v.key));
+        if (currentFilter === 'pending' && isGroupAllDone) return false;
+        if (currentFilter === 'done' && !isGroupAllDone) return false;
+        if (currentFilter === 'bulk' && (!group.hasBulk && group.variants.length <= 1)) return false;
+
+        return true;
+      });
+    }
+
+    // Filter Logic: Flat Items
+    function getFilteredFlatItems() {
       const keyword = searchInput.value.trim().toLowerCase();
       return aggregatedItems.filter(item => {
-        // Match Search: Product Name, SKU, Seller SKU, or exact Order ID
         const matchSearch = !keyword || 
           item.productName.toLowerCase().includes(keyword) || 
           item.sku.toLowerCase().includes(keyword) ||
@@ -1139,48 +1383,278 @@
           item.orderIds.some(id => id.toLowerCase().includes(keyword));
         if (!matchSearch) return false;
 
-        // Match Status Filter
         const isDone = checkedItemKeys.has(item.key);
         if (currentFilter === 'pending' && isDone) return false;
         if (currentFilter === 'done' && !isDone) return false;
+        if (currentFilter === 'bulk') {
+          const pack = parseSkuPackagingType(item.sku);
+          if (!pack.isBulk) return false;
+        }
 
         return true;
       });
     }
 
+    function renderFileBadges(byFile) {
+      return Object.entries(byFile).map(([fname, qty]) => `
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 mr-1.5 mb-1">
+          <span class="truncate max-w-[100px] mr-1" title="${fname}">${fname}</span>: <strong class="text-rose-600 ml-1 font-bold">${qty}</strong>
+        </span>
+      `).join('');
+    }
+
     // Render Current View
     function renderCurrentView() {
-      const items = getFilteredItems();
-
-      if (items.length === 0) {
-        emptySearch.classList.remove('hidden');
-        tableBody.innerHTML = '';
-        cardViewWrapper.innerHTML = '';
-        return;
-      }
-      emptySearch.classList.add('hidden');
-
-      if (currentView === 'table') {
-        renderTable(items);
+      if (groupViewMode === 'grouped') {
+        const groups = getFilteredGroups();
+        if (groups.length === 0) {
+          emptySearch.classList.remove('hidden');
+          tableBody.innerHTML = '';
+          cardViewWrapper.innerHTML = '';
+          return;
+        }
+        emptySearch.classList.add('hidden');
+        if (currentView === 'table') {
+          renderGroupedTable(groups);
+        } else {
+          renderGroupedCards(groups);
+        }
       } else {
-        renderCards(items);
+        const items = getFilteredFlatItems();
+        if (items.length === 0) {
+          emptySearch.classList.remove('hidden');
+          tableBody.innerHTML = '';
+          cardViewWrapper.innerHTML = '';
+          return;
+        }
+        emptySearch.classList.add('hidden');
+        if (currentView === 'table') {
+          renderFlatTable(items);
+        } else {
+          renderFlatCards(items);
+        }
       }
       lucide.createIcons();
     }
 
-    // Render Table View (Clean Light Mode)
-    function renderTable(items) {
+    // Render Grouped Table View (Parent-Child with Smart Packaging Conversion)
+    function renderGroupedTable(groups) {
+      tableBody.innerHTML = groups.map((group, idx) => {
+        const isAllDone = group.variants.every(v => checkedItemKeys.has(v.key));
+        const isPartDone = !isAllDone && group.variants.some(v => checkedItemKeys.has(v.key));
+
+        const imageThumb = group.imageUrl ? `
+          <img 
+            src="${group.imageUrl}" 
+            alt="Thumbnail" 
+            onclick="zoomImage('${group.imageUrl}', '${escapeQuotes(group.productName)}')"
+            class="w-11 h-11 rounded-lg object-contain bg-white border border-slate-200 p-0.5 cursor-zoom-in hover:scale-105 transition-transform" 
+          />
+        ` : `
+          <div class="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+            <i data-lucide="package" class="w-5 h-5"></i>
+          </div>
+        `;
+
+        // Case A: Single Variant Product
+        if (group.isSingleVariant) {
+          const v = group.variants[0];
+          const isDone = checkedItemKeys.has(v.key);
+          const pack = parseSkuPackagingType(v.sku);
+
+          return `
+            <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
+              <td class="py-3 px-3 text-center no-print">
+                <input 
+                  type="checkbox" 
+                  ${isDone ? 'checked' : ''} 
+                  onchange="toggleItemDone('${escapeQuotes(v.key)}')" 
+                  class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                />
+              </td>
+              <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
+              <td class="py-3 px-3 text-center text-xs font-semibold text-slate-400">${idx + 1}</td>
+              <td class="py-2.5 px-3 text-center no-print">
+                <div class="flex justify-center">${imageThumb}</div>
+              </td>
+              <td class="py-3 px-4 font-semibold text-slate-900 leading-snug">
+                <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</div>
+                ${v.sellerSku && v.sellerSku !== '-' ? `<span class="text-[11px] text-slate-400 font-normal">Mã SKU: ${escapeHtml(v.sellerSku)}</span>` : ''}
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                  ${escapeHtml(v.sku)}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200 shadow-xs tabular-nums">
+                  ${group.totalQty}
+                </span>
+              </td>
+              <td class="py-3 px-3 text-center no-print">
+                <button 
+                  onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(group.orderIds)})'
+                  class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+                >
+                  ${group.orderIds.length} đơn
+                </button>
+              </td>
+              <td class="py-3 px-4 no-print">
+                <div class="flex flex-wrap items-center">
+                  ${renderFileBadges(group.byFile)}
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+
+        // Case B: Multi-Variant Product (Parent Row + Indented Child Rows)
+        const parentRow = `
+          <tr class="bg-slate-50/90 border-t-2 border-slate-200 hover:bg-slate-100/70 transition-colors ${isAllDone ? 'bg-emerald-50/50' : ''}">
+            <td class="py-3 px-3 text-center no-print">
+              <input 
+                type="checkbox" 
+                ${isAllDone ? 'checked' : ''} 
+                onchange="toggleGroupDone('${escapeQuotes(group.productName)}')" 
+                title="Tích chọn tất cả phân loại của sản phẩm này"
+                class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+              />
+            </td>
+            <td class="py-3 px-3 text-center font-bold text-xs print-only">[   ]</td>
+            <td class="py-3 px-3 text-center text-xs font-bold text-slate-700">
+              ${idx + 1}
+            </td>
+            <td class="py-2.5 px-3 text-center no-print">
+              <div class="flex justify-center">${imageThumb}</div>
+            </td>
+            <td class="py-3 px-4 font-bold text-slate-900 leading-snug">
+              <div class="flex items-center space-x-2">
+                <span class="${isAllDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                  ${group.variants.length} phân loại
+                </span>
+              </div>
+              ${group.packagingInfo ? `
+                <div class="mt-2 inline-flex flex-wrap items-center gap-1.5 p-1.5 px-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                  <span class="font-bold flex items-center text-emerald-800">
+                    <i data-lucide="package-check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+                    Lấy thực tế: ${escapeHtml(group.packagingInfo.actualPickText)}
+                  </span>
+                  <span class="text-emerald-400 font-bold">➔</span>
+                  <span class="font-bold text-emerald-900 bg-white px-2 py-0.5 rounded-md border border-emerald-300 shadow-2xs">
+                    ⚡ Quy đổi: ${escapeHtml(group.packagingInfo.equivalentText)}
+                  </span>
+                </div>
+              ` : ''}
+            </td>
+            <td class="py-3 px-4">
+              <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">
+                Gộp ${group.variants.length} phân loại
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <span class="inline-flex items-center justify-center min-w-[50px] px-3 py-1 rounded-xl text-base font-black bg-rose-50 text-rose-700 border border-rose-200 shadow-xs tabular-nums" title="Tổng các phân loại">
+                ${group.totalQty}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-center no-print">
+              <button 
+                onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ đơn hàng (${group.variants.length} phân loại)", ${JSON.stringify(group.orderIds)})'
+                class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+              >
+                ${group.orderIds.length} đơn
+              </button>
+            </td>
+            <td class="py-3 px-4 no-print">
+              <div class="flex flex-wrap items-center">
+                ${renderFileBadges(group.byFile)}
+              </div>
+            </td>
+          </tr>
+        `;
+
+        const childRows = group.variants.map((v, vIdx) => {
+          const isVdone = checkedItemKeys.has(v.key);
+          const pack = parseSkuPackagingType(v.sku);
+
+          return `
+            <tr class="bg-slate-50/40 hover:bg-slate-100/60 transition-colors ${isVdone ? 'bg-emerald-50/30' : ''} border-l-4 border-l-purple-400">
+              <td class="py-2.5 px-3 text-center no-print">
+                <input 
+                  type="checkbox" 
+                  ${isVdone ? 'checked' : ''} 
+                  onchange="toggleItemDone('${escapeQuotes(v.key)}')" 
+                  class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                />
+              </td>
+              <td class="py-2.5 px-3 text-center font-bold text-xs print-only">[   ]</td>
+              <td class="py-2.5 px-3 text-center text-xs font-semibold text-slate-400 font-mono">
+                ↳ ${idx + 1}.${vIdx + 1}
+              </td>
+              <td class="py-2.5 px-3 text-center no-print">
+                <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 mx-auto">
+                  <i data-lucide="${pack.isBulk ? 'boxes' : 'package'}" class="w-4 h-4 ${pack.isBulk ? 'text-purple-600' : 'text-slate-400'}"></i>
+                </div>
+              </td>
+              <td class="py-2.5 px-4 text-xs font-medium text-slate-700">
+                <div class="flex items-center space-x-2">
+                  <span class="text-slate-400 font-mono text-sm">↳</span>
+                  <span class="font-bold text-slate-900 ${isVdone ? 'line-through text-slate-400' : ''}">${escapeHtml(v.sku)}</span>
+                  ${pack.isBulk ? `
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                      📦 Thùng nguyên (${pack.packSize} ${pack.rest || 'món'})
+                    </span>
+                  ` : `
+                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                      Chai/Gói lẻ
+                    </span>
+                  `}
+                </div>
+                ${v.sellerSku && v.sellerSku !== '-' ? `
+                  <div class="text-[11px] text-slate-400 mt-0.5 pl-4">Mã SKU: ${escapeHtml(v.sellerSku)}</div>
+                ` : ''}
+              </td>
+              <td class="py-2.5 px-4">
+                <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-white text-slate-700 border border-slate-200">
+                  ${escapeHtml(v.sku)}
+                </span>
+              </td>
+              <td class="py-2.5 px-4 text-center">
+                <span class="inline-flex items-center justify-center min-w-[42px] px-2.5 py-0.5 rounded-lg text-sm font-bold bg-white text-rose-700 border border-rose-200 shadow-2xs tabular-nums">
+                  ${v.totalQty}
+                </span>
+              </td>
+              <td class="py-2.5 px-3 text-center no-print">
+                <button 
+                  onclick='showOrderListModal("${escapeQuotes(v.productName)}", "Phân loại: ${escapeQuotes(v.sku)} • SL: ${v.totalQty}", ${JSON.stringify(v.orderIds)})' 
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white hover:bg-slate-100 text-slate-700 border border-slate-200"
+                >
+                  ${v.orderIds.length} đơn
+                </button>
+              </td>
+              <td class="py-2.5 px-4 no-print">
+                <div class="flex flex-wrap items-center">
+                  ${renderFileBadges(v.byFile)}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        return parentRow + childRows;
+      }).join('');
+    }
+
+    // Render Flat Table View (Independent SKU Rows)
+    function renderFlatTable(items) {
       tableBody.innerHTML = items.map((item, idx) => {
         const isDone = checkedItemKeys.has(item.key);
-        const fileBadges = Object.entries(item.byFile).map(([fname, qty]) => `
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 mr-1.5 mb-1">
-            <span class="truncate max-w-[100px] mr-1" title="${fname}">${fname}</span>: <strong class="text-rose-600 ml-1 font-bold">${qty}</strong>
-          </span>
-        `).join('');
+        const pack = parseSkuPackagingType(item.sku);
+        const fileBadges = renderFileBadges(item.byFile);
 
         const orderBtn = item.orderIds.length > 0 ? `
           <button 
-            onclick="showOrderModal('${escapeQuotes(item.productName)}', '${escapeQuotes(item.sku)}', ${idx})"
+            onclick='showOrderListModal("${escapeQuotes(item.productName)}", "Phân loại: ${escapeQuotes(item.sku)} • Tổng: ${item.totalQty} cái", ${JSON.stringify(item.orderIds)})'
             class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
           >
             ${item.orderIds.length} đơn
@@ -1217,10 +1691,11 @@
             </td>
             <td class="py-3 px-4 font-semibold text-slate-900 leading-snug">
               <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(item.productName)}</div>
+              ${item.sellerSku && item.sellerSku !== '-' ? `<span class="text-[11px] text-slate-400 font-normal">Mã SKU: ${escapeHtml(item.sellerSku)}</span>` : ''}
             </td>
             <td class="py-3 px-4">
-              <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                ${escapeHtml(item.sku)}
+              <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
+                ${pack.isBulk ? `📦 ${escapeHtml(item.sku)}` : escapeHtml(item.sku)}
               </span>
             </td>
             <td class="py-3 px-4 text-center">
@@ -1241,15 +1716,124 @@
       }).join('');
     }
 
-    // Render Card View (Warehouse Mobile Mode)
-    function renderCards(items) {
+    // Render Grouped Card View (Warehouse Pick Mode)
+    function renderGroupedCards(groups) {
+      cardViewWrapper.innerHTML = groups.map((group, idx) => {
+        const isAllDone = group.variants.every(v => checkedItemKeys.has(v.key));
+
+        const imageThumb = group.imageUrl ? `
+          <img 
+            src="${group.imageUrl}" 
+            alt="Thumbnail" 
+            onclick="zoomImage('${group.imageUrl}', '${escapeQuotes(group.productName)}')"
+            class="w-16 h-16 rounded-xl object-contain bg-slate-50 border border-slate-200 p-1 flex-shrink-0 cursor-zoom-in" 
+          />
+        ` : `
+          <div class="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 flex-shrink-0">
+            <i data-lucide="package" class="w-7 h-7"></i>
+          </div>
+        `;
+
+        return `
+          <div class="p-4 rounded-2xl border transition-all duration-200 ${isAllDone ? 'bg-emerald-50/50 border-emerald-300' : 'bg-white border-slate-200 shadow-xs hover:border-slate-300'} flex flex-col justify-between space-y-3">
+            
+            <div class="flex items-start gap-3">
+              ${imageThumb}
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#${idx + 1}</span>
+                  <button 
+                    onclick='showOrderListModal("${escapeQuotes(group.productName)}", "Toàn bộ ${group.orderIds.length} đơn hàng", ${JSON.stringify(group.orderIds)})' 
+                    class="text-xs font-semibold text-slate-500 hover:text-slate-800 underline"
+                  >
+                    ${group.orderIds.length} đơn
+                  </button>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900 leading-snug mt-0.5 line-clamp-2 ${isAllDone ? 'line-through text-slate-400' : ''}">
+                  ${escapeHtml(group.productName)}
+                </h4>
+              </div>
+
+              <!-- Total Quantity Badge -->
+              <div class="flex-shrink-0 text-center bg-rose-50 border border-rose-200 rounded-2xl px-3 py-1.5 min-w-[62px]">
+                <span class="text-[10px] font-bold text-rose-600 uppercase block tracking-tight">TỔNG LẤY</span>
+                <span class="text-2xl font-black text-rose-700 leading-none tabular-nums">${group.totalQty}</span>
+              </div>
+            </div>
+
+            <!-- Smart Packaging Conversion Banner -->
+            ${group.packagingInfo ? `
+              <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-1">
+                <div class="font-bold text-emerald-900 flex items-center">
+                  <i data-lucide="boxes" class="w-4 h-4 mr-1.5 text-emerald-600 flex-shrink-0"></i>
+                  <span>Lấy thực tế: ${escapeHtml(group.packagingInfo.actualPickText)}</span>
+                </div>
+                <div class="text-emerald-700 font-semibold flex items-center">
+                  <span class="text-emerald-500 mr-1.5">➔</span>
+                  <span>Quy đổi: <strong>${escapeHtml(group.packagingInfo.equivalentText)}</strong></span>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Multi-Variant Sub-checklist -->
+            ${group.variants.length > 1 ? `
+              <div class="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                ${group.variants.map(v => {
+                  const isVdone = checkedItemKeys.has(v.key);
+                  const pack = parseSkuPackagingType(v.sku);
+                  return `
+                    <div class="flex items-center justify-between p-1.5 px-2 rounded-lg ${isVdone ? 'bg-emerald-100/50 text-slate-400' : 'bg-white border border-slate-200 text-slate-800'} text-xs">
+                      <label class="flex items-center space-x-2 cursor-pointer flex-1 min-w-0 pr-2">
+                        <input 
+                          type="checkbox" 
+                          ${isVdone ? 'checked' : ''} 
+                          onchange="toggleItemDone('${escapeQuotes(v.key)}')" 
+                          class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500" 
+                        />
+                        <span class="font-semibold truncate ${isVdone ? 'line-through' : ''}">${escapeHtml(v.sku)}</span>
+                        ${pack.isBulk ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-100 text-purple-700">Thùng</span>` : ''}
+                      </label>
+                      <span class="font-black text-rose-700 px-2 py-0.5 bg-rose-50 rounded border border-rose-200 text-xs tabular-nums">
+                        ${v.totalQty}
+                      </span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : `
+              <div class="flex items-center justify-between text-xs">
+                <span class="px-2.5 py-0.5 rounded-md font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                  ${escapeHtml(group.variants[0].sku)}
+                </span>
+              </div>
+            `}
+
+            <!-- Source Files -->
+            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center">
+              ${renderFileBadges(group.byFile)}
+            </div>
+
+            <!-- Big Touch Action Button -->
+            <button 
+              onclick="toggleGroupDone('${escapeQuotes(group.productName)}')" 
+              class="w-full py-2.5 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center space-x-2 active:scale-[0.98] ${isAllDone ? 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'}"
+            >
+              <i data-lucide="${isAllDone ? 'rotate-ccw' : 'check'}" class="w-4 h-4"></i>
+              <span>${isAllDone ? 'Bỏ đánh dấu (Lấy lại)' : 'Đã nhặt xong toàn bộ'}</span>
+            </button>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Flat Card View
+    function renderFlatCards(items) {
       cardViewWrapper.innerHTML = items.map((item, idx) => {
         const isDone = checkedItemKeys.has(item.key);
-        const fileBadges = Object.entries(item.byFile).map(([fname, qty]) => `
-          <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 mr-1 mb-1 inline-block font-medium">
-            ${fname}: <strong class="text-rose-600">${qty}</strong>
-          </span>
-        `).join('');
+        const fileBadges = renderFileBadges(item.byFile);
+        const pack = parseSkuPackagingType(item.sku);
 
         const imageThumb = item.imageUrl ? `
           <img 
@@ -1279,8 +1863,8 @@
                   ${escapeHtml(item.productName)}
                 </h4>
                 <div class="mt-1 flex flex-wrap items-center gap-1.5">
-                  <span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                    ${escapeHtml(item.sku)}
+                  <span class="px-2 py-0.5 rounded text-xs font-semibold ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
+                    ${pack.isBulk ? `📦 ${escapeHtml(item.sku)}` : escapeHtml(item.sku)}
                   </span>
                 </div>
               </div>
@@ -1312,25 +1896,28 @@
     }
 
     // Modal Handlers
-    window.showOrderModal = function(productName, sku, itemIndex) {
-      const item = getFilteredItems()[itemIndex];
-      if (!item) return;
-
-      currentModalOrders = item.orderIds;
-      document.getElementById('modalTitle').textContent = `${productName}`;
-      document.getElementById('modalSubTitle').textContent = `Phân loại: ${sku} • Tổng: ${item.totalQty} cái`;
-      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${item.orderIds.length} mã đơn hàng`;
+    window.showOrderListModal = function(title, subtitle, orderIds) {
+      currentModalOrders = orderIds;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalSubTitle').textContent = subtitle;
+      document.getElementById('modalOrderCount').textContent = `Tổng cộng: ${orderIds.length} mã đơn hàng`;
 
       const listContainer = document.getElementById('modalOrderList');
-      listContainer.innerHTML = item.orderIds.map((id, i) => `
+      listContainer.innerHTML = orderIds.map((id, i) => `
         <div class="flex items-center justify-between p-1.5 rounded-lg bg-white border border-slate-200">
-          <span class="font-bold text-slate-400 mr-1.5">${i + 1}.</span>
-          <span class="text-slate-800 font-medium select-all">${id}</span>
+          <span class="font-bold text-slate-400 mr-1.5 font-mono">${i + 1}.</span>
+          <span class="text-slate-800 font-medium select-all font-mono">${id}</span>
         </div>
       `).join('');
 
       orderModal.classList.remove('hidden');
       lucide.createIcons();
+    };
+
+    window.showOrderModal = function(productName, sku, itemIndex) {
+      const item = getFilteredFlatItems()[itemIndex];
+      if (!item) return;
+      showOrderListModal(productName, `Phân loại: ${sku} • Tổng: ${item.totalQty} cái`, item.orderIds);
     };
 
     window.closeModal = function() {
@@ -1364,12 +1951,21 @@
       }, 2500);
     }
 
-    // Export to Styled Excel
+    // Export to Styled Excel with Smart Packaging Conversion Notes
     function exportExcel() {
-      if (!aggregatedItems.length) return;
+      if (!groupedProducts.length) return;
 
       const fileCols = globalStats.fileNames;
-      const headers = ["STT", "Tên sản phẩm", "Quy cách / Phân loại", "Mã SKU Shop", "TỔNG SỐ LƯỢNG", "Đã nhặt (Kho kiểm)"];
+      const headers = [
+        "STT", 
+        "Tên sản phẩm", 
+        "Phân loại / SKU", 
+        "Loại quy cách",
+        "Mã SKU Shop", 
+        "TỔNG SỐ LƯỢNG", 
+        "Gợi ý quy đổi thông minh (Thùng / Lẻ)", 
+        "Đã nhặt (Kho kiểm)"
+      ];
       if (fileCols.length > 1) {
         fileCols.forEach(f => headers.push(`SL (${f})`));
       }
@@ -1380,26 +1976,38 @@
       rows.push([]);
       rows.push(headers);
 
-      aggregatedItems.forEach((it, idx) => {
-        const isDone = checkedItemKeys.has(it.key);
-        const row = [
-          idx + 1,
-          it.productName,
-          it.sku,
-          it.sellerSku,
-          it.totalQty,
-          isDone ? "[ x ]" : "[   ]"
-        ];
-        if (fileCols.length > 1) {
-          fileCols.forEach(f => {
-            row.push(it.byFile[f] || 0);
-          });
-        }
-        rows.push(row);
+      let currentStt = 1;
+      groupedProducts.forEach(group => {
+        group.variants.forEach((v, vIdx) => {
+          const isDone = checkedItemKeys.has(v.key);
+          const pack = parseSkuPackagingType(v.sku);
+          const packTypeLabel = pack.isBulk ? `Thùng nguyên (${pack.packSize} ${pack.rest || 'món'})` : "Chai/Gói lẻ";
+          const conversionNote = group.packagingInfo ? 
+            `Lấy: ${group.packagingInfo.actualPickText} => Tương đương: ${group.packagingInfo.equivalentText}` : 
+            "-";
+
+          const row = [
+            group.variants.length > 1 ? `${currentStt}.${vIdx + 1}` : currentStt,
+            vIdx === 0 ? group.productName : `(↳ ${group.productName})`,
+            v.sku,
+            packTypeLabel,
+            v.sellerSku,
+            v.totalQty,
+            vIdx === 0 ? conversionNote : `(Cùng sản phẩm: ${conversionNote})`,
+            isDone ? "[ x ]" : "[   ]"
+          ];
+          if (fileCols.length > 1) {
+            fileCols.forEach(f => {
+              row.push(v.byFile[f] || 0);
+            });
+          }
+          rows.push(row);
+        });
+        currentStt++;
       });
 
       // Total row
-      const totalRow = ["", "TỔNG CỘNG", "", "", globalStats.totalQty, ""];
+      const totalRow = ["", "TỔNG CỘNG", "", "", "", globalStats.totalQty, "", ""];
       if (fileCols.length > 1) {
         fileCols.forEach(f => {
           const colSum = aggregatedItems.reduce((acc, it) => acc + (it.byFile[f] || 0), 0);
@@ -1414,12 +2022,14 @@
         { wch: 6 },
         { wch: 48 },
         { wch: 25 },
-        { wch: 15 },
         { wch: 18 },
+        { wch: 15 },
+        { wch: 16 },
+        { wch: 42 },
         { wch: 18 },
       ];
       if (fileCols.length > 1) {
-        fileCols.forEach(() => ws['!cols'].push({ wch: 22 }));
+        fileCols.forEach(() => ws['!cols'].push({ wch: 20 }));
       }
 
       const wb = XLSX.utils.book_new();

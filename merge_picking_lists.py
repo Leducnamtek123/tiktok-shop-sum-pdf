@@ -238,7 +238,50 @@ def merge_picking_lists(pdf_files):
             'by_file': dict(data['by_file'])
         })
 
+    # Group items by parent product name
+    prod_map = defaultdict(lambda: {
+        'product_name': '',
+        'total_qty': 0,
+        'order_ids': set(),
+        'variants': [],
+        'by_file': defaultdict(int)
+    })
+
+    for it in merged_list:
+        pname = it['product_name']
+        grp = prod_map[pname]
+        grp['product_name'] = pname
+        grp['total_qty'] += it['total_qty']
+        grp['order_ids'].update(it['order_ids'])
+        grp['variants'].append(it)
+        for f, q in it['by_file'].items():
+            grp['by_file'][f] += q
+
+    grouped_products = []
+    for pname, grp in prod_map.items():
+        pack_info = analyze_product_packaging(grp['variants'])
+        # Sort variants within group (bulk items first, then by total_qty desc)
+        grp['variants'].sort(key=lambda v: (
+            not parse_packaging_type(v['sku'])['is_bulk'],
+            -v['total_qty']
+        ))
+        grouped_products.append({
+            'product_name': pname,
+            'total_qty': grp['total_qty'],
+            'order_ids': sorted(list(grp['order_ids'])),
+            'order_count': len(grp['order_ids']),
+            'variants': grp['variants'],
+            'by_file': dict(grp['by_file']),
+            'packaging_info': pack_info,
+            'is_single_variant': len(grp['variants']) == 1,
+            'has_bulk': bool(pack_info and pack_info['has_bulk'])
+        })
+
+    # Sort grouped products by total quantity descending
+    grouped_products.sort(key=lambda x: (-x['total_qty'], x['product_name']))
     merged_list.sort(key=lambda x: (-x['total_qty'], x['product_name']))
+
+    bulk_count = sum(1 for g in grouped_products if g['has_bulk'] or len(g['variants']) > 1)
 
     total_stats = {
         'total_files': len(pdf_files),
@@ -246,16 +289,82 @@ def merge_picking_lists(pdf_files):
         'total_orders_declared': sum(m['order_qty'] for m in file_metadata_list),
         'total_items_declared': sum(m['item_qty'] for m in file_metadata_list),
         'total_calculated_qty': sum(x['total_qty'] for x in merged_list),
+        'total_unique_products': len(grouped_products),
         'total_unique_skus': len(merged_list),
+        'total_bulk_products': bulk_count,
         'total_unique_orders': len(all_order_ids_all_files)
     }
 
-    return merged_list, total_stats, file_metadata_list
+    return grouped_products, merged_list, total_stats, file_metadata_list
 
 
-def export_to_excel(merged_list, total_stats, output_path):
+def parse_packaging_type(sku_str):
+    import re
+    s = (sku_str or '').strip()
+    m_thung = re.search(r'thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?', s, re.IGNORECASE)
+    if m_thung:
+        size = int(m_thung.group(1))
+        rest = (m_thung.group(2) or '').strip()
+        return {'is_bulk': True, 'type': 'thùng', 'size': size, 'rest': rest, 'label': f"Thùng nguyên ({size} {rest or 'món'})"}
+    m_hop = re.search(r'hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?', s, re.IGNORECASE)
+    if m_hop:
+        size = int(m_hop.group(1))
+        rest = (m_hop.group(2) or '').strip()
+        return {'is_bulk': True, 'type': 'hộp', 'size': size, 'rest': rest, 'label': f"Hộp lớn ({size} {rest or 'món'})"}
+    m_count = re.search(r'^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)', s)
+    if m_count and int(m_count.group(1)) > 1:
+        size = int(m_count.group(1))
+        rest = (m_count.group(2) or '').strip()
+        return {'is_bulk': True, 'type': 'lô', 'size': size, 'rest': rest, 'label': f"Lô/Combo {size} {rest or 'món'}"}
+    return {'is_bulk': False, 'type': 'lẻ', 'size': 1, 'rest': '', 'label': 'Chai/Gói lẻ'}
+
+
+def analyze_product_packaging(variants):
+    bulk_items = []
+    loose_items = []
+    for v in variants:
+        pack = parse_packaging_type(v['sku'])
+        if pack['is_bulk']:
+            bulk_items.append({**pack, 'variant': v, 'count': v['total_qty']})
+        else:
+            loose_items.append({**pack, 'variant': v, 'count': v['total_qty'], 'name': v['sku']})
+
+    if not bulk_items:
+        return None
+
+    pick_parts = [f"{b['count']} {b['type']} ({b['size']} {b['rest'] or 'cái'})" for b in bulk_items]
+    pick_parts.extend([f"{l['count']} {l['name']}" for l in loose_items])
+
+    eq_desc = []
+    accounted = set()
+    for b in bulk_items:
+        b_rest = b['rest'].lower().replace(' ', '')
+        matched = 0
+        u_label = b['rest'] or 'cái'
+        for idx, l in enumerate(loose_items):
+            l_name = l['name'].lower().replace(' ', '')
+            if b_rest and (b_rest in l_name or l_name in b_rest):
+                matched += l['count']
+                accounted.add(idx)
+                u_label = l['name']
+        total_eq = b['count'] * b['size'] + matched
+        eq_desc.append(f"{total_eq} {u_label}")
+
+    for idx, l in enumerate(loose_items):
+        if idx not in accounted:
+            eq_desc.append(f"{l['count']} {l['name']}")
+
+    return {
+        'has_bulk': True,
+        'actual_pick': " + ".join(pick_parts),
+        'equivalent': " + ".join(eq_desc)
+    }
+
+
+def export_to_excel(grouped_products, total_stats, output_path):
     """
-    Xuất file Excel tổng hợp được định dạng đẹp và chuyên nghiệp.
+    Xuất file Excel tổng hợp theo cấu trúc Sản phẩm Cha & Phân loại Con,
+    kèm theo cột ghi chú Quy đổi thông minh.
     """
     if not openpyxl:
         print("Cảnh báo: Cần cài openpyxl để xuất Excel (pip install openpyxl).")
@@ -271,12 +380,15 @@ def export_to_excel(merged_list, total_stats, output_path):
     font_stat_lbl = Font(name='Segoe UI', size=10, bold=True, color='374151')
     font_stat_val = Font(name='Segoe UI', size=11, bold=True, color='1D4ED8')
     font_header = Font(name='Segoe UI', size=11, bold=True, color='FFFFFF')
-    font_data = Font(name='Segoe UI', size=10)
+    font_parent = Font(name='Segoe UI', size=10, bold=True, color='111827')
+    font_child = Font(name='Segoe UI', size=10, color='374151')
     font_qty = Font(name='Segoe UI', size=11, bold=True, color='DC2626')
     font_total = Font(name='Segoe UI', size=11, bold=True, color='111827')
+    font_note = Font(name='Segoe UI', size=9, italic=True, color='059669')
 
     fill_header = PatternFill(start_color='1E3A8A', end_color='1E3A8A', fill_type='solid')
-    fill_zebra = PatternFill(start_color='F9FAFB', end_color='F9FAFB', fill_type='solid')
+    fill_parent = PatternFill(start_color='F3F4F6', end_color='F3F4F6', fill_type='solid')
+    fill_child = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid')
     fill_total = PatternFill(start_color='E0E7FF', end_color='E0E7FF', fill_type='solid')
 
     border_thin = Border(
@@ -295,12 +407,12 @@ def export_to_excel(merged_list, total_stats, output_path):
     ws['A2'] = f"Ngày tổng hợp: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')} | Nguồn: {total_stats['total_files']} file PDF TikTok Shop"
     ws['A2'].font = font_sub
 
-    ws['A4'] = "Tổng số file PDF:"
+    ws['A4'] = "Số file PDF:"
     ws['B4'] = total_stats['total_files']
     ws['C4'] = "Tổng số đơn hàng:"
     ws['D4'] = total_stats['total_orders_declared']
-    ws['E4'] = "Tổng số mặt hàng SKU:"
-    ws['F4'] = total_stats['total_unique_skus']
+    ws['E4'] = "Số mặt hàng:"
+    ws['F4'] = f"{total_stats['total_unique_products']} ({total_stats['total_unique_skus']} SKU)"
     ws['G4'] = "TỔNG SỐ LƯỢNG LẤY:"
     ws['H4'] = total_stats['total_calculated_qty']
 
@@ -314,7 +426,16 @@ def export_to_excel(merged_list, total_stats, output_path):
 
     start_row = 6
     file_cols = total_stats['file_names']
-    headers = ["STT", "Tên sản phẩm", "Phân loại (SKU)", "Mã Seller SKU", "TỔNG SỐ LƯỢNG", "Đã nhặt (Kho kiểm)"]
+    headers = [
+        "STT", 
+        "Tên sản phẩm", 
+        "Phân loại (SKU)", 
+        "Loại quy cách", 
+        "Mã Seller SKU", 
+        "TỔNG SỐ LƯỢNG", 
+        "Gợi ý quy đổi thông minh (Thùng / Lẻ)", 
+        "Đã nhặt (Kho kiểm)"
+    ]
     if len(file_cols) > 1:
         headers.extend([f"SL ({f})" for f in file_cols])
 
@@ -327,50 +448,62 @@ def export_to_excel(merged_list, total_stats, output_path):
     ws.row_dimensions[start_row].height = 28
 
     current_row = start_row + 1
-    for idx, item in enumerate(merged_list, 1):
-        row_data = [
-            idx,
-            item['product_name'],
-            item['sku'] if item['sku'] else "Mặc định",
-            item['seller_sku'],
-            item['total_qty'],
-            "[   ]"
-        ]
-        if len(file_cols) > 1:
-            for f in file_cols:
-                row_data.append(item['by_file'].get(f, 0))
+    current_stt = 1
 
-        is_even = (idx % 2 == 0)
-        for col_idx, val in enumerate(row_data, 1):
-            cell = ws.cell(row=current_row, column=col_idx, value=val)
-            cell.font = font_qty if col_idx == 5 else font_data
-            cell.border = border_thin
-            if is_even:
-                cell.fill = fill_zebra
+    for group in grouped_products:
+        conv_note = f"Lấy: {group['packaging_info']['actual_pick']} => Tương đương: {group['packaging_info']['equivalent']}" if group['packaging_info'] else "-"
 
-            if col_idx == 1:
-                cell.alignment = Alignment(horizontal='center', vertical='center')
-            elif col_idx in [2, 3]:
-                cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            elif col_idx in [4, 6]:
-                cell.alignment = Alignment(horizontal='center', vertical='center')
-            elif col_idx == 5 or col_idx > 6:
-                cell.alignment = Alignment(horizontal='right', vertical='center')
+        for v_idx, v in enumerate(group['variants']):
+            pack = parse_packaging_type(v['sku'])
+            row_stt = f"{current_stt}.{v_idx + 1}" if len(group['variants']) > 1 else str(current_stt)
+            prod_name_disp = group['product_name'] if v_idx == 0 else f"↳ ({group['product_name'][:30]}...)"
+            note_disp = conv_note if v_idx == 0 else f"(Cùng SP: {conv_note})"
 
-        ws.row_dimensions[current_row].height = 24
-        current_row += 1
+            row_data = [
+                row_stt,
+                prod_name_disp,
+                v['sku'] if v['sku'] else "Mặc định",
+                pack['label'],
+                v['seller_sku'],
+                v['total_qty'],
+                note_disp,
+                "[   ]"
+            ]
+            if len(file_cols) > 1:
+                for f in file_cols:
+                    row_data.append(v['by_file'].get(f, 0))
+
+            for col_idx, val in enumerate(row_data, 1):
+                cell = ws.cell(row=current_row, column=col_idx, value=val)
+                cell.font = font_qty if col_idx == 6 else (font_note if col_idx == 7 else (font_parent if v_idx == 0 else font_child))
+                cell.border = border_thin
+                cell.fill = fill_parent if v_idx == 0 and len(group['variants']) > 1 else fill_child
+
+                if col_idx in [1, 4, 8]:
+                    cell.alignment = Alignment(horizontal='center', vertical='center')
+                elif col_idx in [2, 3, 7]:
+                    cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
+                elif col_idx == 5:
+                    cell.alignment = Alignment(horizontal='center', vertical='center')
+                elif col_idx == 6 or col_idx > 8:
+                    cell.alignment = Alignment(horizontal='right', vertical='center')
+
+            ws.row_dimensions[current_row].height = 24
+            current_row += 1
+
+        current_stt += 1
 
     ws.cell(row=current_row, column=1, value="")
     ws.cell(row=current_row, column=2, value="TỔNG CỘNG").font = font_total
-    ws.cell(row=current_row, column=5, value=f"=SUM(E{start_row+1}:E{current_row-1})").font = font_qty
+    ws.cell(row=current_row, column=6, value=f"=SUM(F{start_row+1}:F{current_row-1})").font = font_qty
     for c in range(1, len(headers) + 1):
         cell = ws.cell(row=current_row, column=c)
         cell.fill = fill_total
         cell.border = border_total
-        if c == 5:
+        if c == 6:
             cell.alignment = Alignment(horizontal='right', vertical='center')
 
-    col_widths = {1: 6, 2: 45, 3: 25, 4: 15, 5: 18, 6: 18}
+    col_widths = {1: 8, 2: 45, 3: 25, 4: 20, 5: 15, 6: 18, 7: 42, 8: 18}
     for col_idx in range(1, len(headers) + 1):
         col_letter = get_column_letter(col_idx)
         if col_idx in col_widths:
@@ -382,42 +515,66 @@ def export_to_excel(merged_list, total_stats, output_path):
     print(f"-> Đã xuất file Excel tổng hợp thành công: {output_path}")
 
 
-def display_console_summary(merged_list, total_stats):
+def display_console_summary(grouped_products, merged_list, total_stats):
     """
-    In kết quả tổng hợp ra màn hình console.
+    In kết quả tổng hợp ra màn hình console theo nhóm sản phẩm & gợi ý quy cách.
     """
     if console:
         console.print(Panel.fit(
-            f"[bold green]KẾT QUẢ GỘP PICKING LIST TIKTOK SHOP[/bold green]\n"
+            f"[bold green]KẾT QUẢ GỘP PICKING LIST TIKTOK SHOP (THÔNG MINH)[/bold green]\n"
             f"• Số file PDF đã gộp: [bold cyan]{total_stats['total_files']}[/bold cyan] file\n"
             f"• Tổng số đơn hàng: [bold cyan]{total_stats['total_orders_declared']}[/bold cyan] đơn\n"
-            f"• Tổng số mặt hàng SKU khác nhau: [bold cyan]{total_stats['total_unique_skus']}[/bold cyan] SKU\n"
+            f"• Mặt hàng sản phẩm: [bold cyan]{total_stats['total_unique_products']}[/bold cyan] món ([yellow]{total_stats['total_unique_skus']} phân loại SKU[/yellow])\n"
+            f"• Số sản phẩm có Thùng/Lẻ: [bold magenta]{total_stats['total_bulk_products']}[/bold magenta] món\n"
             f"• [bold red]TỔNG SỐ LƯỢNG SẢN PHẨM CẦN NHẶT: {total_stats['total_calculated_qty']}[/bold red] món",
             title="[bold blue]TikTok Shop Picking Consolidator[/bold blue]"
         ))
 
-        table = Table(title="Danh sách hàng cần nhặt (Sắp xếp theo số lượng nhiều -> ít)", show_lines=True)
-        table.add_column("STT", justify="center", style="dim", width=4)
-        table.add_column("Tên sản phẩm", justify="left", style="white", min_width=35)
+        table = Table(title="Danh sách hàng cần nhặt (Gom theo Sản phẩm & Phân loại)", show_lines=True)
+        table.add_column("STT", justify="center", style="dim", width=5)
+        table.add_column("Tên sản phẩm & Gợi ý quy cách", justify="left", style="white", min_width=38)
         table.add_column("Phân loại SKU", justify="left", style="yellow", width=22)
         table.add_column("Mã Seller", justify="center", style="dim", width=10)
         table.add_column("TỔNG SL", justify="right", style="bold red", width=10)
 
-        for idx, it in enumerate(merged_list, 1):
-            table.add_row(
-                str(idx),
-                it['product_name'][:45] + ("..." if len(it['product_name']) > 45 else ""),
-                it['sku'] or "Mặc định",
-                it['seller_sku'] or "-",
-                str(it['total_qty'])
-            )
+        for idx, group in enumerate(grouped_products, 1):
+            if group['is_single_variant']:
+                v = group['variants'][0]
+                table.add_row(
+                    str(idx),
+                    group['product_name'][:45] + ("..." if len(group['product_name']) > 45 else ""),
+                    v['sku'] or "Mặc định",
+                    v['seller_sku'] or "-",
+                    str(group['total_qty'])
+                )
+            else:
+                p_text = f"[bold]{group['product_name'][:40]}...[/bold]"
+                if group['packaging_info']:
+                    p_text += f"\n[green]📦 {group['packaging_info']['actual_pick']} ➔ {group['packaging_info']['equivalent']}[/green]"
+                table.add_row(
+                    f"[bold]{idx}[/bold]",
+                    p_text,
+                    f"[magenta]Gộp {len(group['variants'])} phân loại[/magenta]",
+                    "-",
+                    f"[bold red]{group['total_qty']}[/bold red]"
+                )
+                for v_idx, v in enumerate(group['variants'], 1):
+                    table.add_row(
+                        f"  ↳ {idx}.{v_idx}",
+                        f"  ↳ {v['sku']}",
+                        v['sku'] or "Mặc định",
+                        v['seller_sku'] or "-",
+                        f"[yellow]{v['total_qty']}[/yellow]"
+                    )
 
         console.print(table)
     else:
         print("\n=== KẾT QUẢ GỘP PICKING LIST ===")
-        print(f"Tổng files: {total_stats['total_files']} | Tổng SKU: {total_stats['total_unique_skus']} | Tổng SL cần nhặt: {total_stats['total_calculated_qty']}")
-        for idx, it in enumerate(merged_list, 1):
-            print(f"#{idx:2d} | SL: {it['total_qty']:3d} | SKU: {it['sku']:20s} | {it['product_name'][:40]}")
+        print(f"Tổng files: {total_stats['total_files']} | Tổng SP: {total_stats['total_unique_products']} | Tổng SL cần nhặt: {total_stats['total_calculated_qty']}")
+        for idx, group in enumerate(grouped_products, 1):
+            print(f"#{idx:2d} | SL: {group['total_qty']:3d} | {group['product_name'][:40]}")
+            for v in group['variants']:
+                print(f"     ↳ SKU: {v['sku']} | SL: {v['total_qty']}")
 
 
 def main():
@@ -456,11 +613,11 @@ def main():
     for f in input_files:
         print(f"  - {f}")
 
-    merged_list, total_stats, _ = merge_picking_lists(input_files)
-    display_console_summary(merged_list, total_stats)
+    grouped_products, merged_list, total_stats, _ = merge_picking_lists(input_files)
+    display_console_summary(grouped_products, merged_list, total_stats)
 
     out_file = args.output
-    export_to_excel(merged_list, total_stats, out_file)
+    export_to_excel(grouped_products, total_stats, out_file)
 
 
 if __name__ == "__main__":
