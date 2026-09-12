@@ -90,11 +90,31 @@
       pointer-events: none;
     }
 
-    /* Professional A4 Print Stylesheet - 1:1 TikTok Shop Picking List Replica */
+    /* Discrete A4 Paged Media Layout for Both Chrome Print & jsPDF Export */
+    .pdf-a4-page {
+      width: 794px;
+      height: 1123px;
+      max-height: 1123px;
+      box-sizing: border-box;
+      padding: 20px 28px 45px 28px;
+      background: #ffffff;
+      color: #0f172a;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+      margin: 0 auto 16px auto;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+    .pdf-a4-page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
     @media print {
       @page {
         size: A4 portrait;
-        margin: 8mm 8mm 10mm 8mm;
+        margin: 0;
       }
       html, body {
         background: #ffffff !important;
@@ -108,7 +128,7 @@
         print-color-adjust: exact !important;
       }
       .no-print, header, nav, #dropZone, #fileChipsContainer, #progressContainer, 
-      #statsSection, #fulfillmentSection, #resultSection, #toast, .modal-backdrop {
+      #statsSection, #fulfillmentSection, #resultSection, #toast, #pdfExportDock, .modal-backdrop {
         display: none !important;
       }
       .print-only {
@@ -116,7 +136,27 @@
       }
       #printContainer {
         display: block !important;
-        width: 100% !important;
+        width: 210mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+      }
+      .pdf-a4-page {
+        width: 210mm !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        box-sizing: border-box !important;
+        padding: 7mm 8mm 12mm 8mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+      }
+      .pdf-a4-page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
       }
     }
 
@@ -124,7 +164,7 @@
     .tiktok-print-table {
         width: 100% !important;
         border-collapse: collapse !important;
-        margin-top: 6px !important;
+        margin-top: 4px !important;
         font-size: 8.5pt !important;
       }
       .tiktok-print-table th {
@@ -693,59 +733,57 @@
               <span id="badgeDisaggregateCombos" class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-black bg-slate-100 text-slate-500">TẮT</span>
             </button>
 
-            <!-- Chế độ in: Phiếu Kho (Số Lô) vs Phiếu Đối Soát (Mã Đơn) -->
+            <!-- Chế độ in: Phiếu Kho vs Phiếu Đối Soát -->
             <div class="inline-flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200 text-xs font-semibold shadow-2xs">
               <button 
                 id="btnModeBatch" 
                 onclick="setPrintColumnMode('batch')" 
-                class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer flex items-center"
-                title="Phiếu xuất kho: Thay cột Mã đơn thành Số lô để nhân viên kho nhặt hàng"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer flex items-center"
+                title="Phiếu xuất kho: Cột số lô và hạn dùng để nhân viên kho nhặt hàng"
               >
                 <i data-lucide="clipboard-list" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
-                Phiếu kho (Số lô)
+                Phiếu kho
               </button>
               <button 
                 id="btnModeOrder" 
                 onclick="setPrintColumnMode('order')" 
-                class="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:text-slate-900 cursor-pointer flex items-center"
-                title="Phiếu đối soát: Giữ nguyên cột Mã đơn (Order ID)"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:text-slate-900 cursor-pointer flex items-center"
+                title="Phiếu đối soát: Cột mã đơn hàng"
               >
                 <i data-lucide="hash" class="w-3.5 h-3.5 mr-1 text-slate-400"></i>
-                Mã đơn (Order ID)
+                Mã đơn hàng
               </button>
             </div>
 
-            <!-- 1. Hero Primary Action: In phiếu / Lưu PDF (A4) (Chuẩn đẹp nhất, 100% vector, tức thì) -->
+            <!-- 1. Primary Action: In phiếu nhặt hàng -->
             <button 
               type="button"
               id="printBtn" 
               onclick="printA4Direct()"
               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#fe2c55] hover:bg-[#e02447] text-white text-xs font-bold shadow-xs hover:shadow transition-all active:scale-[0.98] cursor-pointer"
-              title="In phiếu hoặc Lưu file PDF chuẩn nét 100% qua hộp thoại Chrome (Khuyên dùng)"
+              title="In phiếu hoặc lưu PDF qua hộp thoại in của trình duyệt"
             >
               <i data-lucide="printer" class="w-4 h-4"></i>
-              <span>In phiếu / Lưu PDF (A4)</span>
-              <span class="ml-0.5 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-white/20 text-white rounded-md">Chuẩn Đẹp</span>
+              <span>In phiếu nhặt hàng</span>
             </button>
 
-            <!-- 2. Secondary Action: Tải file PDF trực tiếp (Tiến trình ngầm không đơ trang) -->
+            <!-- 2. Secondary Action: Tải file PDF trực tiếp -->
             <button 
               type="button"
               id="downloadPdfBtn" 
               onclick="exportPdfA4Direct()"
               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
-              title="Tải trực tiếp file PDF về máy qua tiến trình ngầm (không đơ trang)"
+              title="Tải trực tiếp file PDF về máy tính"
             >
               <i data-lucide="file-down" class="w-4 h-4 text-rose-600"></i>
-              <span>Tải file PDF (A4)</span>
-              <span class="px-1.5 py-0.5 text-[9px] font-bold bg-slate-100 text-slate-500 rounded-md">Ngầm</span>
+              <span>Tải file PDF</span>
             </button>
 
             <!-- 3. Tertiary Action: Xuất file Excel -->
             <button 
               id="exportExcelBtn" 
               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
-              title="Xuất bảng tổng hợp nhặt hàng ra file Excel (.xlsx)"
+              title="Xuất bảng tổng hợp nhặt hàng ra file Excel"
             >
               <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
               <span>Xuất file Excel</span>
@@ -1112,7 +1150,7 @@
                   <th class="py-3.5 px-4 text-center w-14">STT</th>
                   <th class="py-3.5 px-4 w-20 text-center">Ảnh Tem</th>
                   <th class="py-3.5 px-5 min-w-[190px]">Mã Vận Đơn</th>
-                  <th class="py-3.5 px-5 min-w-[180px]">Mã Đơn (Order ID)</th>
+                  <th class="py-3.5 px-5 min-w-[180px]">Mã Đơn Hàng</th>
                   <th class="py-3.5 px-5 min-w-[160px]">Người Nhận</th>
                   <th class="py-3.5 px-5 min-w-[130px] text-right">Thao Tác</th>
                 </tr>
@@ -1521,7 +1559,7 @@
           </svg>
         </div>
         <div class="min-w-0">
-          <div id="pdfDockTitle" class="text-xs font-bold text-slate-900 truncate">Đang tạo file PDF (A4)...</div>
+          <div id="pdfDockTitle" class="text-xs font-bold text-slate-900 truncate">Đang tạo file PDF...</div>
           <div id="pdfDockSubtitle" class="text-[11px] text-slate-500 font-medium truncate">Đang chuẩn bị trang in...</div>
         </div>
       </div>
@@ -1537,7 +1575,7 @@
     <div class="flex items-center justify-between text-[10px] text-slate-400 font-medium">
       <span class="flex items-center gap-1.5">
         <span id="pdfDockDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-        <span id="pdfDockFootnote">Tiến trình ngầm &bull; Không đơ trang web</span>
+        <span id="pdfDockFootnote">Tự động phân trang &bull; Không đơ trang</span>
       </span>
       <button type="button" onclick="dismissPdfDock()" class="hover:text-slate-700 transition-colors text-slate-400 font-semibold cursor-pointer">Đóng</button>
     </div>
@@ -1660,6 +1698,15 @@
         skuKeyword: "Thùng 12",
         packSize: 12,
         unit: "Gói"
+      },
+      {
+        id: "pkg_amox_1kg_6goi",
+        category: "packaging",
+        name: "Navet-Amoxicol Plus (Hộp 1kg + 6 gói 100g)",
+        productKeyword: "Navet-Amoxicol Plus",
+        skuKeyword: "Hộp 1kg",
+        packSize: 1,
+        unit: "Hộp"
       }
     ];
 
@@ -3598,7 +3645,7 @@
     }
     window.dismissPdfDock = dismissPdfDock;
 
-    // Non-blocking Direct PDF Export with Background Progress Dock
+    // Non-blocking Discrete A4 Paged PDF Export with Background Progress Dock
     window.exportPdfA4Direct = async function() {
       if (!groupedProducts.length && !aggregatedItems.length) {
         showToast('Vui lòng tải hoặc nạp ít nhất 1 file PDF để xuất file!');
@@ -3606,86 +3653,112 @@
       }
 
       if (window._isExportingPdf) {
-        showToast('Tiến trình ngầm đang tạo file PDF, vui lòng đợi giây lát...');
+        showToast('Tiến trình đang tạo file PDF, vui lòng đợi giây lát...');
         return;
       }
       window._isExportingPdf = true;
 
       // Show dock immediately
       showPdfDock({
-        title: 'Đang tạo file PDF (A4)...',
-        subtitle: 'Đang chuẩn bị trang in...',
-        percent: 15
+        title: 'Đang tạo file PDF...',
+        subtitle: 'Đang phân trang in A4...',
+        percent: 10
       });
 
       // Yield so UI thread stays responsive
-      await new Promise(r => setTimeout(r, 80));
+      await new Promise(r => setTimeout(r, 60));
 
       try {
-        if (typeof html2pdf === 'undefined') {
-          updatePdfDock({ subtitle: 'Đang nạp thư viện PDF...', percent: 25 });
-          await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'assets/html2pdf.bundle.min.js';
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Không thể nạp thư viện html2pdf.'));
-            document.head.appendChild(script);
-          });
+        // Ensure dependencies
+        if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+          updatePdfDock({ subtitle: 'Đang nạp thư viện PDF...', percent: 20 });
+          if (typeof html2canvas === 'undefined') {
+            await new Promise((res, rej) => {
+              const s = document.createElement('script');
+              s.src = 'assets/html2canvas.min.js';
+              s.onload = res;
+              s.onerror = rej;
+              document.head.appendChild(s);
+            });
+          }
+          if (typeof jspdf === 'undefined') {
+            await new Promise((res, rej) => {
+              const s = document.createElement('script');
+              s.src = 'assets/jspdf.umd.min.js';
+              s.onload = res;
+              s.onerror = rej;
+              document.head.appendChild(s);
+            });
+          }
         }
+
+        updatePdfDock({ subtitle: 'Đang tính toán phân trang chuẩn...', percent: 25 });
+        await new Promise(r => setTimeout(r, 40));
 
         preparePrintContent();
         const printContainer = document.getElementById('printContainer');
         if (!printContainer) throw new Error('Không tìm thấy nội dung phiếu in.');
 
-        updatePdfDock({ subtitle: 'Đang dựng bản in chuẩn TikTok Shop...', percent: 45 });
-        await new Promise(r => setTimeout(r, 80));
+        const pages = printContainer.querySelectorAll('.pdf-a4-page');
+        const totalPages = pages.length;
+        if (totalPages === 0) throw new Error('Chưa có dữ liệu trang in.');
 
-        // Create offscreen wrapper
-        const wrapper = document.createElement('div');
-        wrapper.id = 'pdfExportWrapper';
-        wrapper.style.position = 'fixed';
-        wrapper.style.top = '0';
-        wrapper.style.left = '0';
-        wrapper.style.width = '794px';
-        wrapper.style.zIndex = '-9999';
-        wrapper.style.background = '#ffffff';
+        // Temporarily prepare container for high-fidelity canvas capture
+        printContainer.style.display = 'block';
+        printContainer.style.position = 'fixed';
+        printContainer.style.top = '0';
+        printContainer.style.left = '0';
+        printContainer.style.zIndex = '-9999';
+        printContainer.style.background = '#ffffff';
 
-        const clone = printContainer.cloneNode(true);
-        clone.style.display = 'block';
-        clone.style.width = '794px';
-        clone.style.background = '#ffffff';
-        wrapper.appendChild(clone);
-        document.body.appendChild(wrapper);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
 
-        updatePdfDock({ subtitle: 'Đang render trang PDF chuẩn nét...', percent: 65 });
-        await new Promise(r => setTimeout(r, 80));
+        for (let i = 0; i < totalPages; i++) {
+          const pageEl = pages[i];
+          const pct = 30 + Math.round(((i + 1) / totalPages) * 60);
+          updatePdfDock({
+            title: 'Đang tạo file PDF...',
+            subtitle: `Đang kết xuất trang ${i + 1} / ${totalPages}...`,
+            percent: pct
+          });
+          await new Promise(r => setTimeout(r, 40));
+
+          const canvas = await html2canvas(pageEl, {
+            scale: 2, // Crisp 192+ DPI, exact integer scaling without font squishing
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            windowWidth: 794
+          });
+
+          if (i > 0) {
+            pdf.addPage();
+          }
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+        }
+
+        // Reset printContainer styling
+        printContainer.style.display = '';
+        printContainer.style.position = '';
+        printContainer.style.top = '';
+        printContainer.style.left = '';
+        printContainer.style.zIndex = '';
+        printContainer.style.background = '';
+
+        updatePdfDock({ subtitle: 'Đang lưu file PDF về máy...', percent: 95 });
+        await new Promise(r => setTimeout(r, 30));
 
         const dateStr = new Date().toISOString().slice(0, 10);
         const fileName = `Phieu_Nhat_Hang_TikTok_Shop_${dateStr}.pdf`;
-
-        const opt = {
-          margin: [8, 8, 8, 8],
-          filename: fileName,
-          image: { type: 'jpeg', quality: 0.93 },
-          html2canvas: { 
-            scale: 1.25, 
-            useCORS: true, 
-            logging: false,
-            scrollY: 0,
-            scrollX: 0
-          },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        updatePdfDock({ subtitle: 'Đang đóng gói file PDF...', percent: 85 });
-        await new Promise(r => setTimeout(r, 50));
-
-        await html2pdf().set(opt).from(clone).save();
-
-        if (document.body.contains(wrapper)) {
-          document.body.removeChild(wrapper);
-        }
+        pdf.save(fileName);
 
         updatePdfDock({
           title: 'Đã tải xong file PDF!',
@@ -3697,6 +3770,11 @@
         showToast(`Đã xuất và tải file PDF thành công: ${fileName}`);
       } catch (err) {
         console.error('Lỗi khi xuất file PDF:', err);
+        const printContainer = document.getElementById('printContainer');
+        if (printContainer) {
+          printContainer.style.display = '';
+          printContainer.style.position = '';
+        }
         updatePdfDock({
           title: 'Lỗi xuất PDF',
           subtitle: err.message || 'Không thể tạo file',
@@ -4524,7 +4602,7 @@
                     <th class="py-3.5 px-4 w-20 text-center">Ảnh SP</th>
                     <th class="py-3.5 px-5 min-w-[170px]">Phân loại / SKU</th>
                     <th class="py-3.5 px-5 min-w-[180px]">Mã Vận Đơn</th>
-                    <th class="py-3.5 px-5 min-w-[160px]">Mã Đơn (Order ID)</th>
+                    <th class="py-3.5 px-5 min-w-[160px]">Mã Đơn Hàng</th>
                     <th class="py-3.5 px-5 min-w-[150px]">Người Nhận</th>
                     <th class="py-3.5 px-3 text-center w-14">SL</th>
                     <th class="py-3.5 px-5 min-w-[170px] text-right">Trang &amp; Thao Tác</th>
@@ -6956,10 +7034,10 @@
       `;
     }
 
-    // Prepare 1:1 TikTok Shop Print Layout (Header, Images, Packaging, Tracking, Order IDs, Footer)
+    // Prepare Discrete A4 Paged TikTok Shop Print Layout (Zero Chopped Rows, Repeated Headers, Intact Signatures)
     function preparePrintContent() {
       const printContainer = document.getElementById('printContainer');
-      if (!printContainer) return;
+      if (!printContainer) return 0;
 
       const nowStr = new Date().toLocaleString('vi-VN', {
         day: '2-digit', month: '2-digit', year: 'numeric',
@@ -6968,16 +7046,34 @@
 
       const isGrouped = (groupViewMode === 'grouped');
       const itemsToPrint = isGrouped ? getFilteredGroups() : getFilteredFlatItems();
+      if (!itemsToPrint || itemsToPrint.length === 0) {
+        printContainer.innerHTML = '';
+        return 0;
+      }
 
-      let tableRowsHtml = '';
+      // 1. Measurement harness to get exact rendered height per product group
+      let measureHost = document.getElementById('pdfMeasureHost');
+      if (!measureHost) {
+        measureHost = document.createElement('div');
+        measureHost.id = 'pdfMeasureHost';
+        measureHost.style.position = 'fixed';
+        measureHost.style.top = '-99999px';
+        measureHost.style.left = '0';
+        measureHost.style.width = '738px';
+        measureHost.style.visibility = 'hidden';
+        measureHost.style.pointerEvents = 'none';
+        measureHost.style.background = '#ffffff';
+        document.body.appendChild(measureHost);
+      }
 
-      if (isGrouped) {
-        tableRowsHtml = itemsToPrint.map((group, idx) => {
+      // Helper to render product rows HTML
+      function renderItemRowsHtml(item, idx) {
+        if (isGrouped) {
+          const group = item;
           const imgHtml = group.imageUrl 
             ? `<img src="${group.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
 
-          // Case 1: Single Variant Product
           if (group.isSingleVariant) {
             const v = group.variants[0];
             const pack = parseSkuPackagingType(v.sku, group.productName);
@@ -6985,41 +7081,41 @@
             const trackingsHtml = renderPrintTrackingNumbers(v.trackingNumbers, v.orderIds);
 
             return `
-              <tr class="group-border-bottom">
+              <tr class="group-border-bottom" data-item-idx="${idx}">
                 <td style="text-align: center; font-weight: 700; color: #475569; width: 28px;">${idx + 1}</td>
-                <td style="text-align: center; width: 46px;">${imgHtml}</td>
+                <td style="text-align: center; width: 44px;">${imgHtml}</td>
                 <td style="vertical-align: top; padding-right: 8px;">
-                  <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
-                  ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
+                  <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(group.productName)}</div>
+                  ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
                   ${((group.comboAdditions && group.comboAdditions.length > 0) || (v.comboAdditions && v.comboAdditions.length > 0)) ? `
-                    <div style="font-size: 7.5pt; color: #6b21a8; font-weight: 700; background: #faf5ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">
+                    <div style="font-size: 7.2pt; color: #6b21a8; font-weight: 700; background: #faf5ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1.5px 5px; display: inline-block; margin-top: 3px; line-height: 1.25;">
                       ➕ ${consolidateComboAdditions(v.comboAdditions || group.comboAdditions || []).map(c => `Đã gồm +${c.qty} từ combo ${escapeHtml(c.comboName)}`).join(' • ')}
                     </div>
                   ` : ''}
                 </td>
-                <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt;">
-                  <div>${escapeHtml(v.sku)}</div>
-                  ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+                <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt;">
+                  <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
+                  ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
                 </td>
-                <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top;">
+                <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top;">
                   ${group.totalQty}
                 </td>
-                <td style="vertical-align: top; width: 115px;">
+                <td style="vertical-align: top; width: 145px;">
                   ${trackingsHtml}
                 </td>
-                <td style="vertical-align: top; width: 125px;">
+                <td style="vertical-align: top; width: 145px;">
                   ${lastColHtml}
                 </td>
               </tr>
             `;
           }
 
-          // Case 2: Multi-Variant: Parent with rowspan for STT, image, and product name
+          // Multi-Variant: Always kept together as an atomic unit
           const varCount = group.variants.length;
           let groupHtml = '';
 
           const conversionBadge = group.packagingInfo ? `
-            <div style="font-size: 7.5pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 6px; margin-top: 3px; display: inline-block; line-height: 1.25;">
+            <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 5px; margin-top: 3px; display: inline-block; line-height: 1.25;">
               ⚡ <strong>Lấy:</strong> ${escapeHtml(group.packagingInfo.actualPickText)} ➔ <strong>Quy đổi:</strong> ${escapeHtml(group.packagingInfo.equivalentText)}
             </div>
           ` : '';
@@ -7034,170 +7130,313 @@
 
             if (isFirstVar) {
               groupHtml += `
-                <tr class="${trClass}">
+                <tr class="${trClass}" data-item-idx="${idx}">
                   <td rowspan="${varCount}" style="text-align: center; font-weight: 700; color: #475569; width: 28px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${idx + 1}</td>
-                  <td rowspan="${varCount}" style="text-align: center; width: 46px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${imgHtml}</td>
+                  <td rowspan="${varCount}" style="text-align: center; width: 44px; vertical-align: top; border-bottom: 1.25pt solid #94a3b8;">${imgHtml}</td>
                   <td rowspan="${varCount}" style="vertical-align: top; border-bottom: 1.25pt solid #94a3b8; padding-right: 8px;">
-                    <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
+                    <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(group.productName)}</div>
                     ${conversionBadge}
                   </td>
-                  <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
-                    <div>${escapeHtml(v.sku)}</div>
-                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+                  <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
+                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
                   </td>
-                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
                   </td>
-                  <td style="vertical-align: top; width: 115px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 145px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${trackingsHtml}
                   </td>
-                  <td style="vertical-align: top; width: 125px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 145px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${lastColHtml}
                   </td>
                 </tr>
               `;
             } else {
               groupHtml += `
-                <tr class="${trClass}">
-                  <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
-                    <div>${escapeHtml(v.sku)}</div>
-                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+                <tr class="${trClass}" data-item-idx="${idx}">
+                  <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
+                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
                   </td>
-                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
                   </td>
-                  <td style="vertical-align: top; width: 115px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 145px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${trackingsHtml}
                   </td>
-                  <td style="vertical-align: top; width: 125px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                  <td style="vertical-align: top; width: 145px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${lastColHtml}
                   </td>
                 </tr>
               `;
             }
           });
-
           return groupHtml;
-        }).join('');
-
-      } else {
-        // Flat Mode
-        tableRowsHtml = itemsToPrint.map((item, idx) => {
-          const pack = parseSkuPackagingType(item.sku, item.productName);
-          const imgHtml = item.imageUrl 
-            ? `<img src="${item.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
+        } else {
+          // Flat Mode
+          const itemFlat = item;
+          const pack = parseSkuPackagingType(itemFlat.sku, itemFlat.productName);
+          const imgHtml = itemFlat.imageUrl 
+            ? `<img src="${itemFlat.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
-          const lastColHtml = renderPrintLastColumn(item.key, item.productName, item.orderIds);
-          const trackingsHtml = renderPrintTrackingNumbers(item.trackingNumbers, item.orderIds);
+          const lastColHtml = renderPrintLastColumn(itemFlat.key, itemFlat.productName, itemFlat.orderIds);
+          const trackingsHtml = renderPrintTrackingNumbers(itemFlat.trackingNumbers, itemFlat.orderIds);
 
           return `
-            <tr class="group-border-bottom">
+            <tr class="group-border-bottom" data-item-idx="${idx}">
               <td style="text-align: center; font-weight: 700; color: #475569; width: 28px;">${idx + 1}</td>
-              <td style="text-align: center; width: 46px;">${imgHtml}</td>
+              <td style="text-align: center; width: 44px;">${imgHtml}</td>
               <td style="vertical-align: top; padding-right: 8px;">
-                <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(item.productName)}</div>
-                ${item.sellerSku && item.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(item.sellerSku)}</div>` : ''}
+                <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(itemFlat.productName)}</div>
+                ${itemFlat.sellerSku && itemFlat.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Mã SKU: ${escapeHtml(itemFlat.sellerSku)}</div>` : ''}
               </td>
-              <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt;">
-                <div>${escapeHtml(item.sku)}</div>
-                ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng (${pack.packSize} ${pack.rest || 'món'})</div>` : ''}
+              <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt;">
+                <div style="word-break: break-word;">${escapeHtml(itemFlat.sku)}</div>
+                ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
               </td>
-              <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 44px; vertical-align: top;">
-                ${item.totalQty}
+              <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top;">
+                ${itemFlat.totalQty}
               </td>
-              <td style="vertical-align: top; width: 115px;">
+              <td style="vertical-align: top; width: 145px;">
                 ${trackingsHtml}
               </td>
-              <td style="vertical-align: top; width: 125px;">
+              <td style="vertical-align: top; width: 145px;">
                 ${lastColHtml}
               </td>
             </tr>
           `;
-        }).join('');
+        }
       }
 
-      printContainer.innerHTML = `
-        <!-- Top Brand Header (1:1 TikTok Shop Picking List Replica) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2pt solid #0f172a; padding-bottom: 8px; margin-bottom: 8px;">
-          <div style="display: flex; align-items: center; gap: 14px;">
-            <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 36px; object-fit: contain;" />
-            <div style="border-left: 1.5pt solid #cbd5e1; padding-left: 12px;">
-              <h1 style="font-size: 14pt; font-weight: 900; text-transform: uppercase; color: #0f172a; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">
-                Picking List <span style="font-weight: 500; color: #64748b; font-size: 11pt;">• ${printColumnMode === 'batch' ? 'PHIẾU NHẶT HÀNG (PHIẾU KHO)' : 'PHIẾU NHẶT HÀNG TỔNG HỢP'}</span>
-              </h1>
-              <p style="font-size: 7.5pt; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin: 2px 0 0 0;">
-                TikTok Shop Logistics • ${printColumnMode === 'batch' ? 'Theo Dõi Số Lô &amp; Hạn Dùng Chuẩn Kho Vận' : 'Tự Động Gom Món &amp; Cộng Dồn Chuẩn Kho Vận'}
-              </p>
-            </div>
-          </div>
-          <div style="text-align: right; font-size: 8pt; color: #334155; line-height: 1.4;">
-            <div><span style="color: #64748b;">Thời gian in:</span> <strong style="color: #0f172a;">${nowStr}</strong></div>
-            <div><span style="color: #64748b;">Nguồn:</span> <strong>${globalStats.totalFiles} file PDF</strong> (${globalStats.totalOrders} đơn hàng)</div>
-            <div style="margin-top: 2px; font-size: 8.5pt;">
-              <span style="color: #64748b;">Mặt hàng:</span> <strong>${globalStats.uniqueProducts}</strong> (${globalStats.uniqueSkus} SKU) &nbsp;|&nbsp; 
-              <span style="color: #64748b;">TỔNG SL LẤY:</span> <span style="font-weight: 900; font-size: 11.5pt; color: #e11d48;">${globalStats.totalQty}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Table (1:1 TikTok Shop Layout with Images, Tracking Numbers and Order IDs / Lot numbers) -->
-        <table class="tiktok-print-table">
-          <thead>
-            <tr>
-              <th style="width: 28px; text-align: center;">No</th>
-              <th style="width: 46px; text-align: center;">Ảnh</th>
-              <th style="text-align: left;">Tên sản phẩm</th>
-              <th style="width: 115px; text-align: left;">SKU / Phân loại</th>
-              <th style="width: 44px; text-align: center;">SL</th>
-              <th style="width: 115px; text-align: left;">Mã vận đơn</th>
-              <th style="width: 130px; text-align: left;">${printColumnMode === 'batch' ? 'Số lô sản xuất / HSD' : 'Mã đơn (Order ID)'}</th>
-            </tr>
-          </thead>
+      // 2. Measure actual heights of all items in hidden container
+      measureHost.innerHTML = `
+        <table class="tiktok-print-table" style="width: 738px; table-layout: fixed;">
           <tbody>
-            ${tableRowsHtml}
+            ${itemsToPrint.map((it, idx) => renderItemRowsHtml(it, idx)).join('')}
           </tbody>
         </table>
-
-        <!-- Signatures Section (3 Columns: Người lập phiếu - Người nhận hàng - Thủ kho) -->
-        <div class="tiktok-print-signatures-section">
-          <div class="tiktok-print-date">
-            Ngày ${String(new Date().getDate()).padStart(2, '0')} tháng ${String(new Date().getMonth() + 1).padStart(2, '0')} năm ${new Date().getFullYear()}
-          </div>
-          <div class="tiktok-print-signatures">
-            <div class="tiktok-signature-block">
-              <div class="tiktok-signature-title">Người lập phiếu</div>
-              <div class="tiktok-signature-note">(Ký, ghi rõ họ tên)</div>
-              <div class="tiktok-signature-space"></div>
-              <div class="tiktok-signature-dots">...................................................</div>
-            </div>
-            <div class="tiktok-signature-block">
-              <div class="tiktok-signature-title">Người nhận hàng</div>
-              <div class="tiktok-signature-note">(Ký, ghi rõ họ tên)</div>
-              <div class="tiktok-signature-space"></div>
-              <div class="tiktok-signature-dots">...................................................</div>
-            </div>
-            <div class="tiktok-signature-block">
-              <div class="tiktok-signature-title">Thủ kho</div>
-              <div class="tiktok-signature-note">(Ký, ghi rõ họ tên)</div>
-              <div class="tiktok-signature-space"></div>
-              <div class="tiktok-signature-dots">...................................................</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom Footer (Official TikTok Shop branding) -->
-        <div class="tiktok-print-footer">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 20px; object-fit: contain;" />
-            <span style="font-size: 7.5pt; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.04em;">
-              TikTok Shop Logistics • Phiếu Nhặt Hàng Chuẩn Kho Vận
-            </span>
-          </div>
-          <div style="font-size: 7.5pt; color: #64748b; font-weight: 500;">
-            <span>Thời gian in: ${nowStr} &bull; Hệ thống tự động gom đơn</span>
-          </div>
-        </div>
       `;
+
+      const itemHeights = [];
+      const rows = measureHost.querySelectorAll('tr[data-item-idx]');
+      const groupRowsMap = new Map();
+      rows.forEach(r => {
+        const idx = parseInt(r.getAttribute('data-item-idx'));
+        if (!groupRowsMap.has(idx)) groupRowsMap.set(idx, []);
+        groupRowsMap.get(idx).push(r);
+      });
+
+      for (let i = 0; i < itemsToPrint.length; i++) {
+        const trs = groupRowsMap.get(i) || [];
+        let h = 0;
+        trs.forEach(tr => { h += tr.offsetHeight; });
+        itemHeights.push(Math.max(h, 42));
+      }
+
+      // Budgeting Limits (A4 = 1123px height)
+      const MAX_H_P1 = 920;
+      const MAX_H_PN = 970;
+      const SIG_HEIGHT = 135;
+
+      // 3. Partition items into discrete pages
+      const pages = [];
+      let currentPageItems = [];
+      let currentUsedHeight = 0;
+      let isFirstPage = true;
+
+      for (let i = 0; i < itemsToPrint.length; i++) {
+        const itemH = itemHeights[i];
+        const maxLimit = isFirstPage ? MAX_H_P1 : MAX_H_PN;
+
+        if (currentPageItems.length > 0 && (currentUsedHeight + itemH > maxLimit)) {
+          pages.push({
+            isFirstPage: isFirstPage,
+            items: currentPageItems,
+            hasSignatures: false
+          });
+          currentPageItems = [itemsToPrint[i]];
+          currentUsedHeight = itemH;
+          isFirstPage = false;
+        } else {
+          currentPageItems.push(itemsToPrint[i]);
+          currentUsedHeight += itemH;
+        }
+      }
+
+      // Handle signatures & page balancing
+      if (currentPageItems.length > 0) {
+        const maxLimit = isFirstPage ? MAX_H_P1 : MAX_H_PN;
+        if (currentUsedHeight + SIG_HEIGHT <= maxLimit) {
+          pages.push({
+            isFirstPage: isFirstPage,
+            items: currentPageItems,
+            hasSignatures: true
+          });
+        } else {
+          // If we have at least 3 items on the current page, move 2 to balance with signatures
+          if (currentPageItems.length >= 3) {
+            const lastItems = currentPageItems.splice(-2);
+            pages.push({
+              isFirstPage: isFirstPage,
+              items: currentPageItems,
+              hasSignatures: false
+            });
+            pages.push({
+              isFirstPage: false,
+              items: lastItems,
+              hasSignatures: true
+            });
+          } else if (currentPageItems.length === 2) {
+            const lastItem = currentPageItems.pop();
+            pages.push({
+              isFirstPage: isFirstPage,
+              items: currentPageItems,
+              hasSignatures: false
+            });
+            pages.push({
+              isFirstPage: false,
+              items: [lastItem],
+              hasSignatures: true
+            });
+          } else {
+            pages.push({
+              isFirstPage: isFirstPage,
+              items: currentPageItems,
+              hasSignatures: false
+            });
+            pages.push({
+              isFirstPage: false,
+              items: [],
+              hasSignatures: true
+            });
+          }
+        }
+      }
+
+      const totalPages = pages.length;
+
+      // 4. Render the Discrete A4 Pages into #printContainer
+      let globalItemIdx = 0;
+      let allPagesHtml = '';
+
+      pages.forEach((pageObj, pIdx) => {
+        const pageNum = pIdx + 1;
+        const isP1 = (pageNum === 1);
+
+        const headerHtml = isP1 ? `
+          <!-- Official Brand Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2pt solid #0f172a; padding-bottom: 8px; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 36px; object-fit: contain;" />
+              <div style="border-left: 1.5pt solid #cbd5e1; padding-left: 12px;">
+                <h1 style="font-size: 13.5pt; font-weight: 900; text-transform: uppercase; color: #0f172a; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">
+                  Picking List &bull; <span style="font-weight: 600; color: #475569; font-size: 11pt;">${printColumnMode === 'batch' ? 'Phiếu xuất kho' : 'Phiếu nhặt hàng'}</span>
+                </h1>
+                <p style="font-size: 7.5pt; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin: 2px 0 0 0;">
+                  TikTok Shop Logistics &bull; ${printColumnMode === 'batch' ? 'Theo dõi số lô &amp; hạn dùng' : 'Gom món &amp; cộng dồn kho vận'}
+                </p>
+              </div>
+            </div>
+            <div style="text-align: right; font-size: 8pt; color: #334155; line-height: 1.35;">
+              <div><span style="color: #64748b;">Thời gian in:</span> <strong style="color: #0f172a;">${nowStr}</strong></div>
+              <div><span style="color: #64748b;">Nguồn:</span> <strong>${globalStats.totalFiles} file PDF</strong> (${globalStats.totalOrders} đơn)</div>
+              <div style="margin-top: 1px; font-size: 8.5pt;">
+                <span style="color: #64748b;">Mặt hàng:</span> <strong>${globalStats.uniqueProducts}</strong> &bull; 
+                <span style="color: #64748b;">Tổng SL:</span> <span style="font-weight: 900; font-size: 11.5pt; color: #e11d48;">${globalStats.totalQty}</span>
+              </div>
+            </div>
+          </div>
+        ` : `
+          <!-- Running Header on subsequent pages -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5pt solid #0f172a; padding-bottom: 5px; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 20px; object-fit: contain;" />
+              <span style="font-size: 9pt; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: -0.01em;">
+                Picking List &bull; ${printColumnMode === 'batch' ? 'Phiếu xuất kho' : 'Phiếu nhặt hàng'} (Trang tiếp theo)
+              </span>
+            </div>
+            <div style="font-size: 8pt; color: #64748b; font-weight: 600;">
+              <span>Trang ${pageNum} / ${totalPages} &bull; ${nowStr}</span>
+            </div>
+          </div>
+        `;
+
+        const pageRowsHtml = pageObj.items.map(item => {
+          const rowHtml = renderItemRowsHtml(item, globalItemIdx);
+          globalItemIdx++;
+          return rowHtml;
+        }).join('');
+
+        const signaturesHtml = pageObj.hasSignatures ? `
+          <div class="tiktok-print-signatures-section" style="margin-top: 14px; page-break-inside: avoid; break-inside: avoid;">
+            <div class="tiktok-print-date" style="text-align: right; font-style: italic; font-size: 8pt; color: #334155; margin-bottom: 6px;">
+              Ngày ${String(new Date().getDate()).padStart(2, '0')} tháng ${String(new Date().getMonth() + 1).padStart(2, '0')} năm ${new Date().getFullYear()}
+            </div>
+            <div class="tiktok-print-signatures" style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 8px;">
+              <div class="tiktok-signature-block" style="flex: 1;">
+                <div style="font-weight: 800; font-size: 8.5pt; text-transform: uppercase; color: #0f172a;">Người lập phiếu</div>
+                <div style="font-size: 7.2pt; color: #64748b; font-style: italic; margin-top: 1px;">(Ký, ghi rõ họ tên)</div>
+                <div style="height: 48px;"></div>
+                <div style="font-size: 7.5pt; color: #94a3b8;">...................................................</div>
+              </div>
+              <div class="tiktok-signature-block" style="flex: 1;">
+                <div style="font-weight: 800; font-size: 8.5pt; text-transform: uppercase; color: #0f172a;">Người nhận hàng</div>
+                <div style="font-size: 7.2pt; color: #64748b; font-style: italic; margin-top: 1px;">(Ký, ghi rõ họ tên)</div>
+                <div style="height: 48px;"></div>
+                <div style="font-size: 7.5pt; color: #94a3b8;">...................................................</div>
+              </div>
+              <div class="tiktok-signature-block" style="flex: 1;">
+                <div style="font-weight: 800; font-size: 8.5pt; text-transform: uppercase; color: #0f172a;">Thủ kho</div>
+                <div style="font-size: 7.2pt; color: #64748b; font-style: italic; margin-top: 1px;">(Ký, ghi rõ họ tên)</div>
+                <div style="height: 48px;"></div>
+                <div style="font-size: 7.5pt; color: #94a3b8;">...................................................</div>
+              </div>
+            </div>
+          </div>
+        ` : '';
+
+        const footerHtml = `
+          <div class="tiktok-print-page-footer" style="position: absolute; bottom: 12px; left: 28px; right: 28px; border-top: 1pt solid #cbd5e1; padding-top: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; color: #64748b;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 14px; object-fit: contain;" />
+              <span style="font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.03em;">TikTok Shop Logistics &bull; Phiếu Nhặt Hàng Chuẩn Kho Vận</span>
+            </div>
+            <div style="font-weight: 600; color: #334155;">
+              Trang <strong>${pageNum}</strong> / <strong>${totalPages}</strong> &bull; Hệ thống tự động gom đơn
+            </div>
+          </div>
+        `;
+
+        allPagesHtml += `
+          <div class="pdf-a4-page" id="pdfA4Page_${pageNum}">
+            ${headerHtml}
+            ${pageObj.items.length > 0 ? `
+              <table class="tiktok-print-table" style="width: 738px; table-layout: fixed;">
+                <thead>
+                  <tr>
+                    <th style="width: 28px; text-align: center;">No</th>
+                    <th style="width: 44px; text-align: center;">Ảnh</th>
+                    <th style="text-align: left;">Tên sản phẩm</th>
+                    <th style="width: 110px; text-align: left;">SKU / Phân loại</th>
+                    <th style="width: 40px; text-align: center;">SL</th>
+                    <th style="width: 145px; text-align: left;">Mã vận đơn</th>
+                    <th style="width: 145px; text-align: left;">${printColumnMode === 'batch' ? 'Số lô &amp; Hạn dùng' : 'Mã đơn hàng'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${pageRowsHtml}
+                </tbody>
+              </table>
+            ` : ''}
+            ${signaturesHtml}
+            ${footerHtml}
+          </div>
+        `;
+      });
+
+      printContainer.innerHTML = allPagesHtml;
+      return totalPages;
     }
 
     function escapeHtml(str) {
