@@ -1207,263 +1207,267 @@
     </div>
   </div>
 
-  <!-- Combo & Packaging Rule Configuration Modal (2 Tabs: Packaging Spec & Combo Definition) -->
+  <!-- Combo & Packaging Rule Configuration Modal (Anti-Slop Redesign: 2 Tabs with Instant Search & Drawer) -->
   <div id="comboModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print" onclick="closeComboModal()">
-    <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+    <div class="bg-white border border-slate-200/80 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150" onclick="event.stopPropagation()">
       
       <!-- Modal Header -->
-      <div class="px-6 py-4.5 border-b border-slate-200 flex justify-between items-center bg-white">
-        <div class="flex items-center space-x-3.5">
-          <div class="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shadow-2xs">
-            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+      <div class="px-6 py-4 border-b border-slate-200/90 flex justify-between items-center bg-white">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center shadow-2xs shrink-0">
+            <i data-lucide="sliders" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-slate-900">Cấu Hình Quy Cách Đóng Gói &amp; Combo Sản Phẩm</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Phân tách rõ ràng: (1) Thùng/Hộp quy đổi lẻ &bull; (2) Combo nhiều món thành phần (Lưu vĩnh viễn)</p>
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 leading-tight">Cấu Hình Quy Cách Đóng Gói &amp; Combo</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Tự động nhận diện từ đơn hàng &bull; Đồng bộ lưu trữ vĩnh viễn trên máy chủ</p>
           </div>
         </div>
-        <button onclick="closeComboModal()" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-all cursor-pointer">
+        <button onclick="closeComboModal()" class="text-slate-400 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100 transition-all cursor-pointer" title="Đóng modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Tab Navigation -->
-      <div class="flex border-b border-slate-200 bg-slate-100/70 px-4 sm:px-6 pt-2 gap-2 select-none">
+      <!-- Tab Navigation (Segmented bar) -->
+      <div class="flex border-b border-slate-200/80 bg-slate-50/70 px-4 sm:px-6 pt-2 gap-2 select-none">
         <button id="tabBtnPackaging" type="button" onclick="switchConfigModalTab('packaging')"
-          class="flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-extrabold text-xs sm:text-sm transition-all border-emerald-600 text-emerald-700 bg-white rounded-t-xl shadow-2xs cursor-pointer">
+          class="flex items-center gap-2 px-4 sm:px-5 py-2.5 border-b-2 font-bold text-xs sm:text-sm transition-all border-emerald-600 text-emerald-700 bg-white rounded-t-xl shadow-2xs cursor-pointer">
           <i data-lucide="package" class="w-4 h-4 text-emerald-600"></i>
           <span>1. Quy Cách Đóng Gói (Thùng / Hộp)</span>
-          <span id="packagingTabBadge" class="ml-1 px-2 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800">0</span>
+          <span id="packagingTabBadge" class="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800">0</span>
         </button>
         <button id="tabBtnCombo" type="button" onclick="switchConfigModalTab('combo')"
-          class="flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-bold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer">
-          <i data-lucide="boxes" class="w-4 h-4 text-purple-600"></i>
-          <span>2. Định Nghĩa Combo (Bộ Nhiều Món)</span>
-          <span id="comboTabBadge" class="ml-1 px-2 py-0.5 text-[11px] font-black rounded-full bg-slate-200 text-slate-700">0</span>
+          class="flex items-center gap-2 px-4 sm:px-5 py-2.5 border-b-2 font-semibold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer">
+          <i data-lucide="boxes" class="w-4 h-4 text-indigo-600"></i>
+          <span>2. Định Nghĩa Bộ Combo (Nhiều Món)</span>
+          <span id="comboTabBadge" class="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-slate-200 text-slate-700">0</span>
         </button>
       </div>
 
       <!-- PANEL 1: QUY CÁCH ĐÓNG GÓI (THÙNG / HỘP) -->
-      <div id="panelPackaging" class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs">
-        <!-- Explanation Banner -->
-        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-          <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold mt-0.5 shadow-2xs">
-              <i data-lucide="package-check" class="w-4 h-4"></i>
-            </div>
-            <div class="space-y-0.5 min-w-0">
-              <div class="font-extrabold text-emerald-900 text-xs sm:text-sm">
-                Quy Cách Đóng Gói (Thùng, Hộp, Cặp, Lô &rarr; Quy đổi ra Món Lẻ)
-              </div>
-              <p class="text-emerald-800 leading-relaxed text-[11px] sm:text-xs">
-                Giúp hệ thống gom đúng số lượng thực tế cần lấy: <em>Ví dụ 1 Thùng NAVETCIDE 1L = 12 Chai lẻ; 1 Thùng Calcifort = 6 Chai lẻ; Thùng 12 gói = 12 gói</em>. Hệ thống tự động nhận diện từ PDF và quy đổi.
-              </p>
-            </div>
+      <div id="panelPackaging" class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+        
+        <!-- Action Toolbar & Search -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <!-- Instant Search -->
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="pkgSearchInput" oninput="filterPackagingRulesList(this.value)" placeholder="Tìm kiếm quy cách thùng, tên sản phẩm, SKU..." class="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all shadow-2xs" />
+            <button id="pkgClearSearchBtn" onclick="clearPkgSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
-          <button type="button" onclick="autoScanPackagingFromLoadedFiles()" class="shrink-0 w-full sm:w-auto px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Tự động quét quy cách thùng từ các file đã nạp">
-            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-            <span>Quét Thùng Từ File</span>
-          </button>
+
+          <!-- Buttons Group -->
+          <div class="flex items-center gap-2 flex-wrap shrink-0">
+            <button type="button" onclick="togglePackagingForm()" id="btnTogglePkgForm" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-2xs cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i>
+              <span>Thêm Mới</span>
+            </button>
+            <button type="button" onclick="autoScanPackagingFromLoadedFiles()" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Tự động nhận diện quy cách thùng từ các file đã nạp">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+              <span>Quét Thùng</span>
+            </button>
+            <button type="button" onclick="deduplicateAllRules(true)" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Dọn dẹp và gộp các quy tắc thùng bị trùng lặp">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+              <span>Dọn Trùng</span>
+            </button>
+            <!-- Secondary Utilities -->
+            <button type="button" onclick="resetDefaultPackagingRules()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer" title="Khôi phục 3 quy cách thùng chuẩn của shop">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="exportPackagingRules()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer" title="Xuất file JSON lưu trữ">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            </button>
+            <label class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer inline-flex items-center" title="Nhập cấu hình từ file JSON">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              <input type="file" id="importPkgInput" accept=".json" onchange="importPackagingRules(event)" class="hidden" />
+            </label>
+          </div>
         </div>
 
-        <!-- Add / Edit Packaging Form -->
-        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-4">
+        <!-- Collapsible Add / Edit Packaging Form Drawer -->
+        <div id="pkgFormContainer" class="hidden bg-slate-50/90 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3.5 transition-all">
           <input type="hidden" id="editingPkgId" value="" />
-          <div class="flex flex-wrap items-center justify-between gap-2.5">
-            <div class="font-bold text-slate-900 text-sm flex items-center" id="pkgFormHeaderTitle">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+            <div class="font-bold text-slate-900 text-xs sm:text-sm flex items-center" id="pkgFormHeaderTitle">
               <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
               <span>Thêm Quy Cách Đóng Gói Mới</span>
             </div>
             <!-- Quick Picker from Loaded Files -->
             <div class="flex items-center gap-2">
-              <span class="text-slate-600 font-semibold text-xs hidden sm:inline">Chọn nhanh từ file:</span>
-              <select id="quickPackagingSelect" onchange="onQuickPackagingSelected(this.value)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium max-w-[240px] focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs cursor-pointer">
+              <span class="text-slate-500 font-medium text-xs hidden sm:inline">Nạp nhanh từ file:</span>
+              <select id="quickPackagingSelect" onchange="onQuickPackagingSelected(this.value)" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 font-medium max-w-[220px] focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs cursor-pointer">
                 <option value="">-- Chọn sản phẩm trong file --</option>
               </select>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Tên quy cách hiển thị: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newPkgName" placeholder="VD: NAVETCIDE (Thùng 12 chai)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Tên quy cách hiển thị: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newPkgName" placeholder="VD: NAVETCIDE (Thùng 12 chai)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa Tên Sản Phẩm:</label>
-              <input type="text" id="newPkgProdKey" placeholder="VD: NAVETCIDE (để trống = mọi sản phẩm)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Từ khóa Tên Sản Phẩm:</label>
+              <input type="text" id="newPkgProdKey" placeholder="VD: NAVETCIDE (để trống = mọi sản phẩm)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa SKU / Phân loại: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newPkgSkuKey" placeholder="VD: Thùng 12, Thùng 6 chai, 3 cặp..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Từ khóa SKU / Phân loại: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newPkgSkuKey" placeholder="VD: Thùng 12, Thùng 6 chai, 3 cặp..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Số lượng lẻ trong 1 thùng: <span class="text-rose-600">*</span></label>
-                <input type="number" id="newPkgPackSize" min="1" value="12" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-black text-slate-900 shadow-2xs transition-all" />
+                <label class="block font-semibold text-slate-700 mb-1 text-xs">Số lượng món lẻ: <span class="text-rose-500">*</span></label>
+                <input type="number" id="newPkgPackSize" min="1" value="12" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-xs font-bold text-slate-900 shadow-2xs transition-all" />
               </div>
               <div>
-                <label class="block font-bold text-slate-800 mb-1.5 text-xs">Đơn vị lẻ quy đổi:</label>
-                <input type="text" id="newPkgUnit" placeholder="VD: Chai 1 lít, Gói, Chai 100ml..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+                <label class="block font-semibold text-slate-700 mb-1 text-xs">Đơn vị lẻ quy đổi:</label>
+                <input type="text" id="newPkgUnit" placeholder="VD: Chai 1L, Gói..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
               </div>
             </div>
           </div>
-          <div class="flex items-center justify-between pt-1">
-            <div id="pkgFormMessage" class="text-xs text-slate-600 italic"></div>
-            <div class="flex items-center gap-2.5">
-              <button id="btnCancelEditPkg" onclick="cancelEditPackaging()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
-                Hủy sửa
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/80">
+            <div id="pkgFormMessage" class="text-xs text-slate-500 italic"></div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btnCancelEditPkg" onclick="cancelEditPackaging()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 transition-all cursor-pointer">
+                Đóng
               </button>
-              <button id="btnSavePkg" onclick="handleSavePackagingRule()" class="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
-                <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
-                <span id="btnSavePkgText">Lưu Quy Cách Này</span>
+              <button type="button" id="btnSavePkg" onclick="handleSavePackagingRule()" class="inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+                <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i>
+                <span id="btnSavePkgText">Lưu Quy Cách</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Packaging Rules List -->
+        <!-- Packaging Rules List Header & Content -->
         <div>
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <span class="font-bold text-slate-900 text-sm flex items-center">
-              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-emerald-700"></i>
-              Danh Sách Quy Cách Thùng / Hộp (<span id="packagingListCount">0</span>)
+          <div class="flex items-center justify-between mb-2.5 px-0.5">
+            <span class="font-bold text-slate-800 text-xs flex items-center">
+              <span>Danh Sách Quy Cách</span>
+              <span class="ml-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px]" id="packagingListCount">0</span>
             </span>
-            <div class="flex items-center gap-2 flex-wrap">
-              <button type="button" onclick="resetDefaultPackagingRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition-all cursor-pointer shadow-2xs" title="Khôi phục 3 quy cách thùng chuẩn của shop">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
-                Khôi phục 3 quy cách chuẩn
-              </button>
-              <button onclick="exportPackagingRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
-                <i data-lucide="download" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
-                Xuất JSON
-              </button>
-              <label class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
-                <i data-lucide="upload" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
-                Nhập JSON
-                <input type="file" id="importPkgInput" accept=".json" onchange="importPackagingRules(event)" class="hidden" />
-              </label>
-              <button onclick="clearAllPackagingRules()" class="text-xs text-rose-600 hover:text-rose-800 font-bold transition-all cursor-pointer px-2 py-1">
-                Xóa tất cả
-              </button>
-            </div>
+            <span id="pkgFilterCount" class="text-[11px] text-slate-500"></span>
           </div>
-          <div id="packagingRulesList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+          <div id="packagingRulesList" class="space-y-2 max-h-[52vh] overflow-y-auto pr-1">
             <!-- Rendered by JS -->
           </div>
         </div>
       </div>
 
       <!-- PANEL 2: ĐỊNH NGHĨA COMBO (BỘ NHIỀU MÓN) -->
-      <div id="panelCombo" class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs hidden">
-        <!-- Explanation Banner -->
-        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-          <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 font-bold mt-0.5 shadow-2xs">
-              <i data-lucide="boxes" class="w-4 h-4"></i>
-            </div>
-            <div class="space-y-0.5 min-w-0">
-              <div class="font-extrabold text-purple-900 text-xs sm:text-sm">
-                Định Nghĩa Bộ Combo (Bộ Nhiều Món Khác Nhau)
-              </div>
-              <p class="text-purple-800 leading-relaxed text-[11px] sm:text-xs">
-                Dành cho các sản phẩm bán theo bộ gồm nhiều món khác nhau: <em>Ví dụ Combo Phục Hồi = 1 Calcifort 100ml + 1 ADE B.Complex 100ml; Combo Vỗ Béo = 1 Betazyme + 1 Vitamino</em>. Thành phần chi tiết sẽ hiện rõ trên Phiếu nhặt hàng &amp; Tem vận đơn.
-              </p>
-            </div>
+      <div id="panelCombo" class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 text-xs hidden">
+        
+        <!-- Action Toolbar & Search -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <!-- Instant Search -->
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="comboSearchInput" oninput="filterComboRulesList(this.value)" placeholder="Tìm kiếm theo tên combo, từ khóa sản phẩm, thành phần..." class="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all shadow-2xs" />
+            <button id="comboClearSearchBtn" onclick="clearComboSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
-          <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="shrink-0 w-full sm:w-auto px-3.5 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Tự động tìm kiếm các bộ combo trong file">
-            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-            <span>Quét Combo Từ File</span>
-          </button>
+
+          <!-- Buttons Group -->
+          <div class="flex items-center gap-2 flex-wrap shrink-0">
+            <button type="button" onclick="toggleComboForm()" id="btnToggleComboForm" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 active:scale-[0.98] transition-all shadow-2xs cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i>
+              <span>Thêm Mới</span>
+            </button>
+            <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Tự động tìm kiếm các bộ combo trong các file đã nạp">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-1 text-indigo-600"></i>
+              <span>Quét Combo</span>
+            </button>
+            <button type="button" onclick="deduplicateAllRules(true)" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Dọn dẹp và gộp các combo bị trùng lặp">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+              <span>Dọn Trùng</span>
+            </button>
+            <!-- Secondary Utilities -->
+            <button type="button" onclick="resetDefaultComboRules()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer" title="Khôi phục 3 combo chuẩn của shop">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="exportComboRulesOnly()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer" title="Xuất file JSON lưu trữ">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            </button>
+            <label class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer inline-flex items-center" title="Nhập cấu hình từ file JSON">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              <input type="file" id="importComboInput" accept=".json" onchange="importComboRulesOnly(event)" class="hidden" />
+            </label>
+          </div>
         </div>
 
-        <!-- Add / Edit Combo Form -->
-        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-4">
+        <!-- Collapsible Add / Edit Combo Form Drawer -->
+        <div id="comboFormContainer" class="hidden bg-slate-50/90 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3.5 transition-all">
           <input type="hidden" id="editingComboId" value="" />
-          <div class="flex flex-wrap items-center justify-between gap-2.5">
-            <div class="font-bold text-slate-900 text-sm flex items-center" id="comboFormHeaderTitle">
-              <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+            <div class="font-bold text-slate-900 text-xs sm:text-sm flex items-center" id="comboFormHeaderTitle">
+              <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-indigo-600"></i>
               <span>Thêm Định Nghĩa Combo Mới</span>
             </div>
             <!-- Quick Picker from Loaded Files -->
             <div class="flex items-center gap-2">
-              <span class="text-slate-600 font-semibold text-xs hidden sm:inline">Chọn nhanh từ file:</span>
-              <select id="quickComboSelect" onchange="onQuickComboSelected(this.value)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium max-w-[240px] focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-2xs cursor-pointer">
+              <span class="text-slate-500 font-medium text-xs hidden sm:inline">Nạp nhanh từ file:</span>
+              <select id="quickComboSelect" onchange="onQuickComboSelected(this.value)" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 font-medium max-w-[220px] focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer">
                 <option value="">-- Chọn sản phẩm trong file --</option>
               </select>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Tên Bộ Combo: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Cặp 100ml)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Tên Bộ Combo: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newComboName" placeholder="VD: Combo Phục Hồi (Cặp 100ml)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa Tên Sản Phẩm: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi, VỖ BÉO LITE, TIÊU CHẢY..." class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Từ khóa Tên Sản Phẩm: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newComboProdKey" placeholder="VD: Combo Phục hồi, VỖ BÉO LITE..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Từ khóa SKU / Phân loại:</label>
-              <input type="text" id="newComboSkuKey" placeholder="VD: Cặp 100ml (để trống = áp dụng cho mọi phân loại)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Từ khóa SKU / Phân loại:</label>
+              <input type="text" id="newComboSkuKey" placeholder="VD: Cặp 100ml (để trống = mọi phân loại)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
             <div>
-              <label class="block font-bold text-slate-800 mb-1.5 text-xs">Thành phần chi tiết trong Combo: <span class="text-rose-600">*</span></label>
-              <input type="text" id="newComboComponents" placeholder="VD: 1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
+              <label class="block font-semibold text-slate-700 mb-1 text-xs">Thành phần chi tiết trong Combo: <span class="text-rose-500">*</span></label>
+              <input type="text" id="newComboComponents" placeholder="VD: 1 Betazyme + 1 Vitamino..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-xs font-medium text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all" />
             </div>
           </div>
-          <div class="flex items-center justify-between pt-1">
-            <div id="comboFormMessage" class="text-xs text-slate-600 italic"></div>
-            <div class="flex items-center gap-2.5">
-              <button id="btnCancelEditCombo" onclick="cancelEditCombo()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-all cursor-pointer">
-                Hủy sửa
+          <div class="flex items-center justify-between pt-1 border-t border-slate-200/80">
+            <div id="comboFormMessage" class="text-xs text-slate-500 italic"></div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btnCancelEditCombo" onclick="cancelEditCombo()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 transition-all cursor-pointer">
+                Đóng
               </button>
-              <button id="btnSaveCombo" onclick="handleSaveComboRule()" class="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
-                <i data-lucide="check" class="w-4 h-4 mr-1.5"></i>
+              <button type="button" id="btnSaveCombo" onclick="handleSaveComboRule()" class="inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+                <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i>
                 <span id="btnSaveComboText">Lưu Combo Này</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Combo Rules List -->
+        <!-- Combo Rules List Header & Content -->
         <div>
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <span class="font-bold text-slate-900 text-sm flex items-center">
-              <i data-lucide="list-checks" class="w-4 h-4 mr-1.5 text-purple-700"></i>
-              Danh Sách Bộ Combo Đang Áp Dụng (<span id="comboListCount">0</span>)
+          <div class="flex items-center justify-between mb-2.5 px-0.5">
+            <span class="font-bold text-slate-800 text-xs flex items-center">
+              <span>Danh Sách Bộ Combo</span>
+              <span class="ml-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px]" id="comboListCount">0</span>
             </span>
-            <div class="flex items-center gap-2 flex-wrap">
-              <button type="button" onclick="resetDefaultComboRules()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 border border-purple-200 text-purple-800 hover:bg-purple-100 transition-all cursor-pointer shadow-2xs" title="Khôi phục 3 combo chuẩn của shop">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>
-                Khôi phục 3 combo chuẩn
-              </button>
-              <button onclick="exportComboRulesOnly()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
-                <i data-lucide="download" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
-                Xuất JSON
-              </button>
-              <label class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
-                <i data-lucide="upload" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
-                Nhập JSON
-                <input type="file" id="importComboInput" accept=".json" onchange="importComboRulesOnly(event)" class="hidden" />
-              </label>
-              <button onclick="clearAllComboRulesOnly()" class="text-xs text-rose-600 hover:text-rose-800 font-bold transition-all cursor-pointer px-2 py-1">
-                Xóa tất cả
-              </button>
-            </div>
+            <span id="comboFilterCount" class="text-[11px] text-slate-500"></span>
           </div>
-          <div id="comboRulesList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+          <div id="comboRulesList" class="space-y-2 max-h-[52vh] overflow-y-auto pr-1">
             <!-- Rendered by JS -->
           </div>
         </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-3">
+      <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-3">
         <div id="comboSyncStatus" class="text-xs font-semibold text-slate-700 flex items-center">
-          <i data-lucide="cloud" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
-          <span>Đã kết nối lưu trữ máy chủ &amp; trình duyệt</span>
+          <i data-lucide="cloud" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i>
+          <span>Đã đồng bộ máy chủ</span>
         </div>
-        <button onclick="closeComboModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs active:scale-[0.98]">
+        <button onclick="closeComboModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs active:scale-[0.98]">
           Đóng &amp; Áp Dụng Ngay
         </button>
       </div>
@@ -1677,8 +1681,11 @@
         comboRules = [...DEFAULT_ALL_RULES];
       }
 
+      // Auto deduplicate legacy duplicates if any
+      deduplicateAllRules(false);
+
       updateComboBadge();
-      updateSyncStatusText(loadedFromServer ? 'Đã đồng bộ từ máy chủ (Lưu vĩnh viễn)' : 'Đang sử dụng dữ liệu trình duyệt');
+      updateSyncStatusText(loadedFromServer ? 'Đã đồng bộ máy chủ' : 'Bộ nhớ trình duyệt');
       renderConfigRulesLists();
     }
 
@@ -1705,8 +1712,8 @@
           body: JSON.stringify(comboRules)
         });
         if (resp.ok) {
-          const nowStr = new Date().toLocaleTimeString('vi-VN');
-          updateSyncStatusText(`Đã lưu vĩnh viễn trên máy chủ lúc ${nowStr}`, 'success');
+          const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+          updateSyncStatusText(`Đã lưu máy chủ lúc ${nowStr}`, 'success');
         } else {
           updateSyncStatusText('Đã lưu trên máy (Máy chủ phản hồi ' + resp.status + ')', 'warn');
         }
@@ -1718,14 +1725,22 @@
     function updateSyncStatusText(msg, type = 'info') {
       const statusEl = document.getElementById('comboSyncStatus');
       if (!statusEl) return;
+      const pkgCount = comboRules.filter(r => r.category === 'packaging').length;
+      const comboCount = comboRules.filter(r => r.category === 'combo').length;
+      const countBadge = `<span class="opacity-75 font-normal ml-1">(${comboCount} combo &bull; ${pkgCount} thùng quy đổi)</span>`;
+
       if (type === 'success') {
-        statusEl.innerHTML = `<span class="inline-flex items-center text-emerald-600 font-semibold"><i data-lucide="cloud-check" class="w-3.5 h-3.5 mr-1 text-emerald-500"></i> ${escapeHtml(msg)}</span>`;
+        statusEl.innerHTML = `<span class="inline-flex items-center text-emerald-700 font-semibold text-[11px] bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full"><i data-lucide="cloud-check" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i> ${escapeHtml(msg)} ${countBadge}</span>`;
       } else if (type === 'warn') {
-        statusEl.innerHTML = `<span class="inline-flex items-center text-amber-600 font-semibold"><i data-lucide="hard-drive" class="w-3.5 h-3.5 mr-1 text-amber-500"></i> ${escapeHtml(msg)}</span>`;
+        statusEl.innerHTML = `<span class="inline-flex items-center text-amber-700 font-semibold text-[11px] bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-full"><i data-lucide="hard-drive" class="w-3.5 h-3.5 mr-1.5 text-amber-600"></i> ${escapeHtml(msg)} ${countBadge}</span>`;
       } else {
-        statusEl.innerHTML = `<span class="inline-flex items-center text-slate-500"><i data-lucide="cloud" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${escapeHtml(msg)}</span>`;
+        statusEl.innerHTML = `<span class="inline-flex items-center text-slate-600 font-medium text-[11px] bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full"><i data-lucide="cloud" class="w-3.5 h-3.5 mr-1.5 text-slate-500"></i> ${escapeHtml(msg)} ${countBadge}</span>`;
       }
       lucide.createIcons();
+    }
+
+    function normalizeRuleKey(str) {
+      return (str || '').toLowerCase().replace(/[\s\-_:,+.]+/g, ' ').trim();
     }
 
     function updateComboBadge() {
@@ -1758,20 +1773,20 @@
         if (panelCombo) panelCombo.classList.add('hidden');
 
         if (btnPkg) {
-          btnPkg.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-extrabold text-xs sm:text-sm transition-all border-emerald-600 text-emerald-700 bg-white rounded-t-xl shadow-2xs cursor-pointer';
+          btnPkg.className = 'flex items-center gap-2 px-4 sm:px-5 py-2.5 border-b-2 font-bold text-xs sm:text-sm transition-all border-emerald-600 text-emerald-700 bg-white rounded-t-xl shadow-2xs cursor-pointer';
         }
         if (btnCombo) {
-          btnCombo.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-bold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer';
+          btnCombo.className = 'flex items-center gap-2 px-4 sm:px-5 py-2.5 border-b-2 font-semibold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer';
         }
       } else {
         if (panelPkg) panelPkg.classList.add('hidden');
         if (panelCombo) panelCombo.classList.remove('hidden');
 
         if (btnCombo) {
-          btnCombo.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-extrabold text-xs sm:text-sm transition-all border-purple-600 text-purple-700 bg-white rounded-t-xl shadow-2xs cursor-pointer';
+          btnCombo.className = 'flex items-center gap-2 px-4 sm:px-5 py-2.5 border-b-2 font-bold text-xs sm:text-sm transition-all border-indigo-600 text-indigo-700 bg-white rounded-t-xl shadow-2xs cursor-pointer';
         }
         if (btnPkg) {
-          btnPkg.className = 'flex items-center gap-2 px-4 sm:px-5 py-3 border-b-2 font-bold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer';
+          btnPkg.className = 'flex items-center gap-2 px-4 sm:px-5 py-2.5 border-b-2 font-semibold text-xs sm:text-sm transition-all border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 rounded-t-xl cursor-pointer';
         }
       }
       lucide.createIcons();
@@ -1805,6 +1820,75 @@
       if (shippingOrders.length > 0) {
         sortAndRenderShippingOrders();
       }
+    }
+
+    // Toggle Collapsible Drawer Forms
+    function togglePackagingForm(forceState = null) {
+      const container = document.getElementById('pkgFormContainer');
+      const btn = document.getElementById('btnTogglePkgForm');
+      if (!container) return;
+      const shouldOpen = forceState !== null ? forceState : container.classList.contains('hidden');
+      if (shouldOpen) {
+        container.classList.remove('hidden');
+        if (btn) btn.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5 mr-1"></i><span>Đóng Form</span>`;
+        document.getElementById('newPkgName')?.focus();
+      } else {
+        container.classList.add('hidden');
+        if (btn) btn.innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i><span>Thêm Mới</span>`;
+      }
+      lucide.createIcons();
+    }
+
+    function toggleComboForm(forceState = null) {
+      const container = document.getElementById('comboFormContainer');
+      const btn = document.getElementById('btnToggleComboForm');
+      if (!container) return;
+      const shouldOpen = forceState !== null ? forceState : container.classList.contains('hidden');
+      if (shouldOpen) {
+        container.classList.remove('hidden');
+        if (btn) btn.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5 mr-1"></i><span>Đóng Form</span>`;
+        document.getElementById('newComboName')?.focus();
+      } else {
+        container.classList.add('hidden');
+        if (btn) btn.innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i><span>Thêm Mới</span>`;
+      }
+      lucide.createIcons();
+    }
+
+    // Search & Filter state
+    let pkgSearchQuery = '';
+    let comboSearchQuery = '';
+
+    function filterPackagingRulesList(q) {
+      pkgSearchQuery = (q || '').trim().toLowerCase();
+      const clearBtn = document.getElementById('pkgClearSearchBtn');
+      if (clearBtn) {
+        if (pkgSearchQuery) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      renderPackagingRulesList();
+    }
+
+    function clearPkgSearch() {
+      const input = document.getElementById('pkgSearchInput');
+      if (input) input.value = '';
+      filterPackagingRulesList('');
+    }
+
+    function filterComboRulesList(q) {
+      comboSearchQuery = (q || '').trim().toLowerCase();
+      const clearBtn = document.getElementById('comboClearSearchBtn');
+      if (clearBtn) {
+        if (comboSearchQuery) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      renderComboRulesList();
+    }
+
+    function clearComboSearch() {
+      const input = document.getElementById('comboSearchInput');
+      if (input) input.value = '';
+      filterComboRulesList('');
     }
 
     // Populate the quick picker dropdowns from loaded files
@@ -1843,23 +1927,12 @@
       window._quickProductOptions = options;
 
       if (selectPkg) {
-        selectPkg.innerHTML = '<option value="">-- Chọn sản phẩm trong file --</option>';
-        options.forEach((opt, idx) => {
-          const el = document.createElement('option');
-          el.value = idx;
-          el.textContent = opt.label;
-          selectPkg.appendChild(el);
-        });
+        selectPkg.innerHTML = '<option value="">-- Chọn sản phẩm trong file --</option>' +
+          options.map((opt, idx) => `<option value="${idx}">${escapeHtml(opt.label)}</option>`).join('');
       }
-
       if (selectCombo) {
-        selectCombo.innerHTML = '<option value="">-- Chọn sản phẩm trong file --</option>';
-        options.forEach((opt, idx) => {
-          const el = document.createElement('option');
-          el.value = idx;
-          el.textContent = opt.label;
-          selectCombo.appendChild(el);
-        });
+        selectCombo.innerHTML = '<option value="">-- Chọn sản phẩm trong file --</option>' +
+          options.map((opt, idx) => `<option value="${idx}">${escapeHtml(opt.label)}</option>`).join('');
       }
     }
 
@@ -1868,15 +1941,15 @@
       const opt = window._quickProductOptions[parseInt(idxStr, 10)];
       if (!opt) return;
 
-      document.getElementById('newPkgName').value = `${opt.productName.slice(0, 25)} (${opt.sku})`;
-      document.getElementById('newPkgProdKey').value = opt.productName.slice(0, 30);
-      document.getElementById('newPkgSkuKey').value = opt.sku;
-
-      const numMatch = opt.sku.match(/\d+/);
-      if (numMatch) {
-        const num = parseInt(numMatch[0], 10);
-        if (num > 1 && num <= 100) {
-          document.getElementById('newPkgPackSize').value = num;
+      document.getElementById('newPkgName').value = `${opt.productName.slice(0, 28)} (${opt.sku})`;
+      document.getElementById('newPkgProdKey').value = opt.productName.slice(0, 28);
+      document.getElementById('newPkgSkuKey').value = opt.sku === 'Mặc định' ? '' : opt.sku;
+      
+      const thungM = opt.sku.match(/(\d+)/);
+      if (thungM) {
+        const count = parseInt(thungM[1], 10);
+        if (count > 1) {
+          document.getElementById('newPkgPackSize').value = count;
         }
       }
       document.getElementById('newPkgUnit').value = 'Món lẻ';
@@ -1965,11 +2038,12 @@
 
       document.getElementById('pkgFormHeaderTitle').innerHTML = `
         <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
-        <span>Đang Sửa Quy Cách: <strong class="text-emerald-700">${escapeHtml(rule.name)}</strong></span>
+        <span>Đang Sửa: <strong class="text-emerald-700">${escapeHtml(rule.name)}</strong></span>
       `;
-      document.getElementById('btnSavePkgText').textContent = 'Cập Nhật Quy Cách';
+      document.getElementById('btnSavePkgText').textContent = 'Cập Nhật';
       document.getElementById('btnCancelEditPkg').classList.remove('hidden');
 
+      togglePackagingForm(true);
       lucide.createIcons();
       document.getElementById('newPkgName').focus();
     }
@@ -1988,8 +2062,8 @@
         <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
         <span>Thêm Quy Cách Đóng Gói Mới</span>
       `;
-      document.getElementById('btnSavePkgText').textContent = 'Lưu Quy Cách Này';
-      document.getElementById('btnCancelEditPkg').classList.add('hidden');
+      document.getElementById('btnSavePkgText').textContent = 'Lưu Quy Cách';
+      togglePackagingForm(false);
       lucide.createIcons();
     }
 
@@ -2056,16 +2130,19 @@
             alert('Không tìm thấy quy cách hợp lệ trong file!');
             return;
           }
-          const existingKeys = new Set(comboRules.filter(r => r.category === 'packaging').map(r => (r.productKeyword || '') + '|||' + r.skuKeyword));
+          const existingKeys = new Set(comboRules.filter(r => r.category === 'packaging').map(r => normalizeRuleKey(r.productKeyword) + '|||' + normalizeRuleKey(r.skuKeyword)));
+          let addedCount = 0;
           valid.forEach(r => {
-            const k = (r.productKeyword || '') + '|||' + r.skuKeyword;
+            const k = normalizeRuleKey(r.productKeyword) + '|||' + normalizeRuleKey(r.skuKeyword);
             if (!existingKeys.has(k)) {
+              existingKeys.add(k);
               r.id = r.id || ('pkg_' + Date.now() + Math.random().toString(36).substr(2, 4));
               comboRules.unshift(r);
+              addedCount++;
             }
           });
           saveComboRules(comboRules);
-          showToast(`Đã nạp ${valid.length} quy cách từ file JSON!`);
+          showToast(`Đã nạp ${addedCount} quy cách mới từ file JSON!`);
         } catch (err) {
           alert('Lỗi đọc file JSON: ' + err.message);
         }
@@ -2076,7 +2153,7 @@
 
     function autoScanPackagingFromLoadedFiles() {
       const candidates = [];
-      const seenKeys = new Set(comboRules.filter(r => r.category === 'packaging').map(r => ((r.productKeyword || '').toLowerCase() + '|||' + (r.skuKeyword || '').toLowerCase())));
+      let duplicatesSkipped = 0;
 
       const examineItem = (productName, sku) => {
         const pClean = cleanItemProductName(productName);
@@ -2131,15 +2208,30 @@
         }
 
         if (detected) {
-          const k = ((detected.productKeyword || '').toLowerCase() + '|||' + (detected.skuKeyword || '').toLowerCase());
-          if (!seenKeys.has(k)) {
-            seenKeys.add(k);
-            candidates.push({
-              id: 'pkg_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-              category: 'packaging',
-              ...detected
-            });
+          const normProd = normalizeRuleKey(detected.productKeyword);
+          const normSku = normalizeRuleKey(detected.skuKeyword);
+
+          const exists = comboRules.some(r => {
+            if (r.category !== 'packaging') return false;
+            const rProd = normalizeRuleKey(r.productKeyword || '');
+            const rSku = normalizeRuleKey(r.skuKeyword || '');
+            return (rProd === normProd || (!rProd && !normProd)) && rSku === normSku;
+          }) || candidates.some(c => {
+            const cProd = normalizeRuleKey(c.productKeyword);
+            const cSku = normalizeRuleKey(c.skuKeyword);
+            return (cProd === normProd || (!cProd && !normProd)) && cSku === normSku;
+          });
+
+          if (exists) {
+            duplicatesSkipped++;
+            return;
           }
+
+          candidates.push({
+            id: 'pkg_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            category: 'packaging',
+            ...detected
+          });
         }
       };
 
@@ -2155,13 +2247,17 @@
       }
 
       if (candidates.length === 0) {
-        showToast('Không tìm thấy thêm quy cách thùng/hộp mới nào từ các file đã nạp.');
+        if (duplicatesSkipped > 0) {
+          showToast(`Tất cả ${duplicatesSkipped} quy cách thùng trong file đã có trong danh sách!`);
+        } else {
+          showToast('Không tìm thấy thêm quy cách thùng/hộp mới nào từ các file đã nạp.');
+        }
         return;
       }
 
       comboRules = [...candidates, ...comboRules];
       saveComboRules(comboRules);
-      showToast(`Đã tự động nhận diện & nạp thêm ${candidates.length} quy cách đóng gói từ file!`);
+      showToast(`Đã thêm mới ${candidates.length} quy cách đóng gói! (${duplicatesSkipped} quy cách đã tồn tại được bỏ qua)`);
     }
 
     // ==========================================
@@ -2234,12 +2330,13 @@
       document.getElementById('newComboComponents').value = rule.components || '';
 
       document.getElementById('comboFormHeaderTitle').innerHTML = `
-        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-purple-600"></i>
-        <span>Đang Sửa Combo: <strong class="text-purple-700">${escapeHtml(rule.name)}</strong></span>
+        <i data-lucide="edit-3" class="w-4 h-4 mr-1.5 text-indigo-600"></i>
+        <span>Đang Sửa: <strong class="text-indigo-700">${escapeHtml(rule.name)}</strong></span>
       `;
-      document.getElementById('btnSaveComboText').textContent = 'Cập Nhật Combo';
+      document.getElementById('btnSaveComboText').textContent = 'Cập Nhật';
       document.getElementById('btnCancelEditCombo').classList.remove('hidden');
 
+      toggleComboForm(true);
       lucide.createIcons();
       document.getElementById('newComboName').focus();
     }
@@ -2254,11 +2351,11 @@
       if (quickSel) quickSel.value = '';
 
       document.getElementById('comboFormHeaderTitle').innerHTML = `
-        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-purple-600"></i>
+        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5 text-indigo-600"></i>
         <span>Thêm Định Nghĩa Combo Mới</span>
       `;
-      document.getElementById('btnSaveComboText').textContent = 'Lưu Combo Này';
-      document.getElementById('btnCancelEditCombo').classList.add('hidden');
+      document.getElementById('btnSaveComboText').textContent = 'Lưu Combo';
+      toggleComboForm(false);
       lucide.createIcons();
     }
 
@@ -2325,16 +2422,19 @@
             alert('Không tìm thấy combo hợp lệ trong file!');
             return;
           }
-          const existingKeys = new Set(comboRules.filter(r => r.category === 'combo').map(r => (r.productKeyword || '').toLowerCase()));
+          const existingKeys = new Set(comboRules.filter(r => r.category === 'combo').map(r => normalizeRuleKey(r.productKeyword || r.name)));
+          let addedCount = 0;
           valid.forEach(r => {
-            const k = (r.productKeyword || '').toLowerCase();
+            const k = normalizeRuleKey(r.productKeyword || r.name);
             if (!existingKeys.has(k)) {
+              existingKeys.add(k);
               r.id = r.id || ('combo_' + Date.now() + Math.random().toString(36).substr(2, 4));
               comboRules.push(r);
+              addedCount++;
             }
           });
           saveComboRules(comboRules);
-          showToast(`Đã nạp ${valid.length} combo từ file JSON!`);
+          showToast(`Đã nạp ${addedCount} combo mới từ file JSON!`);
         } catch (err) {
           alert('Lỗi đọc file JSON: ' + err.message);
         }
@@ -2343,27 +2443,70 @@
       event.target.value = '';
     }
 
+    // Smart and bulletproof combo scanner with duplicate prevention
     function autoScanCombosFromLoadedFiles() {
       const candidates = [];
-      const seenKeys = new Set(comboRules.filter(r => r.category === 'combo').map(r => (r.productKeyword || '').toLowerCase()));
+      let duplicatesSkipped = 0;
 
       const checkComboName = (prodName, sku) => {
         const pClean = cleanItemProductName(prodName);
         const sClean = cleanSku(sku);
         const text = `${pClean} ${sClean}`.toLowerCase();
         if (text.includes('combo') || text.includes('bộ đôi') || text.includes('cặp đôi') || text.includes('combo vỗ béo') || text.includes('combo phục hồi')) {
-          const k = pClean.toLowerCase();
-          if (!seenKeys.has(k)) {
-            seenKeys.add(k);
-            candidates.push({
-              id: 'combo_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-              category: 'combo',
-              name: pClean.slice(0, 32),
-              productKeyword: pClean.slice(0, 30),
-              skuKeyword: sClean === 'Mặc định' ? '' : sClean,
-              components: `Gồm các món theo mô tả: ${pClean.slice(0, 30)}`
-            });
+
+          // Extract combo title and components
+          let comboTitle = pClean;
+          let components = '';
+          if (pClean.includes(':')) {
+            const parts = pClean.split(':');
+            comboTitle = parts[0].trim();
+            components = parts.slice(1).join(':').trim();
+          } else if (pClean.includes('_')) {
+            const parts = pClean.split('_');
+            comboTitle = parts[0].trim();
+            components = parts.slice(1).join('_').trim();
+          } else if (pClean.includes('+')) {
+            comboTitle = pClean.split('+')[0].trim();
+            components = pClean;
           }
+
+          if (!components) {
+            components = `Gồm các món theo mô tả: ${pClean}`;
+          }
+
+          const normClean = normalizeRuleKey(pClean);
+          const normTitle = normalizeRuleKey(comboTitle);
+
+          // Check against existing combo rules and newly identified candidates
+          const exists = comboRules.some(r => {
+            if (r.category !== 'combo') return false;
+            const rProd = normalizeRuleKey(r.productKeyword || '');
+            const rName = normalizeRuleKey(r.name || '');
+            if (rProd === normClean || rProd === normTitle) return true;
+            if (rName === normClean || rName === normTitle) return true;
+            if (rProd.length > 12 && (normClean.includes(rProd) || rProd.includes(normClean))) return true;
+            if (rName.length > 12 && (normClean.includes(rName) || rName.includes(normClean))) return true;
+            return false;
+          }) || candidates.some(c => {
+            const cProd = normalizeRuleKey(c.productKeyword);
+            const cName = normalizeRuleKey(c.name);
+            return cProd === normClean || cProd === normTitle || cName === normClean || cName === normTitle;
+          });
+
+          if (exists) {
+            duplicatesSkipped++;
+            return;
+          }
+
+          candidates.push({
+            id: 'combo_auto_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            category: 'combo',
+            name: comboTitle.slice(0, 36),
+            productKeyword: comboTitle.slice(0, 36),
+            skuKeyword: sClean === 'Mặc định' ? '' : sClean,
+            components: components.slice(0, 100),
+            createdAt: Date.now()
+          });
         }
       };
 
@@ -2379,13 +2522,69 @@
       }
 
       if (candidates.length === 0) {
-        showToast('Không tìm thấy thêm tên combo nào từ các file đã nạp.');
+        if (duplicatesSkipped > 0) {
+          showToast(`Tất cả ${duplicatesSkipped} combo trong file đã có trong danh sách! (Đã bỏ qua trùng lặp)`);
+        } else {
+          showToast('Không tìm thấy tên combo nào từ các file đã nạp.');
+        }
         return;
       }
 
       comboRules = [...comboRules, ...candidates];
       saveComboRules(comboRules);
-      showToast(`Đã tự động tìm thấy và thêm ${candidates.length} bộ combo từ file!`);
+      showToast(`Đã thêm mới ${candidates.length} bộ combo! (${duplicatesSkipped} combo đã tồn tại được bỏ qua)`);
+    }
+
+    // 1-Click Clean and Deduplicate All Rules
+    function deduplicateAllRules(showNotification = false) {
+      const seenPkg = new Map();
+      const seenCombo = new Map();
+      let duplicatesCount = 0;
+      const cleanList = [];
+
+      comboRules.forEach(rule => {
+        if (!rule) return;
+        const cat = rule.category === 'packaging' ? 'packaging' : 'combo';
+        if (cat === 'packaging') {
+          const key = `${normalizeRuleKey(rule.productKeyword)}|||${normalizeRuleKey(rule.skuKeyword)}|||${rule.packSize || 1}`;
+          if (!seenPkg.has(key)) {
+            seenPkg.set(key, rule);
+            cleanList.push(rule);
+          } else {
+            duplicatesCount++;
+          }
+        } else {
+          // Combo deduplication
+          const normName = normalizeRuleKey(rule.name || rule.productKeyword || '');
+          let matchedKey = null;
+          for (const k of seenCombo.keys()) {
+            if (k === normName || (k.length > 12 && normName.length > 12 && (k.includes(normName) || normName.includes(k)))) {
+              matchedKey = k;
+              break;
+            }
+          }
+          if (!matchedKey) {
+            seenCombo.set(normName, rule);
+            cleanList.push(rule);
+          } else {
+            duplicatesCount++;
+            const existing = seenCombo.get(matchedKey);
+            if ((rule.components || '').length > (existing.components || '').length) {
+              existing.components = rule.components;
+            }
+          }
+        }
+      });
+
+      if (duplicatesCount > 0 || cleanList.length !== comboRules.length) {
+        comboRules = cleanList;
+        saveComboRules(comboRules);
+        if (showNotification) {
+          showToast(`Đã dọn dẹp và gộp ${duplicatesCount} mục trùng lặp! Còn lại ${comboRules.length} quy tắc chuẩn.`);
+        }
+      } else if (showNotification) {
+        showToast(`Danh sách đã chuẩn xác, không phát hiện mục trùng lặp nào (${comboRules.length} quy tắc).`);
+      }
     }
 
     // ==========================================
@@ -2400,14 +2599,41 @@
     function renderPackagingRulesList() {
       const container = document.getElementById('packagingRulesList');
       if (!container) return;
-      const list = comboRules.filter(r => r.category === 'packaging');
+      const allPkgs = comboRules.filter(r => r.category === 'packaging');
+      const list = pkgSearchQuery
+        ? allPkgs.filter(r =>
+            (r.name || '').toLowerCase().includes(pkgSearchQuery) ||
+            (r.productKeyword || '').toLowerCase().includes(pkgSearchQuery) ||
+            (r.skuKeyword || '').toLowerCase().includes(pkgSearchQuery) ||
+            (r.unit || '').toLowerCase().includes(pkgSearchQuery) ||
+            String(r.packSize || '').includes(pkgSearchQuery)
+          )
+        : allPkgs;
+
+      const filterCountEl = document.getElementById('pkgFilterCount');
+      if (filterCountEl) {
+        filterCountEl.textContent = pkgSearchQuery ? `Hiển thị ${list.length} / ${allPkgs.length}` : '';
+      }
+
+      if (allPkgs.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200 space-y-2">
+            <i data-lucide="package" class="w-7 h-7 mx-auto text-slate-400"></i>
+            <div class="font-bold text-slate-700 text-sm">Chưa có quy cách đóng gói nào</div>
+            <div class="text-xs text-slate-500">Bấm nút "+ Thêm Mới" hoặc "Quét Thùng" để nạp từ file.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
 
       if (list.length === 0) {
         container.innerHTML = `
-          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
-            <i data-lucide="package" class="w-7 h-7 mx-auto text-slate-400"></i>
-            <div class="font-bold text-slate-700 text-sm">Chưa có quy cách đóng gói nào</div>
-            <div class="text-xs text-slate-500">Hãy thêm quy cách thùng/hộp ở form phía trên hoặc bấm "Quét Thùng Từ File".</div>
+          <div class="p-6 text-center text-slate-500 bg-white rounded-xl border border-slate-200 space-y-2">
+            <div class="font-medium text-xs">Không tìm thấy quy cách khớp từ khóa "${escapeHtml(pkgSearchQuery)}"</div>
+            <button onclick="clearPkgSearch()" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
+              Xóa tìm kiếm
+            </button>
           </div>
         `;
         lucide.createIcons();
@@ -2415,24 +2641,24 @@
       }
 
       container.innerHTML = list.map(rule => `
-        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all flex items-center justify-between gap-4">
-          <div class="space-y-1.5 min-w-0 flex-1">
-            <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all flex items-center justify-between gap-3">
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(rule.name)}</span>
-              <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+              <span class="px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
                 1 THÙNG = ${rule.packSize} ${escapeHtml(rule.unit || 'món lẻ')}
               </span>
             </div>
-            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-2">
-              ${rule.productKeyword ? `<span class="font-semibold text-slate-700">Sản phẩm:</span> <span class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-900 font-medium">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-500 font-medium">Mọi sản phẩm &bull; </span>'}
-              <span class="font-semibold text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-900 font-mono text-xs font-bold">${escapeHtml(rule.skuKeyword)}</code>
+            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-2">
+              ${rule.productKeyword ? `<span class="font-medium text-slate-600">Sản phẩm:</span> <span class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-800 font-medium font-mono text-[11px]">"${escapeHtml(rule.productKeyword)}"</span> &bull; ` : '<span class="text-slate-400">Mọi sản phẩm &bull; </span>'}
+              <span class="font-medium text-slate-600">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-800 font-mono text-[11px] font-bold">${escapeHtml(rule.skuKeyword)}</code>
             </div>
           </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button onclick="editPackagingRule('${rule.id}')" class="p-2 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa quy cách này">
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="editPackagingRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all cursor-pointer" title="Chỉnh sửa quy cách này">
               <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
-            <button onclick="deletePackagingRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa quy cách này">
+            <button onclick="deletePackagingRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Xóa quy cách này">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -2444,14 +2670,40 @@
     function renderComboRulesList() {
       const container = document.getElementById('comboRulesList');
       if (!container) return;
-      const list = comboRules.filter(r => r.category === 'combo');
+      const allCombos = comboRules.filter(r => r.category === 'combo');
+      const list = comboSearchQuery
+        ? allCombos.filter(r =>
+            (r.name || '').toLowerCase().includes(comboSearchQuery) ||
+            (r.productKeyword || '').toLowerCase().includes(comboSearchQuery) ||
+            (r.skuKeyword || '').toLowerCase().includes(comboSearchQuery) ||
+            (r.components || '').toLowerCase().includes(comboSearchQuery)
+          )
+        : allCombos;
+
+      const filterCountEl = document.getElementById('comboFilterCount');
+      if (filterCountEl) {
+        filterCountEl.textContent = comboSearchQuery ? `Hiển thị ${list.length} / ${allCombos.length}` : '';
+      }
+
+      if (allCombos.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200 space-y-2">
+            <i data-lucide="boxes" class="w-7 h-7 mx-auto text-slate-400"></i>
+            <div class="font-bold text-slate-700 text-sm">Chưa có định nghĩa combo nào</div>
+            <div class="text-xs text-slate-500">Bấm nút "+ Thêm Mới" hoặc "Quét Combo" để nạp từ file.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
 
       if (list.length === 0) {
         container.innerHTML = `
-          <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300 space-y-2">
-            <i data-lucide="boxes" class="w-7 h-7 mx-auto text-slate-400"></i>
-            <div class="font-bold text-slate-700 text-sm">Chưa có định nghĩa combo nào</div>
-            <div class="text-xs text-slate-500">Hãy thêm bộ combo ở form phía trên để công nhân biết rõ các món cần nhặt.</div>
+          <div class="p-6 text-center text-slate-500 bg-white rounded-xl border border-slate-200 space-y-2">
+            <div class="font-medium text-xs">Không tìm thấy combo khớp từ khóa "${escapeHtml(comboSearchQuery)}"</div>
+            <button onclick="clearComboSearch()" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
+              Xóa tìm kiếm
+            </button>
           </div>
         `;
         lucide.createIcons();
@@ -2459,25 +2711,25 @@
       }
 
       container.innerHTML = list.map(rule => `
-        <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-purple-300 hover:shadow-xs transition-all flex items-center justify-between gap-4">
-          <div class="space-y-1.5 min-w-0 flex-1">
-            <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex items-center justify-between gap-3">
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="font-bold text-slate-900 text-xs sm:text-sm truncate">${escapeHtml(rule.name)}</span>
-              <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-purple-50 text-purple-800 border border-purple-200/80 flex items-center gap-1">
-                <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600"></i>
-                <span>GỒM: <strong>${escapeHtml(rule.components || 'Chi tiết món')}</strong></span>
+              <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-1.5">
+                <i data-lucide="boxes" class="w-3.5 h-3.5 text-indigo-600"></i>
+                <span>GỒM: <strong class="text-slate-900">${escapeHtml(rule.components || 'Chi tiết món')}</strong></span>
               </span>
             </div>
-            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-2">
-              <span class="font-semibold text-slate-700">Khớp SP:</span> <span class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-900 font-medium">"${escapeHtml(rule.productKeyword)}"</span>
-              ${rule.skuKeyword ? `&bull; <span class="font-semibold text-slate-700">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-900 font-mono text-xs font-bold">${escapeHtml(rule.skuKeyword)}</code>` : ''}
+            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-2">
+              <span class="font-medium text-slate-600">Khớp SP:</span> <span class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-800 font-mono text-[11px] font-medium">"${escapeHtml(rule.productKeyword)}"</span>
+              ${rule.skuKeyword ? `&bull; <span class="font-medium text-slate-600">Khớp SKU:</span> <code class="bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded text-slate-800 font-mono text-[11px] font-bold">${escapeHtml(rule.skuKeyword)}</code>` : ''}
             </div>
           </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button onclick="editComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-purple-700 hover:bg-purple-50 rounded-xl transition-all cursor-pointer" title="Chỉnh sửa combo này">
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="editComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all cursor-pointer" title="Chỉnh sửa combo này">
               <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
-            <button onclick="deleteComboRule('${rule.id}')" class="p-2 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Xóa combo này">
+            <button onclick="deleteComboRule('${rule.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Xóa combo này">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -2519,6 +2771,14 @@
     window.openComboModal = openComboModal;
     window.closeComboModal = closeComboModal;
     window.switchConfigModalTab = switchConfigModalTab;
+    window.togglePackagingForm = togglePackagingForm;
+    window.toggleComboForm = toggleComboForm;
+    window.filterPackagingRulesList = filterPackagingRulesList;
+    window.clearPkgSearch = clearPkgSearch;
+    window.filterComboRulesList = filterComboRulesList;
+    window.clearComboSearch = clearComboSearch;
+    window.deduplicateAllRules = deduplicateAllRules;
+
     window.handleSavePackagingRule = handleSavePackagingRule;
     window.editPackagingRule = editPackagingRule;
     window.cancelEditPackaging = cancelEditPackaging;
