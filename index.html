@@ -1747,7 +1747,7 @@
         id: "combo_chuyen_ho_hap",
         category: "combo",
         name: "COMBO Chuyên Hô Hấp _ Navet-Flor + Doxy-T",
-        productKeyword: "Navet-Flor + Doxy-T",
+        productKeyword: "Chuyên Hô Hấp",
         skuKeyword: "",
         components: "1 Navet-Flor (100ml) + 1 Navet-Doxy-T (100ml)"
       },
@@ -1947,6 +1947,9 @@
         } else {
           r.category = 'packaging';
         }
+      }
+      if (r.id === 'combo_chuyen_ho_hap' || (r.name && r.name.toLowerCase().includes('chuyên hô hấp'))) {
+        r.productKeyword = 'Chuyên Hô Hấp';
       }
       return r;
     }
@@ -3085,15 +3088,40 @@
       return null;
     }
 
+    function normalizeMatchText(str) {
+      if (!str) return '';
+      return str
+        .toLowerCase()
+        .replace(/[\-_–—]/g, '-')
+        .replace(/\s*-\s*/g, '-')
+        .replace(/\s*\+\s*/g, '+')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     function findMatchingComboRule(productName = '', skuStr = '') {
-      const p = (productName || '').toLowerCase();
-      const s = (skuStr || '').toLowerCase();
-      if (!p && !s) return null;
+      if (!productName && !skuStr) return null;
+      const pNorm = normalizeMatchText(productName);
+      const sNorm = normalizeMatchText(skuStr);
 
       for (const rule of comboRules) {
         if (rule.category !== 'combo') continue;
-        const matchProd = !rule.productKeyword || p.includes(rule.productKeyword.toLowerCase());
-        const matchSku = !rule.skuKeyword || (s && s.includes(rule.skuKeyword.toLowerCase()));
+        const kwNorm = normalizeMatchText(rule.productKeyword);
+        const nameNorm = normalizeMatchText((rule.name || '').split('(')[0]);
+        const skuRuleNorm = normalizeMatchText(rule.skuKeyword);
+
+        let matchProd = false;
+        if (!kwNorm) {
+          matchProd = true;
+        } else if (pNorm.includes(kwNorm)) {
+          matchProd = true;
+        } else if (nameNorm && pNorm.includes(nameNorm)) {
+          matchProd = true;
+        } else if (rule.id === 'combo_chuyen_ho_hap' && (pNorm.includes('chuyen ho hap') || pNorm.includes('chuyên hô hấp'))) {
+          matchProd = true;
+        }
+
+        const matchSku = !skuRuleNorm || (sNorm && sNorm.includes(skuRuleNorm));
         if (matchProd && matchSku) return rule;
       }
       return null;
@@ -3200,6 +3228,7 @@
         const mParen = name.match(/\(([^)]+)\)/);
         if (mParen) {
           sku = mParen[1].trim();
+          name = name.replace(/\(([^)]+)\)/, '').trim();
         } else {
           const mVol = name.match(/(\d+\s*(?:ml|g|kg|l|can|chai|gói|hộp|lọ|túi|vỉ))\b/i);
           if (mVol) sku = mVol[1].trim();
@@ -3207,6 +3236,36 @@
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
       return res;
+    }
+
+    // Extract significant dosage / numeric identifiers that distinguish products
+    // e.g., '200' in 'Fer 200', '100' in 'Excel 100', '50%' in 'Doxy 50%', '10%' in 'Lincomycin 10%', 'la' in 'Amoxy LA'
+    function getProductDosageTokens(str) {
+      if (!str) return new Set();
+      // Remove volume/packaging units like 100ml, 1kg, 100g, 1l, 10ml, 20ml
+      const sNoVol = str.replace(/\b\d+\s*(?:ml|l|lit|lít|g|gam|kg|cc)\b/gi, '');
+      const matches = sNoVol.match(/\b(?:\d{2,4}%?|\d+%|la|lite|pro|plus|forte)\b/gi) || [];
+      return new Set(matches.map(m => m.toLowerCase().trim()));
+    }
+
+    function matchSkuVariant(compSku, candSku) {
+      if (!compSku || ['mặc định', 'default', ''].includes(compSku.toLowerCase().trim())) {
+        return true;
+      }
+      const c = compSku.toLowerCase().replace(/\s+/g, '');
+      const s = (candSku || '').toLowerCase().replace(/\s+/g, '');
+      if (c === s || s.includes(c) || c.includes(s)) return true;
+
+      // Special checks for weight/volume conflicts
+      if (c.includes('1kg') && s.includes('100g')) return false;
+      if (c.includes('100g') && s.includes('1kg')) return false;
+      if (c.includes('100ml') && s.includes('10ml')) return false;
+      if (c.includes('10ml') && s.includes('100ml')) return false;
+      if (c.includes('1l') && s.includes('100ml')) return false;
+      if (c.includes('1kg') && s.includes('1kg')) return true;
+      if (c.includes('100g') && s.includes('100g')) return true;
+      if (c.includes('100ml') && s.includes('100ml')) return true;
+      return false;
     }
 
     // Helper: Token-based fuzzy matcher to pair a combo component with an existing loose product
@@ -3218,35 +3277,86 @@
       return words.filter(w => w.length >= 2 && !noise.has(w));
     }
 
-    function findMatchingTargetCandidate(compName, candidates) {
+    function findMatchingTargetCandidate(compName, compSku, candidates) {
       if (!candidates || candidates.length === 0) return null;
-      const cClean = cleanItemProductName(compName).toLowerCase();
+      const cClean = cleanItemProductName(compName).toLowerCase().replace(/[\-_–—]/g, ' ').replace(/\s+/g, ' ').trim();
       const cTokens = new Set(getProductTokens(compName));
+      const cDosage = getProductDosageTokens(compName);
 
       let bestCand = null;
-      let bestScore = 0;
+      let bestScore = -1;
 
       for (const cand of candidates) {
-        const candClean = cleanItemProductName(cand.productName).toLowerCase();
-        if (cClean === candClean || candClean.includes(cClean) || cClean.includes(candClean)) {
-          return cand;
+        const candPName = cand.productName || '';
+        const candClean = cleanItemProductName(candPName).toLowerCase().replace(/[\-_–—]/g, ' ').replace(/\s+/g, ' ').trim();
+        const candDosage = getProductDosageTokens(candPName);
+
+        // 1. Strict Dosage / Concentration verification
+        // If comp has dosage tokens (like '200' in Fer 200), cand MUST have it!
+        if (cDosage.size > 0) {
+          let conflict = false;
+          for (const d of cDosage) {
+            if (!candDosage.has(d)) {
+              conflict = true;
+              break;
+            }
+          }
+          if (conflict) continue;
         }
 
-        const candTokens = new Set(getProductTokens(cand.productName));
-        if (cTokens.size === 0 || candTokens.size === 0) continue;
-
-        let matchCount = 0;
-        for (const t of cTokens) {
-          if (candTokens.has(t)) matchCount++;
+        // If cand has special dosage tokens (like '200', 'la', '50%') and comp does NOT have it, conflict!
+        if (candDosage.size > 0 && cDosage.size === 0) {
+          const criticalDosages = ['200', '50%', 'la'];
+          let conflict = false;
+          for (const cd of criticalDosages) {
+            if (candDosage.has(cd)) {
+              conflict = true;
+              break;
+            }
+          }
+          if (conflict) continue;
         }
-        const score = matchCount / Math.min(cTokens.size, candTokens.size);
-        if (score > bestScore) {
-          bestScore = score;
+
+        // 2. Product Name Matching Score
+        const candTokens = new Set(getProductTokens(candPName));
+        let nameScore = 0;
+
+        if (cClean === candClean) {
+          nameScore = 100;
+        } else if (candClean.startsWith(cClean) || cClean.startsWith(candClean)) {
+          nameScore = 85;
+        } else if (candClean.includes(cClean) || cClean.includes(candClean)) {
+          nameScore = 70;
+        } else if (cTokens.size > 0 && candTokens.size > 0) {
+          let matchCount = 0;
+          for (const t of cTokens) {
+            if (candTokens.has(t)) matchCount++;
+          }
+          const tokenRatio = matchCount / Math.max(cTokens.size, candTokens.size);
+          if (tokenRatio >= 0.5) {
+            nameScore = 50 * tokenRatio;
+          }
+        }
+
+        if (nameScore < 30) continue;
+
+        // 3. Multi-variant / SKU Match Adjustment
+        const isSkuMatch = matchSkuVariant(compSku, cand.sku);
+        if (compSku && !['mặc định', 'default', ''].includes(compSku.toLowerCase().trim())) {
+          if (isSkuMatch) {
+            nameScore += 50; // Strong boost for matching variant (e.g. 1kg -> Gói 1kg)
+          } else {
+            nameScore -= 50; // Heavy penalty for mismatching variant (e.g. 1kg vs Gói 100g)
+          }
+        }
+
+        if (nameScore > bestScore) {
+          bestScore = nameScore;
           bestCand = cand;
         }
       }
 
-      if (bestScore >= 0.5) return bestCand;
+      if (bestScore >= 40) return bestCand;
       return null;
     }
 
@@ -5471,7 +5581,8 @@
             const pName = it.productName.trim();
             const sName = it.sku.trim() || 'Mặc định';
             const rule = findMatchingComboRule(pName, sName);
-            if (!rule) {
+            const isComboLike = /^(?:combo\b|bộ\s+(?:thuốc|sản\s+phẩm|combo)|cặp\b)/i.test(pName) || pName.toLowerCase().startsWith('combo') || (rule && rule.category === 'combo');
+            if (!rule && !isComboLike) {
               const cName = cleanItemProductName(pName);
               const img = it.imageUrl || productImageMap.get(`${cName}|||${cleanSku(sName)}`) || productImageMap.get(cName) || null;
               nonComboCandidates.push({
@@ -5498,7 +5609,7 @@
 
             // Smart Fallback: If components produced 0 matches (e.g. user typed description "trị viêm đa khớp..."),
             // automatically extract component names from '+' segments in the combo product title
-            const hasAnyMatch = components.some(c => findMatchingTargetCandidate(c.name, nonComboCandidates));
+            const hasAnyMatch = components.some(c => findMatchingTargetCandidate(c.name, c.sku, nonComboCandidates));
             if (!hasAnyMatch && (pName.includes('+') || (comboRule.name && comboRule.name.includes('+')))) {
               const nameToParse = pName.includes('+') ? pName : comboRule.name;
               const cleanComboTitle = nameToParse.replace(/^Combo\s+/i, '').split(/[:_]/)[0];
@@ -5517,11 +5628,20 @@
 
               components.forEach(comp => {
                 const compQty = comboMultiplier * comp.qty;
-                const matchCand = findMatchingTargetCandidate(comp.name, nonComboCandidates);
+                const matchCand = findMatchingTargetCandidate(comp.name, comp.sku, nonComboCandidates);
 
-                const targetPName = matchCand ? matchCand.productName : comp.name;
-                const targetSku = matchCand ? matchCand.sku : (comp.sku || 'Mặc định');
+                let targetPName = matchCand ? matchCand.productName : comp.name;
+                let targetSku = matchCand ? matchCand.sku : (comp.sku || 'Mặc định');
                 const targetSelSku = matchCand ? matchCand.sellerSku : '-';
+
+                // If standalone item created from combo component because no loose candidate exists
+                if (!matchCand && comp.sku) {
+                  const sLow = comp.sku.toLowerCase();
+                  if (/^\d+\s*ml$/i.test(sLow)) targetSku = `Chai ${comp.sku}`;
+                  else if (/^\d+\s*l(?:it|ít)?$/i.test(sLow)) targetSku = `Chai ${comp.sku}`;
+                  else if (/^\d+\s*(?:g|kg)$/i.test(sLow)) targetSku = `Gói ${comp.sku}`;
+                }
+
                 const key = `${targetPName}|||${targetSku}|||${targetSelSku}`;
 
                 if (!map.has(key)) {
