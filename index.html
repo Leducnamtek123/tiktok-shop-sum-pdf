@@ -678,6 +678,18 @@
 
           <!-- Right: Action Buttons -->
           <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 justify-end">
+            <!-- Nút Bật/Tắt Tách Món Combo vào Tổng Nhặt Hàng Lẻ -->
+            <button 
+              id="btnToggleDisaggregate" 
+              onclick="toggleDisaggregateCombos()" 
+              class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-slate-300 bg-white text-slate-700 shadow-2xs hover:bg-slate-50 cursor-pointer"
+              title="Bật để tự động bóc tách các món thành phần trong Combo và cộng dồn vào từng kệ sản phẩm lẻ trên kho"
+            >
+              <i data-lucide="boxes" class="w-3.5 h-3.5 mr-1.5 text-purple-600"></i>
+              <span id="txtDisaggregateCombos">Bung Combo vào món lẻ</span>
+              <span id="badgeDisaggregateCombos" class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-black bg-slate-100 text-slate-500">TẮT</span>
+            </button>
+
             <!-- Chế độ in: Phiếu Kho (Số Lô) vs Phiếu Đối Soát (Mã Đơn) -->
             <div class="inline-flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200 text-xs font-semibold shadow-2xs">
               <button 
@@ -826,7 +838,7 @@
         <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span class="font-bold uppercase tracking-wider text-[11px]">Đơn 1 Món (Dán Lô)</span>
+              <span class="font-bold uppercase tracking-wider text-[11px]">Đơn 1 Món (1 Trang)</span>
               <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/60">
                 <i data-lucide="zap" class="w-4 h-4"></i>
               </div>
@@ -835,7 +847,7 @@
           </div>
           <div class="text-xs text-slate-600 mt-2.5 flex items-center">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-            <span>Xếp theo từng món</span>
+            <span>Dán lô liên tục</span>
           </div>
         </div>
 
@@ -843,7 +855,7 @@
         <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span class="font-bold uppercase tracking-wider text-[11px]">Đơn Nhiều Món (Gom)</span>
+              <span class="font-bold uppercase tracking-wider text-[11px]">Đơn Nhiều Món / 2 Trang</span>
               <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200/60">
                 <i data-lucide="layers" class="w-4 h-4"></i>
               </div>
@@ -852,7 +864,7 @@
           </div>
           <div class="text-xs text-slate-600 mt-2.5 flex items-center">
             <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
-            <span>Gom riêng đóng gói</span>
+            <span>Gom cuối đóng riêng</span>
           </div>
         </div>
 
@@ -899,8 +911,8 @@
           <!-- Filter Buttons -->
           <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-semibold border border-slate-200/60">
             <button onclick="filterShippingList('all')" id="shipFilterAll" class="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 font-bold shadow-2xs transition-all cursor-pointer">Tất cả (<span id="shipCountAll">0</span>)</button>
-            <button onclick="filterShippingList('single')" id="shipFilterSingle" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn 1 món (<span id="shipCountSingle">0</span>)</button>
-            <button onclick="filterShippingList('multi')" id="shipFilterMulti" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn nhiều món (<span id="shipCountMulti">0</span>)</button>
+            <button onclick="filterShippingList('single')" id="shipFilterSingle" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn 1 món (1 trang) (<span id="shipCountSingle">0</span>)</button>
+            <button onclick="filterShippingList('multi')" id="shipFilterMulti" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn nhiều món / 2 trang (<span id="shipCountMulti">0</span>)</button>
           </div>
 
           <!-- Search Input -->
@@ -2804,6 +2816,128 @@
     window.findMatchingPackagingRule = findMatchingPackagingRule;
     window.findMatchingComboRule = findMatchingComboRule;
 
+    // Global state for combo disaggregation into loose picking lines
+    let isDisaggregateCombos = localStorage.getItem('tiktok_disaggregate_combos') === 'true';
+
+    function toggleDisaggregateCombos() {
+      isDisaggregateCombos = !isDisaggregateCombos;
+      localStorage.setItem('tiktok_disaggregate_combos', isDisaggregateCombos ? 'true' : 'false');
+      updateDisaggregateButtonState();
+      if (lastParsedFilesData && lastParsedFilesData.length > 0) {
+        processAggregatedData(lastParsedFilesData);
+        showToast(isDisaggregateCombos ? 'Đã bật: Tách món Combo vào từng mặt hàng lẻ trên kho' : 'Đã tắt: Giữ nguyên gom theo bộ Combo nguyên gốc');
+      }
+    }
+    window.toggleDisaggregateCombos = toggleDisaggregateCombos;
+
+    function updateDisaggregateButtonState() {
+      const btn = document.getElementById('btnToggleDisaggregate');
+      const txt = document.getElementById('txtDisaggregateCombos');
+      const badge = document.getElementById('badgeDisaggregateCombos');
+      if (!btn || !badge) return;
+
+      if (isDisaggregateCombos) {
+        btn.className = "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-purple-300 bg-purple-50 text-purple-900 shadow-2xs cursor-pointer hover:bg-purple-100";
+        badge.className = "ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-200 text-purple-900";
+        badge.textContent = "BẬT";
+        if (txt) txt.textContent = "Đã bung món Combo";
+      } else {
+        btn.className = "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold transition-all border border-slate-300 bg-white text-slate-700 shadow-2xs hover:bg-slate-50 cursor-pointer";
+        badge.className = "ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-black bg-slate-100 text-slate-500";
+        badge.textContent = "TẮT";
+        if (txt) txt.textContent = "Bung Combo vào món lẻ";
+      }
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+    window.updateDisaggregateButtonState = updateDisaggregateButtonState;
+
+    // Helper: Parse combo components string into individual items with quantities
+    function parseComboComponents(compStr) {
+      if (!compStr || typeof compStr !== 'string') return [];
+      const parts = compStr.split(/[+&,;]|\bvà\b/i);
+      const res = [];
+      for (let p of parts) {
+        p = p.trim();
+        if (!p) continue;
+        const m = p.match(/^(\d+)\s*(?:x|chai|gói|hộp|lọ|túi|can|viên|vỉ|bịch)?\s*[:\-\s]?\s*(.+)$/i);
+        let qty = 1;
+        let name = p;
+        if (m && m[1] && m[2]) {
+          qty = parseInt(m[1], 10) || 1;
+          name = m[2].trim();
+        } else {
+          const mTrail = p.match(/^(.+?)\s*(?:x|\*|\()\s*(\d+)\s*\)?$/i);
+          if (mTrail && mTrail[1] && mTrail[2]) {
+            name = mTrail[1].trim();
+            qty = parseInt(mTrail[2], 10) || 1;
+          }
+        }
+        let sku = '';
+        const mParen = name.match(/\(([^)]+)\)/);
+        if (mParen) {
+          sku = mParen[1].trim();
+        } else {
+          const mVol = name.match(/(\d+\s*(?:ml|g|kg|l|can|chai|gói|hộp|lọ|túi|vỉ))\b/i);
+          if (mVol) sku = mVol[1].trim();
+        }
+        res.push({ name, qty, sku: sku || 'Mặc định' });
+      }
+      return res;
+    }
+
+    // Helper: Token-based fuzzy matcher to pair a combo component with an existing loose product
+    function getProductTokens(str) {
+      if (!str) return [];
+      const sClean = str.replace(/\b\d+\s*(?:ml|g|kg|l|chai|goi|hop|can)\b/gi, '');
+      const words = sClean.toLowerCase().match(/[a-zA-Z0-9À-ỹ]+/g) || [];
+      const noise = new Set(['combo', 'bo', 'sung', 'cho', 'giup', 'va', 'cua', 'loai', 'thu', 'cung', 'chong', 'tri', 'sau', 'tiem', 'phong', 'vac', 'xin', 'dac', 'tri']);
+      return words.filter(w => w.length >= 2 && !noise.has(w));
+    }
+
+    function findMatchingTargetCandidate(compName, candidates) {
+      if (!candidates || candidates.length === 0) return null;
+      const cClean = cleanItemProductName(compName).toLowerCase();
+      const cTokens = new Set(getProductTokens(compName));
+
+      let bestCand = null;
+      let bestScore = 0;
+
+      for (const cand of candidates) {
+        const candClean = cleanItemProductName(cand.productName).toLowerCase();
+        if (cClean === candClean || candClean.includes(cClean) || cClean.includes(candClean)) {
+          return cand;
+        }
+
+        const candTokens = new Set(getProductTokens(cand.productName));
+        if (cTokens.size === 0 || candTokens.size === 0) continue;
+
+        let matchCount = 0;
+        for (const t of cTokens) {
+          if (candTokens.has(t)) matchCount++;
+        }
+        const score = matchCount / Math.min(cTokens.size, candTokens.size);
+        if (score > bestScore) {
+          bestScore = score;
+          bestCand = cand;
+        }
+      }
+
+      if (bestScore >= 0.5) return bestCand;
+      return null;
+    }
+
+    function consolidateComboAdditions(additions) {
+      if (!additions || additions.length === 0) return [];
+      const map = {};
+      additions.forEach(a => {
+        const key = cleanItemProductName(a.comboName || a.ruleName || 'Combo');
+        map[key] = (map[key] || 0) + a.qty;
+      });
+      return Object.entries(map).map(([comboName, qty]) => ({ comboName, qty }));
+    }
+
     // Packaging Parsing & Smart Conversion Utilities
     function parseSkuPackagingType(skuStr, productName = '') {
       const s = (skuStr || '').trim();
@@ -2839,7 +2973,10 @@
       if (countMatch && parseInt(countMatch[1], 10) > 1) {
         const packSize = parseInt(countMatch[1], 10);
         const rest = (countMatch[2] || '').trim();
-        return { isBulk: true, type: 'lô', packSize, rest, label: `Lô ${packSize} ${rest || 'món'}` };
+        const isVolumeOrWeight = /^(?:ml|l|lit|lít|g|gam|kg|cc|mg)$/i.test(rest);
+        if (!isVolumeOrWeight) {
+          return { isBulk: true, type: 'lô', packSize, rest, label: `Lô ${packSize} ${rest || 'món'}` };
+        }
       }
       return { isBulk: false, type: 'lẻ', packSize: 1, rest: '', label: 'Lẻ' };
     }
@@ -3632,14 +3769,18 @@
       }
     }
 
+    // Complex order checker: Multi-item OR Multi-page (2+ pages)
+    const isComplexOrder = o => Boolean(o.isMultiItem || (o.pages && o.pages.length > 1));
+
     // Sort Shipping Orders by Product, SKU & Quantity
     function sortAndRenderShippingOrders() {
       if (shippingOrders.length === 0) return;
 
-      const singleOrders = shippingOrders.filter(o => !o.isMultiItem);
-      const multiOrders = shippingOrders.filter(o => o.isMultiItem);
+      // Single-item 1-page orders go first; Multi-item and 2+ page orders go last
+      const singleOrders = shippingOrders.filter(o => !isComplexOrder(o));
+      const multiOrders = shippingOrders.filter(o => isComplexOrder(o));
 
-      // Count frequency of products
+      // Count frequency of products for single-item 1-page orders
       const prodCounts = {};
       singleOrders.forEach(o => {
         const p = o.primaryProduct;
@@ -3673,8 +3814,11 @@
         return a.orderId.localeCompare(b.orderId);
       });
 
-      // Multi-item orders sorted by item count
+      // Multi-item / Multi-page orders sorted by page count, item count, then name
       multiOrders.sort((a, b) => {
+        const pagesA = (a.pages && a.pages.length) || 1;
+        const pagesB = (b.pages && b.pages.length) || 1;
+        if (pagesA !== pagesB) return pagesA - pagesB;
         if (a.items.length !== b.items.length) return a.items.length - b.items.length;
         return a.primaryProduct.localeCompare(b.primaryProduct, 'vi');
       });
@@ -3722,8 +3866,8 @@
       const totalOrders = sortedShippingOrders.length;
       const totalPages = sortedShippingOrders.reduce((sum, o) => sum + o.pages.length, 0);
       const totalItems = sortedShippingOrders.reduce((sum, o) => sum + o.totalQty, 0);
-      const singleOrders = sortedShippingOrders.filter(o => !o.isMultiItem);
-      const multiOrders = sortedShippingOrders.filter(o => o.isMultiItem);
+      const singleOrders = sortedShippingOrders.filter(o => !isComplexOrder(o));
+      const multiOrders = sortedShippingOrders.filter(o => isComplexOrder(o));
       const uniqueProds = new Set(singleOrders.map(o => cleanItemProductName(o.primaryProduct))).size;
 
       document.getElementById('shipTotalOrders').textContent = totalOrders;
@@ -3766,7 +3910,7 @@
       const groups = {};
       filtered.forEach(o => {
         const cleanProd = cleanItemProductName(o.primaryProduct);
-        const grpKey = o.isMultiItem ? "🧩 ĐƠN NHIỀU MÓN (ĐÓNG RIÊNG)" : cleanProd;
+        const grpKey = isComplexOrder(o) ? "🧩 ĐƠN NHIỀU MÓN & NHIỀU KIỆN (2 TRANG - ĐÓNG RIÊNG)" : cleanProd;
         if (!groups[grpKey]) groups[grpKey] = [];
         groups[grpKey].push(o);
       });
@@ -3781,13 +3925,13 @@
         const currentGrpId = grpCounter;
         window.__shippingGroupOrders[currentGrpId] = ordersInGrp;
 
-        const isMultiGroup = prodName.includes('ĐƠN NHIỀU MÓN');
+        const isMultiGroup = prodName.includes('ĐƠN NHIỀU MÓN') || prodName.includes('NHIỀU KIỆN');
         const cleanedProdName = isMultiGroup ? prodName : cleanItemProductName(prodName);
         const totalGrpQty = ordersInGrp.reduce((sum, o) => sum + o.totalQty, 0);
 
         const skuGroups = {};
         ordersInGrp.forEach(o => {
-          const s = o.isMultiItem ? "Nhiều món hỗn hợp" : (cleanSku(o.primarySku) || "Mặc định");
+          const s = isComplexOrder(o) ? (o.isMultiItem ? "Nhiều món hỗn hợp" : `Đơn ${o.pages.length} trang`) : (cleanSku(o.primarySku) || "Mặc định");
           if (!skuGroups[s]) skuGroups[s] = [];
           skuGroups[s].push(o);
         });
@@ -3957,6 +4101,33 @@
                                   </div>
                                 </div>
                               `).join('')}
+                            </div>
+                          ` : (o.pages && o.pages.length > 1) ? `
+                            <div class="text-[11px] font-bold text-amber-900 mb-1.5 flex items-center">
+                              <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-extrabold mr-1.5">ĐƠN ${o.pages.length} TRANG (NHIỀU KIỆN)</span>
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                              <div class="inline-flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                  ${escapeHtml(cleanSku(o.primarySku))}
+                                </span>
+                              </div>
+                              ${(!isMultiGroup && findMatchingComboRule(rowProdName, rowSku)) ? `
+                                <div class="text-[11px] text-purple-900 font-bold flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded border border-purple-200/80">
+                                  <i data-lucide="boxes" class="w-3 h-3 text-purple-600 shrink-0"></i>
+                                  <span>Gồm: ${escapeHtml(findMatchingComboRule(rowProdName, rowSku).components)}</span>
+                                </div>
+                              ` : ''}
+                              ${(!isMultiGroup && parseSkuPackagingType(rowSku, rowProdName).isBulk) ? `
+                                <div class="text-[11px] text-emerald-900 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
+                                  <i data-lucide="package-check" class="w-3 h-3 text-emerald-600 shrink-0"></i>
+                                  <span>Quy cách: ${escapeHtml(parseSkuPackagingType(rowSku, rowProdName).label)}</span>
+                                </div>
+                              ` : ''}
+                              <div class="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+                                <span>Số lượng:</span>
+                                <strong class="text-slate-900 font-bold">${o.totalQty} món</strong>
+                              </div>
                             </div>
                           ` : `
                             <div class="flex flex-col gap-1.5">
@@ -4253,7 +4424,9 @@
       sortedShippingOrders.forEach(o => {
         const origPagesStr = o.pageNumbers.join(', ');
         const newPagesStr = (o.newStartPage === o.newEndPage) ? `${o.newStartPage}` : `${o.newStartPage}-${o.newEndPage}`;
-        const orderType = o.isMultiItem ? "Đơn nhiều món (hỗn hợp)" : "Đơn 1 món";
+        const orderType = o.isMultiItem 
+          ? `Đơn ${o.items.length} món (hỗn hợp)` 
+          : ((o.pages && o.pages.length > 1) ? `Đơn nhiều kiện (${o.pages.length} trang)` : "Đơn 1 món (1 trang)");
 
         rows.push([
           o.newSeq,
@@ -4684,14 +4857,102 @@
         });
       });
 
+      // Gather candidate loose products for combo disaggregation pairing
+      const nonComboCandidates = [];
+      if (isDisaggregateCombos) {
+        filesToAggregate.forEach(fd => {
+          fd.items.forEach(it => {
+            const pName = it.productName.trim();
+            const sName = it.sku.trim() || 'Mặc định';
+            const rule = findMatchingComboRule(pName, sName);
+            if (!rule) {
+              const cName = cleanItemProductName(pName);
+              const img = it.imageUrl || productImageMap.get(`${cName}|||${cleanSku(sName)}`) || productImageMap.get(cName) || null;
+              nonComboCandidates.push({
+                productName: pName,
+                sku: sName,
+                sellerSku: it.sellerSku.trim() || '-',
+                imageUrl: img
+              });
+            }
+          });
+        });
+      }
+
       filesToAggregate.forEach(fd => {
         totalDeclaredOrders += fd.metadata.orderQty;
         fd.items.forEach(it => {
           const pName = it.productName.trim();
           const sName = it.sku.trim() || 'Mặc định';
           const selSku = it.sellerSku.trim() || '-';
-          const key = `${pName}|||${sName}|||${selSku}`;
+          const comboRule = isDisaggregateCombos ? findMatchingComboRule(pName, sName) : null;
 
+          if (comboRule && comboRule.components) {
+            const components = parseComboComponents(comboRule.components);
+            if (components.length > 0) {
+              const pack = parseSkuPackagingType(sName, pName);
+              const comboMultiplier = pack.isBulk ? (it.qty * pack.packSize) : it.qty;
+
+              components.forEach(comp => {
+                const compQty = comboMultiplier * comp.qty;
+                const matchCand = findMatchingTargetCandidate(comp.name, nonComboCandidates);
+
+                const targetPName = matchCand ? matchCand.productName : comp.name;
+                const targetSku = matchCand ? matchCand.sku : (comp.sku || 'Mặc định');
+                const targetSelSku = matchCand ? matchCand.sellerSku : '-';
+                const key = `${targetPName}|||${targetSku}|||${targetSelSku}`;
+
+                if (!map.has(key)) {
+                  const cName = cleanItemProductName(targetPName);
+                  const img = (matchCand && matchCand.imageUrl) || 
+                              productImageMap.get(`${cName}|||${cleanSku(targetSku)}`) || 
+                              productImageMap.get(cName) || 
+                              it.imageUrl || null;
+                  map.set(key, {
+                    key: key,
+                    productName: targetPName,
+                    sku: targetSku,
+                    sellerSku: targetSelSku,
+                    imageUrl: img,
+                    totalQty: 0,
+                    orderIds: new Set(),
+                    trackingNumbers: new Set(),
+                    byFile: {},
+                    comboAdditions: []
+                  });
+                }
+
+                const record = map.get(key);
+                record.totalQty += compQty;
+                if (!record.comboAdditions) record.comboAdditions = [];
+                record.comboAdditions.push({
+                  comboName: pName,
+                  ruleName: comboRule.name,
+                  qty: compQty
+                });
+
+                if (it.imageUrl && !record.imageUrl) record.imageUrl = it.imageUrl;
+                it.orderIds.forEach(id => {
+                  record.orderIds.add(id);
+                  allOrdersGlobal.add(id);
+                  const trk = orderToTrackingMap[id];
+                  if (trk && trk !== '-') record.trackingNumbers.add(trk);
+                });
+                if (it.trackingNumbers) {
+                  it.trackingNumbers.forEach(t => {
+                    if (t && t !== '-') record.trackingNumbers.add(t);
+                  });
+                }
+                record.byFile[it.sourceFile] = (record.byFile[it.sourceFile] || 0) + compQty;
+              });
+
+              // The combo has been distributed into individual items
+              return;
+            }
+          }
+
+          // Normal processing (non-combo or combo disaggregation disabled)
+          const key = `${pName}|||${sName}|||${selSku}`;
           if (!map.has(key)) {
             const cName = cleanItemProductName(pName);
             const img = it.imageUrl || productImageMap.get(`${cName}|||${cleanSku(sName)}`) || productImageMap.get(cName) || null;
@@ -4704,7 +4965,8 @@
               totalQty: 0,
               orderIds: new Set(),
               trackingNumbers: new Set(),
-              byFile: {}
+              byFile: {},
+              comboAdditions: []
             });
           }
           const record = map.get(key);
@@ -4714,9 +4976,7 @@
             record.orderIds.add(id);
             allOrdersGlobal.add(id);
             const trk = orderToTrackingMap[id];
-            if (trk && trk !== '-') {
-              record.trackingNumbers.add(trk);
-            }
+            if (trk && trk !== '-') record.trackingNumbers.add(trk);
           });
           if (it.trackingNumbers) {
             it.trackingNumbers.forEach(t => {
@@ -4745,7 +5005,8 @@
             orderIds: new Set(),
             trackingNumbers: new Set(),
             variants: [],
-            byFile: {}
+            byFile: {},
+            comboAdditions: []
           });
         }
         const grp = prodMap.get(pName);
@@ -4753,6 +5014,9 @@
         if (item.imageUrl && !grp.imageUrl) grp.imageUrl = item.imageUrl;
         item.orderIds.forEach(id => grp.orderIds.add(id));
         item.trackingNumbers.forEach(t => grp.trackingNumbers.add(t));
+        if (item.comboAdditions && item.comboAdditions.length > 0) {
+          grp.comboAdditions.push(...item.comboAdditions);
+        }
         grp.variants.push(item);
         Object.entries(item.byFile).forEach(([f, q]) => {
           grp.byFile[f] = (grp.byFile[f] || 0) + q;
@@ -5049,6 +5313,7 @@
           const isDone = checkedItemKeys.has(v.key);
           const pack = parseSkuPackagingType(v.sku, group.productName);
           const comboRule = findMatchingComboRule(group.productName, v.sku);
+          const comboAdditions = consolidateComboAdditions(v.comboAdditions || group.comboAdditions || []);
 
           return `
             <tr class="hover:bg-slate-50/80 transition-colors ${isDone ? 'bg-emerald-50/40' : ''}">
@@ -5068,7 +5333,17 @@
               <td class="py-3.5 px-5 font-semibold text-slate-900 leading-snug">
                 <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</div>
                 ${v.sellerSku && v.sellerSku !== '-' ? `<div class="text-[11px] text-slate-400 font-normal mt-0.5">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
-                ${comboRule ? `
+                ${comboAdditions.length > 0 ? `
+                  <div class="mt-2 flex flex-wrap gap-1.5">
+                    ${comboAdditions.map(c => `
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold">
+                        <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
+                        <span>Đã gồm <strong>+${c.qty}</strong> từ combo: <em>${escapeHtml(c.comboName)}</em></span>
+                      </span>
+                    `).join('')}
+                  </div>
+                ` : ''}
+                ${(comboRule && comboAdditions.length === 0) ? `
                   <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs">
                     <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
                     <span><strong>🧩 Combo gồm:</strong> ${escapeHtml(comboRule.components)}</span>
@@ -5157,7 +5432,17 @@
               <div class="flex items-center space-x-2">
                 <span class="${isAllDone ? 'line-through text-slate-400' : ''}">${escapeHtml(group.productName)}</span>
               </div>
-              ${multiComboRule ? `
+              ${(group.comboAdditions && group.comboAdditions.length > 0) ? `
+                <div class="mt-2 flex flex-wrap gap-1.5" onclick="event.stopPropagation()">
+                  ${consolidateComboAdditions(group.comboAdditions).map(c => `
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold">
+                      <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
+                      <span>Đã gồm <strong>+${c.qty}</strong> từ combo: <em>${escapeHtml(c.comboName)}</em></span>
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
+              ${(multiComboRule && (!group.comboAdditions || group.comboAdditions.length === 0)) ? `
                 <div class="mt-2 inline-flex flex-wrap items-center gap-2 p-2 px-3 rounded-xl bg-purple-50/90 border border-purple-200 text-xs" onclick="event.stopPropagation()">
                   <span class="font-extrabold text-purple-900 flex items-center">
                     <i data-lucide="boxes" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>
@@ -5346,6 +5631,16 @@
             <td class="py-3.5 px-5 font-semibold text-slate-900 leading-snug">
               <div class="${isDone ? 'line-through text-slate-400' : ''}">${escapeHtml(item.productName)}</div>
               ${item.sellerSku && item.sellerSku !== '-' ? `<span class="text-[11px] text-slate-400 font-normal mt-0.5 block">Mã SKU: ${escapeHtml(item.sellerSku)}</span>` : ''}
+              ${(item.comboAdditions && item.comboAdditions.length > 0) ? `
+                <div class="mt-2 flex flex-wrap gap-1.5">
+                  ${consolidateComboAdditions(item.comboAdditions).map(c => `
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold">
+                      <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
+                      <span>Đã gồm <strong>+${c.qty}</strong> từ combo: <em>${escapeHtml(c.comboName)}</em></span>
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
             </td>
             <td class="py-3.5 px-5">
               <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
@@ -5431,8 +5726,23 @@
               </div>
             </div>
 
-            <!-- Combo Definition Breakdown -->
-            ${comboRule ? `
+            <!-- Combo Additions Breakdown or Definition -->
+            ${(group.comboAdditions && group.comboAdditions.length > 0) ? `
+              <div class="p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs space-y-1.5">
+                <div class="font-extrabold text-purple-900 flex items-center">
+                  <i data-lucide="boxes" class="w-4 h-4 mr-1.5 text-purple-600 flex-shrink-0"></i>
+                  <span>Đã cộng dồn từ đơn Combo:</span>
+                </div>
+                <div class="space-y-1">
+                  ${consolidateComboAdditions(group.comboAdditions).map(c => `
+                    <div class="text-purple-900 font-bold bg-white p-2 rounded-lg border border-purple-200 shadow-2xs flex items-center justify-between">
+                      <span class="truncate">${escapeHtml(c.comboName)}</span>
+                      <span class="ml-2 px-2 py-0.5 rounded bg-purple-100 text-purple-900 font-black shrink-0">+${c.qty} món</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : (comboRule ? `
               <div class="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-xs space-y-1.5">
                 <div class="font-extrabold text-purple-900 flex items-center">
                   <i data-lucide="boxes" class="w-4 h-4 mr-1.5 text-purple-600 flex-shrink-0"></i>
@@ -5442,7 +5752,7 @@
                   ${escapeHtml(comboRule.components)}
                 </div>
               </div>
-            ` : ''}
+            ` : '')}
 
             <!-- Smart Packaging Conversion Banner -->
             ${group.packagingInfo ? `
@@ -5554,6 +5864,16 @@
                     ${pack.isBulk ? `<i data-lucide="boxes" class="w-3.5 h-3.5 mr-1 text-purple-600"></i>` : ''}${escapeHtml(item.sku)}
                   </span>
                 </div>
+                ${(item.comboAdditions && item.comboAdditions.length > 0) ? `
+                  <div class="mt-1.5 flex flex-wrap gap-1">
+                    ${consolidateComboAdditions(item.comboAdditions).map(c => `
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-[11px] font-bold">
+                        <i data-lucide="boxes" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
+                        <span>Đã gồm <strong>+${c.qty}</strong> từ combo: <em>${escapeHtml(c.comboName)}</em></span>
+                      </span>
+                    `).join('')}
+                  </div>
+                ` : ''}
               </div>
 
               <!-- Huge Quantity Badge -->
@@ -5919,9 +6239,11 @@
           const isDone = checkedItemKeys.has(v.key);
           const pack = parseSkuPackagingType(v.sku, group.productName);
           const packTypeLabel = pack.isBulk ? `Thùng nguyên (${pack.packSize} ${pack.rest || 'món'})` : "Chai/Gói lẻ";
+          const comboAdditions = consolidateComboAdditions(v.comboAdditions || group.comboAdditions || []);
+          const comboNote = comboAdditions.length > 0 ? `Đã gồm +${comboAdditions.map(c => c.qty + ' từ ' + cleanItemProductName(c.comboName)).join(', ')}` : '';
           const conversionNote = group.packagingInfo ? 
-            `Lấy: ${group.packagingInfo.actualPickText} => Tương đương: ${group.packagingInfo.equivalentText}` : 
-            "-";
+            `Lấy: ${group.packagingInfo.actualPickText} => Tương đương: ${group.packagingInfo.equivalentText}${comboNote ? ' | ' + comboNote : ''}` : 
+            (comboNote || "-");
 
           const lotStr = getProductLot(v.key, group.productName) || "-";
           const trackingStr = (v.trackingNumbers && v.trackingNumbers.length > 0) ? v.trackingNumbers.join(', ') : "-";
@@ -6125,6 +6447,11 @@
                 <td style="vertical-align: top; padding-right: 8px;">
                   <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.25;">${escapeHtml(group.productName)}</div>
                   ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
+                  ${((group.comboAdditions && group.comboAdditions.length > 0) || (v.comboAdditions && v.comboAdditions.length > 0)) ? `
+                    <div style="font-size: 7.5pt; color: #6b21a8; font-weight: 700; background: #faf5ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">
+                      ➕ ${consolidateComboAdditions(v.comboAdditions || group.comboAdditions || []).map(c => `Đã gồm +${c.qty} từ combo ${escapeHtml(c.comboName)}`).join(' • ')}
+                    </div>
+                  ` : ''}
                 </td>
                 <td style="vertical-align: top; width: 115px; color: #1e293b; font-weight: 500; font-size: 8pt;">
                   <div>${escapeHtml(v.sku)}</div>
@@ -6371,6 +6698,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadComboRules();
       updatePrintModeButtons();
+      updateDisaggregateButtonState();
       if (window.lucide) {
         lucide.createIcons();
       }
