@@ -1877,7 +1877,7 @@
         name: "Combo cho dê con (Navet Verxil + Fer 200 B12 + Tulamycin + Navet Cox)",
         productKeyword: "cho dê con",
         skuKeyword: "",
-        components: "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (100ml) + 1 Navet Cox (100ml)"
+        components: "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (20ml) + 1 Navet Cox (100ml)"
       },
       {
         id: "combo_amoxicol_electrolytes",
@@ -1885,7 +1885,7 @@
         name: "Combo Amoxicol Plus + Electrolytes (Heo nhập đàn)",
         productKeyword: "Amoxicol Plus + Electrolytes",
         skuKeyword: "",
-        components: "1 Amoxicol Plus + 1 Vita-Electrolytes (1kg)"
+        components: "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
       },
       {
         id: "combo_amoxy_analgin_calcifort",
@@ -3304,9 +3304,9 @@
           if (conflict) continue;
         }
 
-        // If cand has special dosage tokens (like '200', 'la', '50%') and comp does NOT have it, conflict!
+        // If cand has special dosage tokens (like '200', '50%') and comp does NOT have it, conflict!
         if (candDosage.size > 0 && cDosage.size === 0) {
-          const criticalDosages = ['200', '50%', 'la'];
+          const criticalDosages = ['200', '50%'];
           let conflict = false;
           for (const cd of criticalDosages) {
             if (candDosage.has(cd)) {
