@@ -204,12 +204,36 @@
     "components": "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (100ml) + 1 Navet Cox (100ml)"
   },
   {
+    "id": "combo_amoxicol_electrolytes_qc2",
+    "category": "combo",
+    "name": "Combo Heo nhập đàn - Quy cách 2 (2 gói Amoxicol 100g + 1 Electrolytes 1kg)",
+    "productKeyword": "Amoxicol Plus + Electrolytes",
+    "skuKeyword": "2 gói",
+    "components": "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+  },
+  {
+    "id": "combo_amoxicol_electrolytes_qc3",
+    "category": "combo",
+    "name": "Combo Heo nhập đàn - Quy cách 3 (1 hộp Amoxicol 1kg + 1 Electrolytes 1kg)",
+    "productKeyword": "Amoxicol Plus + Electrolytes",
+    "skuKeyword": "hộp",
+    "components": "1 Amoxicol Plus (1kg) + 1 Vita-Electrolytes (1kg)"
+  },
+  {
+    "id": "combo_amoxicol_electrolytes_qc1",
+    "category": "combo",
+    "name": "Combo Heo nhập đàn - Quy cách 1 (1 gói Amoxicol 100g + 1 Electrolytes 1kg)",
+    "productKeyword": "Amoxicol Plus + Electrolytes",
+    "skuKeyword": "1 gói",
+    "components": "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+  },
+  {
     "id": "combo_amoxicol_electrolytes",
     "category": "combo",
     "name": "Combo Amoxicol Plus + Electrolytes (Heo nhập đàn)",
     "productKeyword": "Amoxicol Plus + Electrolytes",
     "skuKeyword": "",
-    "components": "1 Amoxicol Plus + 1 Vita-Electrolytes (1kg)"
+    "components": "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
   },
   {
     "id": "combo_amoxy_analgin_calcifort",

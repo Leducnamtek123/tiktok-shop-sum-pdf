@@ -1880,12 +1880,36 @@
         components: "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (20ml) + 1 Navet Cox (100ml)"
       },
       {
+        id: "combo_amoxicol_electrolytes_qc2",
+        category: "combo",
+        name: "Combo Heo nhập đàn - Quy cách 2 (2 gói Amoxicol 100g + 1 Electrolytes 1kg)",
+        productKeyword: "Amoxicol Plus + Electrolytes",
+        skuKeyword: "2 gói",
+        components: "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+      },
+      {
+        id: "combo_amoxicol_electrolytes_qc3",
+        category: "combo",
+        name: "Combo Heo nhập đàn - Quy cách 3 (1 hộp Amoxicol 1kg + 1 Electrolytes 1kg)",
+        productKeyword: "Amoxicol Plus + Electrolytes",
+        skuKeyword: "hộp",
+        components: "1 Amoxicol Plus (1kg) + 1 Vita-Electrolytes (1kg)"
+      },
+      {
+        id: "combo_amoxicol_electrolytes_qc1",
+        category: "combo",
+        name: "Combo Heo nhập đàn - Quy cách 1 (1 gói Amoxicol 100g + 1 Electrolytes 1kg)",
+        productKeyword: "Amoxicol Plus + Electrolytes",
+        skuKeyword: "1 gói",
+        components: "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+      },
+      {
         id: "combo_amoxicol_electrolytes",
         category: "combo",
         name: "Combo Amoxicol Plus + Electrolytes (Heo nhập đàn)",
         productKeyword: "Amoxicol Plus + Electrolytes",
         skuKeyword: "",
-        components: "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+        components: "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
       },
       {
         id: "combo_amoxy_analgin_calcifort",
@@ -1950,6 +1974,18 @@
       }
       if (r.id === 'combo_chuyen_ho_hap' || (r.name && r.name.toLowerCase().includes('chuyên hô hấp'))) {
         r.productKeyword = 'Chuyên Hô Hấp';
+      }
+      if (r.id === 'combo_amoxicol_electrolytes_qc2' || (r.name && r.name.toLowerCase().includes('quy cách 2') && r.name.toLowerCase().includes('amoxicol'))) {
+        r.components = "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)";
+      }
+      if (r.id === 'combo_amoxicol_electrolytes_qc3' || (r.name && r.name.toLowerCase().includes('quy cách 3') && r.name.toLowerCase().includes('amoxicol'))) {
+        r.components = "1 Amoxicol Plus (1kg) + 1 Vita-Electrolytes (1kg)";
+      }
+      if (r.id === 'combo_amoxicol_electrolytes_qc1' || (r.name && r.name.toLowerCase().includes('quy cách 1') && r.name.toLowerCase().includes('amoxicol'))) {
+        r.components = "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)";
+      }
+      if (r.id === 'combo_amoxicol_electrolytes') {
+        r.components = "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)";
       }
       return r;
     }
@@ -3104,6 +3140,8 @@
       const pNorm = normalizeMatchText(productName);
       const sNorm = normalizeMatchText(skuStr);
 
+      let fallbackRule = null;
+
       for (const rule of comboRules) {
         if (rule.category !== 'combo') continue;
         const kwNorm = normalizeMatchText(rule.productKeyword);
@@ -3121,10 +3159,16 @@
           matchProd = true;
         }
 
-        const matchSku = !skuRuleNorm || (sNorm && sNorm.includes(skuRuleNorm));
-        if (matchProd && matchSku) return rule;
+        if (matchProd) {
+          if (skuRuleNorm && sNorm && sNorm.includes(skuRuleNorm)) {
+            return rule;
+          }
+          if (!skuRuleNorm && !fallbackRule) {
+            fallbackRule = rule;
+          }
+        }
       }
-      return null;
+      return fallbackRule;
     }
 
     // Expose all modal and rule functions to window
@@ -3230,8 +3274,11 @@
           sku = mParen[1].trim();
           name = name.replace(/\(([^)]+)\)/, '').trim();
         } else {
-          const mVol = name.match(/(\d+\s*(?:ml|g|kg|l|can|chai|gói|hộp|lọ|túi|vỉ))\b/i);
-          if (mVol) sku = mVol[1].trim();
+          const mVol = name.match(/(\d+\s*(?:ml|g|gam|kg|l|lit|lít|can|chai|gói|hộp|lọ|túi|vỉ))\b/i);
+          if (mVol) {
+            sku = mVol[1].trim();
+            name = name.replace(mVol[0], '').replace(/\s+/g, ' ').trim();
+          }
         }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
@@ -3386,6 +3433,11 @@
           label: `${matchedPkg.name} (${matchedPkg.packSize} ${matchedPkg.unit || 'món lẻ'})`,
           matchedRule: matchedPkg
         };
+      }
+
+      // If SKU contains '+' or product is a combo, it is a bundle of items, never a bulk pack multiplier
+      if (s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:')) {
+        return { isBulk: false, type: 'lẻ', packSize: 1, rest: '', label: 'Lẻ' };
       }
 
       // Priority 2: Standard regex for Thùng / Hộp
@@ -5606,6 +5658,18 @@
 
           if (comboRule && comboRule.components) {
             let components = parseComboComponents(comboRule.components);
+
+            // Smart Variant Override from SKU:
+            // If the SKU explicitly specifies a multi-product bundle using '+', parse the SKU directly
+            // so each specific variant (e.g. Quy cách 1: 1 gói 100g, Quy cách 2: 2 gói 100g, Quy cách 3: 1 hộp 1kg)
+            // maps precisely to the exact purchased components and quantities!
+            if (sName.includes('+')) {
+              const skuComponents = parseComboComponents(sName);
+              const matchedCount = skuComponents.filter(c => findMatchingTargetCandidate(c.name, c.sku, nonComboCandidates)).length;
+              if (matchedCount >= 2 || (matchedCount > 0 && matchedCount === skuComponents.length)) {
+                components = skuComponents;
+              }
+            }
 
             // Smart Fallback: If components produced 0 matches (e.g. user typed description "trị viêm đa khớp..."),
             // automatically extract component names from '+' segments in the combo product title
