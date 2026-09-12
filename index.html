@@ -12,6 +12,7 @@
   <script src="assets/pdf.min.js"></script>
   <script src="assets/pdf-lib.min.js"></script>
   <script src="assets/xlsx.full.min.js"></script>
+  <script src="assets/html2pdf.bundle.min.js"></script>
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -721,14 +722,28 @@
               Xuất file Excel
             </button>
 
-            <!-- Print / Export PDF A4 Button -->
+            <!-- Export PDF A4 Direct Download Button -->
             <button 
-              id="printBtn" 
-              class="inline-flex items-center px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
-              title="In phiếu nhặt hàng hoặc Lưu dưới dạng file PDF (A4)"
+              type="button"
+              id="downloadPdfBtn" 
+              onclick="exportPdfA4Direct()"
+              class="inline-flex items-center px-4.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
+              title="Tải trực tiếp file PDF (A4) về máy tính"
             >
-              <i data-lucide="printer" class="w-4 h-4 mr-1.5"></i>
-              In phiếu / Xuất PDF (A4)
+              <i data-lucide="file-down" class="w-4 h-4 mr-1.5"></i>
+              Xuất PDF (A4)
+            </button>
+
+            <!-- Print Button (Physical Printer Dialog) -->
+            <button 
+              type="button"
+              id="printBtn" 
+              onclick="printA4Direct()"
+              class="inline-flex items-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
+              title="Mở hộp thoại in để gửi lệnh in ra máy in"
+            >
+              <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-slate-500"></i>
+              In phiếu
             </button>
           </div>
 
@@ -1617,6 +1632,30 @@
         components: "1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
       },
       {
+        id: "combo_pen_strep_ketofen_calcifort",
+        category: "combo",
+        name: "Combo Navet-Pen-Strep + Ketofen + Calcifort B12 (Trị viêm đa khớp)",
+        productKeyword: "Navet-Pen-Strep + Ketofen",
+        skuKeyword: "",
+        components: "1 NAVET-PEN-STREP (100ml) + 1 NAVET-KETOFEN (100ml) + 1 Calcifort-B12 (100ml)"
+      },
+      {
+        id: "combo_flor_analgin_butavit",
+        category: "combo",
+        name: "Combo Navet-Flor + Navet Analgin C + Navet-Butavit",
+        productKeyword: "Navet-Flor + Navet Analgin",
+        skuKeyword: "",
+        components: "1 Navet-Flor (100ml) + 1 NAVET-ANALGIN C (100ml) + 1 Navet-Butavit (100ml)"
+      },
+      {
+        id: "combo_chuyen_ho_hap",
+        category: "combo",
+        name: "COMBO Chuyên Hô Hấp _ Navet-Flor + Doxy-T",
+        productKeyword: "Navet-Flor + Doxy-T",
+        skuKeyword: "",
+        components: "1 Navet-Flor (100ml) + 1 Doxy-T (100ml)"
+      },
+      {
         id: "combo_vo_beo",
         category: "combo",
         name: "COMBO VỖ BÉO LITE",
@@ -1631,6 +1670,22 @@
         productKeyword: "TIÊU CHẢY HEO CON",
         skuKeyword: "",
         components: "1 Navet-Cox 100ml + 1 Fer 200 B12 100ml"
+      },
+      {
+        id: "combo_cox_fer",
+        category: "combo",
+        name: "Combo Navet-Cox + Fer 200 B12",
+        productKeyword: "Navet Cox + Fer 200",
+        skuKeyword: "",
+        components: "1 Navet-Cox (100ml) + 1 Fer 200 B12 (100ml)"
+      },
+      {
+        id: "combo_pen_strep_dexasone",
+        category: "combo",
+        name: "Combo Pen-strep + Dexasone",
+        productKeyword: "Pen-strep + Dexasone",
+        skuKeyword: "",
+        components: "1 NAVET-PEN-STREP (100ml) + 1 DEXASONE (100ml)"
       }
     ];
 
@@ -2816,11 +2871,13 @@
     window.findMatchingPackagingRule = findMatchingPackagingRule;
     window.findMatchingComboRule = findMatchingComboRule;
 
-    // Global state for combo disaggregation into loose picking lines
-    let isDisaggregateCombos = localStorage.getItem('tiktok_disaggregate_combos') === 'true';
+    // Global state for combo disaggregation into loose picking lines (default: ON for warehouse picking)
+    let isDisaggregateCombos = localStorage.getItem('tiktok_disaggregate_combos') !== 'false';
+    window.isDisaggregateCombos = isDisaggregateCombos;
 
     function toggleDisaggregateCombos() {
       isDisaggregateCombos = !isDisaggregateCombos;
+      window.isDisaggregateCombos = isDisaggregateCombos;
       localStorage.setItem('tiktok_disaggregate_combos', isDisaggregateCombos ? 'true' : 'false');
       updateDisaggregateButtonState();
       if (lastParsedFilesData && lastParsedFilesData.length > 0) {
@@ -3212,7 +3269,7 @@
 
     exportExcelBtn.addEventListener('click', exportExcel);
 
-    printBtn.addEventListener('click', () => {
+    window.printA4Direct = function() {
       if (!groupedProducts.length && !aggregatedItems.length) {
         showToast('Vui lòng tải hoặc nạp ít nhất 1 file PDF để in phiếu!');
         return;
@@ -3221,7 +3278,92 @@
       setTimeout(() => {
         window.print();
       }, 50);
-    });
+    };
+
+    if (printBtn) {
+      printBtn.addEventListener('click', window.printA4Direct);
+    }
+
+    window.exportPdfA4Direct = async function() {
+      if (!groupedProducts.length && !aggregatedItems.length) {
+        showToast('Vui lòng tải hoặc nạp ít nhất 1 file PDF để xuất file!');
+        return;
+      }
+
+      const downloadBtn = document.getElementById('downloadPdfBtn');
+      const originalHtml = downloadBtn ? downloadBtn.innerHTML : '';
+      if (downloadBtn) {
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 mr-1.5 animate-spin"></i> Đang tạo PDF...';
+        lucide.createIcons();
+      }
+
+      try {
+        if (typeof html2pdf === 'undefined') {
+          showToast('Đang tải thư viện xuất PDF, vui lòng đợi...');
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'assets/html2pdf.bundle.min.js';
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Không thể nạp thư viện html2pdf. Vui lòng thử lại.'));
+            document.head.appendChild(script);
+          });
+        }
+
+        preparePrintContent();
+        const printContainer = document.getElementById('printContainer');
+        if (!printContainer) throw new Error('Không tìm thấy nội dung phiếu in.');
+
+        // Create offscreen wrapper positioned behind page content for proper html2canvas capture
+        const wrapper = document.createElement('div');
+        wrapper.id = 'pdfRenderWrapper';
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '0';
+        wrapper.style.left = '0';
+        wrapper.style.width = '794px';
+        wrapper.style.zIndex = '-9999';
+        wrapper.style.background = '#ffffff';
+
+        const clone = printContainer.cloneNode(true);
+        clone.style.display = 'block';
+        clone.style.width = '794px';
+        clone.style.background = '#ffffff';
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const fileName = `Phieu_Nhat_Hang_TikTok_Shop_${dateStr}.pdf`;
+
+        const opt = {
+          margin: [8, 8, 8, 8],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { 
+            scale: 1.5, 
+            useCORS: true, 
+            logging: false,
+            scrollY: 0,
+            scrollX: 0
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        await html2pdf().set(opt).from(clone).save();
+        document.body.removeChild(wrapper);
+
+        showToast(`Đã xuất và tải file PDF thành công: ${fileName}`);
+      } catch (err) {
+        console.error('Lỗi khi xuất file PDF:', err);
+        showToast('Lỗi xuất PDF: ' + (err.message || 'Không thể tạo file'));
+      } finally {
+        if (downloadBtn) {
+          downloadBtn.disabled = false;
+          downloadBtn.innerHTML = originalHtml;
+          lucide.createIcons();
+        }
+      }
+    };
 
     // View Switching
     window.switchView = function(mode) {
@@ -4930,7 +5072,23 @@
           const comboRule = isDisaggregateCombos ? findMatchingComboRule(pName, sName) : null;
 
           if (comboRule && comboRule.components) {
-            const components = parseComboComponents(comboRule.components);
+            let components = parseComboComponents(comboRule.components);
+
+            // Smart Fallback: If components produced 0 matches (e.g. user typed description "trị viêm đa khớp..."),
+            // automatically extract component names from '+' segments in the combo product title
+            const hasAnyMatch = components.some(c => findMatchingTargetCandidate(c.name, nonComboCandidates));
+            if (!hasAnyMatch && (pName.includes('+') || (comboRule.name && comboRule.name.includes('+')))) {
+              const nameToParse = pName.includes('+') ? pName : comboRule.name;
+              const cleanComboTitle = nameToParse.replace(/^Combo\s+/i, '').split(/[:_]/)[0];
+              const nameParts = cleanComboTitle.split('+').map(s => s.trim()).filter(Boolean);
+              if (nameParts.length > 1) {
+                components = nameParts.map(part => {
+                  const parsed = parseComboComponents(part);
+                  return parsed.length > 0 ? parsed[0] : { name: part, qty: 1, sku: 'Mặc định' };
+                });
+              }
+            }
+
             if (components.length > 0) {
               const pack = parseSkuPackagingType(sName, pName);
               const comboMultiplier = pack.isBulk ? (it.qty * pack.packSize) : it.qty;
@@ -6749,6 +6907,7 @@
     try {
       loadComboRules();
       updatePrintModeButtons();
+      updateDisaggregateButtonState();
       if (window.lucide) {
         lucide.createIcons();
       }
