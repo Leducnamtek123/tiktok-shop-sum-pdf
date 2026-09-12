@@ -177,10 +177,58 @@
       .tiktok-order-id div {
         padding: 0.5px 0 !important;
       }
-      .tiktok-print-footer {
+      /* Signatures Block - 3 Columns (Người lập phiếu - Người nhận hàng - Thủ kho) */
+      .tiktok-print-signatures-section {
         margin-top: 14px !important;
-        border-top: 1.5pt solid #0f172a !important;
-        padding-top: 8px !important;
+        padding-top: 6px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      .tiktok-print-date {
+        text-align: right !important;
+        font-style: italic !important;
+        font-size: 8pt !important;
+        color: #334155 !important;
+        margin-bottom: 8px !important;
+      }
+      .tiktok-print-signatures {
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: flex-start !important;
+        text-align: center !important;
+        margin-bottom: 12px !important;
+      }
+      .tiktok-signature-block {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+      .tiktok-signature-title {
+        font-weight: 800 !important;
+        font-size: 8.5pt !important;
+        text-transform: uppercase !important;
+        color: #0f172a !important;
+        letter-spacing: 0.02em !important;
+      }
+      .tiktok-signature-note {
+        font-size: 7.2pt !important;
+        color: #64748b !important;
+        font-style: italic !important;
+        margin-top: 1.5px !important;
+      }
+      .tiktok-signature-space {
+        height: 52px !important;
+      }
+      .tiktok-signature-dots {
+        font-size: 7.5pt !important;
+        color: #94a3b8 !important;
+        letter-spacing: 0.03em !important;
+      }
+      .tiktok-print-footer {
+        margin-top: 8px !important;
+        border-top: 1.2pt solid #0f172a !important;
+        padding-top: 6px !important;
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
@@ -639,13 +687,14 @@
               Xuất file Excel
             </button>
 
-            <!-- Print A4 Button -->
+            <!-- Print / Export PDF A4 Button -->
             <button 
               id="printBtn" 
               class="inline-flex items-center px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+              title="In phiếu nhặt hàng hoặc Lưu dưới dạng file PDF (A4)"
             >
               <i data-lucide="printer" class="w-4 h-4 mr-1.5"></i>
-              In phiếu A4
+              In phiếu / Xuất PDF (A4)
             </button>
           </div>
 
@@ -3886,6 +3935,32 @@
         ]);
       });
 
+      // Signatures section in Shipping Excel (Người lập phiếu - Người nhận hàng - Thủ kho)
+      rows.push([]);
+      rows.push([]);
+      const nowShipEx = new Date();
+      const dateStrShipEx = `Ngày ${String(nowShipEx.getDate()).padStart(2, '0')} tháng ${String(nowShipEx.getMonth() + 1).padStart(2, '0')} năm ${nowShipEx.getFullYear()}`;
+      
+      const dateRowShip = new Array(11).fill("");
+      dateRowShip[7] = dateStrShipEx;
+      rows.push(dateRowShip);
+
+      const sigTitleRowShip = new Array(11).fill("");
+      sigTitleRowShip[1] = "NGƯỜI LẬP PHIẾU";
+      sigTitleRowShip[4] = "NGƯỜI NHẬN HÀNG";
+      sigTitleRowShip[7] = "THỦ KHO";
+      rows.push(sigTitleRowShip);
+
+      const sigNoteRowShip = new Array(11).fill("");
+      sigNoteRowShip[1] = "(Ký, ghi rõ họ tên)";
+      sigNoteRowShip[4] = "(Ký, ghi rõ họ tên)";
+      sigNoteRowShip[7] = "(Ký, ghi rõ họ tên)";
+      rows.push(sigNoteRowShip);
+
+      rows.push([]);
+      rows.push([]);
+      rows.push([]);
+
       const ws = XLSX.utils.aoa_to_sheet(rows);
       ws['!cols'] = [
         { wch: 12 }, { wch: 20 }, { wch: 22 }, { wch: 45 }, { wch: 22 },
@@ -5514,6 +5589,32 @@
       }
       rows.push(totalRow);
 
+      // Signatures section in Excel (Người lập phiếu - Người nhận hàng - Thủ kho)
+      rows.push([]);
+      rows.push([]);
+      const nowEx = new Date();
+      const dateStrEx = `Ngày ${String(nowEx.getDate()).padStart(2, '0')} tháng ${String(nowEx.getMonth() + 1).padStart(2, '0')} năm ${nowEx.getFullYear()}`;
+      
+      const dateRow = new Array(headers.length).fill("");
+      dateRow[Math.min(7, headers.length - 1)] = dateStrEx;
+      rows.push(dateRow);
+
+      const sigTitleRow = new Array(headers.length).fill("");
+      sigTitleRow[1] = "NGƯỜI LẬP PHIẾU";
+      sigTitleRow[4] = "NGƯỜI NHẬN HÀNG";
+      sigTitleRow[Math.min(7, headers.length - 1)] = "THỦ KHO";
+      rows.push(sigTitleRow);
+
+      const sigNoteRow = new Array(headers.length).fill("");
+      sigNoteRow[1] = "(Ký, ghi rõ họ tên)";
+      sigNoteRow[4] = "(Ký, ghi rõ họ tên)";
+      sigNoteRow[Math.min(7, headers.length - 1)] = "(Ký, ghi rõ họ tên)";
+      rows.push(sigNoteRow);
+
+      rows.push([]);
+      rows.push([]);
+      rows.push([]);
+
       const ws = XLSX.utils.aoa_to_sheet(rows);
 
       ws['!cols'] = [
@@ -5792,16 +5893,43 @@
           </tbody>
         </table>
 
+        <!-- Signatures Section (3 Columns: Người lập phiếu - Người nhận hàng - Thủ kho) -->
+        <div class="tiktok-print-signatures-section">
+          <div class="tiktok-print-date">
+            Ngày ${String(new Date().getDate()).padStart(2, '0')} tháng ${String(new Date().getMonth() + 1).padStart(2, '0')} năm ${new Date().getFullYear()}
+          </div>
+          <div class="tiktok-print-signatures">
+            <div class="tiktok-signature-block">
+              <div class="tiktok-signature-title">Người lập phiếu</div>
+              <div class="tiktok-signature-note">(Ký, ghi rõ họ tên)</div>
+              <div class="tiktok-signature-space"></div>
+              <div class="tiktok-signature-dots">...................................................</div>
+            </div>
+            <div class="tiktok-signature-block">
+              <div class="tiktok-signature-title">Người nhận hàng</div>
+              <div class="tiktok-signature-note">(Ký, ghi rõ họ tên)</div>
+              <div class="tiktok-signature-space"></div>
+              <div class="tiktok-signature-dots">...................................................</div>
+            </div>
+            <div class="tiktok-signature-block">
+              <div class="tiktok-signature-title">Thủ kho</div>
+              <div class="tiktok-signature-note">(Ký, ghi rõ họ tên)</div>
+              <div class="tiktok-signature-space"></div>
+              <div class="tiktok-signature-dots">...................................................</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Bottom Footer (Official TikTok Shop branding) -->
         <div class="tiktok-print-footer">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 22px; object-fit: contain;" />
+            <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 20px; object-fit: contain;" />
             <span style="font-size: 7.5pt; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.04em;">
               TikTok Shop Logistics • Phiếu Nhặt Hàng Chuẩn Kho Vận
             </span>
           </div>
-          <div style="font-size: 8pt; color: #475569; font-weight: 600;">
-            <span>Chữ ký thủ kho kiểm hàng: ....................................................</span>
+          <div style="font-size: 7.5pt; color: #64748b; font-weight: 500;">
+            <span>Thời gian in: ${nowStr} &bull; Hệ thống tự động gom đơn</span>
           </div>
         </div>
       `;
