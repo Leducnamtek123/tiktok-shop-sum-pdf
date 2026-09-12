@@ -1,0 +1,262 @@
+[
+  {
+    "id": "pkg_thung_24_chai",
+    "category": "packaging",
+    "name": "Quy cách Thùng 24 chai",
+    "productKeyword": "",
+    "skuKeyword": "Thùng 24 chai",
+    "packSize": 24,
+    "unit": "Chai 100ml"
+  },
+  {
+    "id": "pkg_thung_12_chai",
+    "category": "packaging",
+    "name": "Quy cách Thùng 12 chai",
+    "productKeyword": "",
+    "skuKeyword": "Thùng 12 chai",
+    "packSize": 12,
+    "unit": "Chai 100ml"
+  },
+  {
+    "id": "pkg_thung_6_chai",
+    "category": "packaging",
+    "name": "Quy cách Thùng 6 chai",
+    "productKeyword": "",
+    "skuKeyword": "Thùng 6 chai",
+    "packSize": 6,
+    "unit": "Chai 100ml"
+  },
+  {
+    "id": "pkg_thung_12_goi",
+    "category": "packaging",
+    "name": "Quy cách Thùng 12 gói",
+    "productKeyword": "",
+    "skuKeyword": "Thùng 12",
+    "packSize": 12,
+    "unit": "Gói"
+  },
+  {
+    "id": "combo_phuc_hoi_calcifort_ade",
+    "category": "combo",
+    "name": "Combo Phục hồi _ CALCIFORT B12 + ADE B.COMPLEX",
+    "productKeyword": "Combo Phục hồi",
+    "skuKeyword": "",
+    "components": "1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+  },
+  {
+    "id": "combo_pen_strep_dexasone",
+    "category": "combo",
+    "name": "Combo Pen-strep + Dexasone (Trị viêm da)",
+    "productKeyword": "Pen-strep + Dexasone",
+    "skuKeyword": "",
+    "components": "1 Navet-Pen-Strep (100ml) + 1 Dexasone (100ml)"
+  },
+  {
+    "id": "combo_pen_strep_ketofen_calcifort",
+    "category": "combo",
+    "name": "Combo Navet-Pen-Strep + Ketofen + Calcifort B12 (Trị viêm đa khớp)",
+    "productKeyword": "Navet-Pen-Strep + Ketofen",
+    "skuKeyword": "",
+    "components": "1 Navet-Pen-Strep (100ml) + 1 Ketofen (100ml) + 1 Calcifort-B12 (100ml)"
+  },
+  {
+    "id": "combo_bo_thuoc_co_ban",
+    "category": "combo",
+    "name": "Combo Bộ thuốc cơ bản (Pen-strep + Analgin C + Butavit + Dexasone)",
+    "productKeyword": "Bộ thuốc cơ bản",
+    "skuKeyword": "",
+    "components": "1 Navet-Pen-Strep (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml) + 1 Dexasone (100ml)"
+  },
+  {
+    "id": "combo_chuyen_ho_hap",
+    "category": "combo",
+    "name": "COMBO Chuyên Hô Hấp _ Navet-Flor + Doxy-T",
+    "productKeyword": "Navet-Flor + Doxy-T",
+    "skuKeyword": "",
+    "components": "1 Navet-Flor (100ml) + 1 Navet-Doxy-T (100ml)"
+  },
+  {
+    "id": "combo_viem_vu_excel_ketofen",
+    "category": "combo",
+    "name": "Combo viêm vú: Navet Excel 100 + Ketofen",
+    "productKeyword": "Navet Excel 100 + Ketofen",
+    "skuKeyword": "",
+    "components": "1 Navet-Excel 100 (100ml) + 1 Ketofen (100ml)"
+  },
+  {
+    "id": "combo_vo_beo_bioglucan_vitamino",
+    "category": "combo",
+    "name": "COMBO SẢN PHẨM VỖ BÉO _ Navet-BioGlucan + Vitamino",
+    "productKeyword": "Navet-BioGlucan + Vitamino",
+    "skuKeyword": "",
+    "components": "1 Navet-BioGlucan (1kg) + 1 Vitamino (1kg)"
+  },
+  {
+    "id": "combo_vo_beo_lite_betazyme_vitamino",
+    "category": "combo",
+    "name": "COMBO VỖ BÉO LITE _ Navet BETAZYME + Vitamino LITE",
+    "productKeyword": "VỖ BÉO LITE",
+    "skuKeyword": "",
+    "components": "1 Navet BETAZYME (1kg) + 1 Vitamino LITE (1kg)"
+  },
+  {
+    "id": "combo_tieu_chay_heo_con_ampicol_scour",
+    "category": "combo",
+    "name": "Combo TIÊU CHẢY HEO CON _ Navet-Ampicol + Scour Solution",
+    "productKeyword": "Navet-Ampicol + Scour Solution",
+    "skuKeyword": "",
+    "components": "1 Navet-Ampicol (100ml) + 1 Scour Solution (100ml)"
+  },
+  {
+    "id": "combo_tri_bo_an_excel_analgin_butavital",
+    "category": "combo",
+    "name": "Combo trị bỏ ăn: Navet Excel + Analgin C + Butavital",
+    "productKeyword": "trị bỏ ăn",
+    "skuKeyword": "",
+    "components": "1 Navet-Excel 100 (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+  },
+  {
+    "id": "combo_heo_nai_oxytocin_gentamox_calcifort",
+    "category": "combo",
+    "name": "Combo cho heo nái (Oxytocin + Gentamox + Calcifort + ADE)",
+    "productKeyword": "cho heo nái",
+    "skuKeyword": "",
+    "components": "1 Oxytocin + 1 Gentamox (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+  },
+  {
+    "id": "combo_sieu_chong_coi_butavital_calcifort_ade",
+    "category": "combo",
+    "name": "Combo siêu chống còi (Butavital + Calcifort B12 + ADE.Bcomplex)",
+    "productKeyword": "siêu chống còi",
+    "skuKeyword": "",
+    "components": "1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+  },
+  {
+    "id": "combo_flor_analgin_butavit",
+    "category": "combo",
+    "name": "Combo Navet-Flor + Navet Analgin C + Navet-Butavit (Hô hấp phức hợp)",
+    "productKeyword": "Navet-Flor + Navet Analgin",
+    "skuKeyword": "",
+    "components": "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+  },
+  {
+    "id": "combo_sat_trung_navetcide_iodine",
+    "category": "combo",
+    "name": "Combo sản phẩm sát trùng NAVETCIDE + IODINE",
+    "productKeyword": "NAVETCIDE + IODINE",
+    "skuKeyword": "",
+    "components": "1 Navetcide (1L) + 1 Navet-Iodine (1L)"
+  },
+  {
+    "id": "combo_sieu_vo_beo_bio_one_vitamino",
+    "category": "combo",
+    "name": "COMBO SIÊU VỖ BÉO _ Navet BIO.One + Vitamino",
+    "productKeyword": "BIO.One + Vitamino",
+    "skuKeyword": "",
+    "components": "1 Navet BIO.One (1kg) + 1 Vitamino (1kg)"
+  },
+  {
+    "id": "combo_enro_bioglucan_electrolytes",
+    "category": "combo",
+    "name": "Combo NAVET ENRO + BIOGLUCAN + VITA-ELECTROLYTES",
+    "productKeyword": "NAVET ENRO + BIOGLUCAN",
+    "skuKeyword": "",
+    "components": "1 Navet-Enro (100ml) + 1 Navet-BioGlucan (1kg) + 1 Vita-Electrolytes (1kg)"
+  },
+  {
+    "id": "combo_phong_tieu_chay_cox_igy",
+    "category": "combo",
+    "name": "Combo phòng tiêu chảy heo con: Navet Cox + Navet IGY",
+    "productKeyword": "Navet Cox + Navet IGY",
+    "skuKeyword": "",
+    "components": "1 Navet Cox (100ml) + 1 Navet IGY (100ml)"
+  },
+  {
+    "id": "combo_cox_fer_200_b12",
+    "category": "combo",
+    "name": "Combo Navet Cox + Fer 200 B12",
+    "productKeyword": "Navet Cox + Fer 200",
+    "skuKeyword": "",
+    "components": "1 Navet Cox (100ml) + 1 Navet-Fer 200-B12 (100ml)"
+  },
+  {
+    "id": "combo_gia_suc_sinh_san_eselen_vitaject",
+    "category": "combo",
+    "name": "Combo gia súc sinh sản : Navet E-Selen Lite + Vitaject ADE",
+    "productKeyword": "gia súc sinh sản",
+    "skuKeyword": "",
+    "components": "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml)"
+  },
+  {
+    "id": "combo_cho_de_de",
+    "category": "combo",
+    "name": "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
+    "productKeyword": "cho Dê đẻ",
+    "skuKeyword": "",
+    "components": "1 Oxytocin + 1 Gentamox (100ml) + 1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml)"
+  },
+  {
+    "id": "combo_cho_de_con",
+    "category": "combo",
+    "name": "Combo cho dê con (Navet Verxil + Fer 200 B12 + Tulamycin + Navet Cox)",
+    "productKeyword": "cho dê con",
+    "skuKeyword": "",
+    "components": "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (100ml) + 1 Navet Cox (100ml)"
+  },
+  {
+    "id": "combo_amoxicol_electrolytes",
+    "category": "combo",
+    "name": "Combo Amoxicol Plus + Electrolytes (Heo nhập đàn)",
+    "productKeyword": "Amoxicol Plus + Electrolytes",
+    "skuKeyword": "",
+    "components": "1 Amoxicol Plus + 1 Vita-Electrolytes (1kg)"
+  },
+  {
+    "id": "combo_amoxy_analgin_calcifort",
+    "category": "combo",
+    "name": "Combo Navet-Amoxy + Navet-Analgin C + Calcifort B12 (Viêm khớp cơ bản)",
+    "productKeyword": "Navet-Amoxy + Navet-Analgin C + Calcifort",
+    "skuKeyword": "",
+    "components": "1 Navet-Amoxy (100ml) + 1 Navet-Analgin C (100ml) + 1 Calcifort-B12 (100ml)"
+  },
+  {
+    "id": "combo_mycoplasma_suis_oxytetra_analgin",
+    "category": "combo",
+    "name": "Combo đặc trị Mycoplasma Suis : Navet Oxytetra 200 + Analgin C + Butavital",
+    "productKeyword": "đặc trị Mycoplasma Suis",
+    "skuKeyword": "",
+    "components": "1 Navet Oxytetra 200 LA (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+  },
+  {
+    "id": "combo_azifluxin_analgin_butavit",
+    "category": "combo",
+    "name": "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT",
+    "productKeyword": "AZIFLUXIN + ANALGIN C",
+    "skuKeyword": "",
+    "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+  },
+  {
+    "id": "combo_sat_trung_navetcide_vitaminc",
+    "category": "combo",
+    "name": "Combo sản phẩm Sát Trùng Navetcide + Vitamin C Antistress",
+    "productKeyword": "Navetcide + Vitamin C Antistress",
+    "skuKeyword": "",
+    "components": "1 Navetcide (1L) + 1 Vitamin C Antistress (1kg)"
+  },
+  {
+    "id": "combo_navet_cel_analgin_calcifort_butavit",
+    "category": "combo",
+    "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavit (Sau sinh)",
+    "productKeyword": "Navet-Cel + Analgin C",
+    "skuKeyword": "",
+    "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 Calcifort-B12 (100ml) + 1 Navet-Butavit (100ml)"
+  },
+  {
+    "id": "combo_amoxy_iodine",
+    "category": "combo",
+    "name": "Combo Navet-Amoxy + Navet-Iodine (Trị viêm da)",
+    "productKeyword": "Navet-Amoxy + Navet-Iodine",
+    "skuKeyword": "",
+    "components": "1 Navet-Amoxy (100ml) + 1 Navet-Iodine (1L)"
+  }
+]

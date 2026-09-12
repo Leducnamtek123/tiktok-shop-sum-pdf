@@ -13,6 +13,8 @@
   <script src="assets/pdf-lib.min.js"></script>
   <script src="assets/xlsx.full.min.js"></script>
   <script src="assets/html2pdf.bundle.min.js"></script>
+  <script src="assets/html2canvas.min.js"></script>
+  <script src="assets/jspdf.umd.min.js"></script>
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -116,9 +118,10 @@
         display: block !important;
         width: 100% !important;
       }
+    }
 
-      /* TikTok Shop Table Print Styling */
-      .tiktok-print-table {
+    /* TikTok Shop Table Print Styling - Active for both @media print and Direct PDF export */
+    .tiktok-print-table {
         width: 100% !important;
         border-collapse: collapse !important;
         margin-top: 6px !important;
@@ -236,7 +239,6 @@
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
-    }
 
     .print-only {
       display: none;
@@ -293,7 +295,7 @@
         >
           <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 mr-1.5 text-rose-600"></i>
           <span>Quy Cách &amp; Combo</span>
-          <span id="comboBadgeCount" class="ml-1.5 px-1.5 py-0.2 text-[10px] font-black rounded-full bg-rose-100 text-rose-700 border border-rose-200">6</span>
+          <span id="comboBadgeCount" class="ml-1.5 px-1.5 py-0.2 text-[10px] font-black rounded-full bg-rose-100 text-rose-700 border border-rose-200">32</span>
         </button>
 
         <span class="hidden sm:inline-flex items-center px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-slate-50 text-slate-600 border border-slate-200">
@@ -713,37 +715,40 @@
               </button>
             </div>
 
-            <!-- Export Excel Button -->
-            <button 
-              id="exportExcelBtn" 
-              class="inline-flex items-center px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
-            >
-              <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
-              Xuất file Excel
-            </button>
-
-            <!-- Export PDF A4 Direct Download Button -->
-            <button 
-              type="button"
-              id="downloadPdfBtn" 
-              onclick="exportPdfA4Direct()"
-              class="inline-flex items-center px-4.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
-              title="Tải trực tiếp file PDF (A4) về máy tính"
-            >
-              <i data-lucide="file-down" class="w-4 h-4 mr-1.5"></i>
-              Xuất PDF (A4)
-            </button>
-
-            <!-- Print Button (Physical Printer Dialog) -->
+            <!-- 1. Hero Primary Action: In phiếu / Lưu PDF (A4) (Chuẩn đẹp nhất, 100% vector, tức thì) -->
             <button 
               type="button"
               id="printBtn" 
               onclick="printA4Direct()"
-              class="inline-flex items-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
-              title="Mở hộp thoại in để gửi lệnh in ra máy in"
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#fe2c55] hover:bg-[#e02447] text-white text-xs font-bold shadow-xs hover:shadow transition-all active:scale-[0.98] cursor-pointer"
+              title="In phiếu hoặc Lưu file PDF chuẩn nét 100% qua hộp thoại Chrome (Khuyên dùng)"
             >
-              <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-slate-500"></i>
-              In phiếu
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>In phiếu / Lưu PDF (A4)</span>
+              <span class="ml-0.5 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-white/20 text-white rounded-md">Chuẩn Đẹp</span>
+            </button>
+
+            <!-- 2. Secondary Action: Tải file PDF trực tiếp (Tiến trình ngầm không đơ trang) -->
+            <button 
+              type="button"
+              id="downloadPdfBtn" 
+              onclick="exportPdfA4Direct()"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
+              title="Tải trực tiếp file PDF về máy qua tiến trình ngầm (không đơ trang)"
+            >
+              <i data-lucide="file-down" class="w-4 h-4 text-rose-600"></i>
+              <span>Tải file PDF (A4)</span>
+              <span class="px-1.5 py-0.5 text-[9px] font-bold bg-slate-100 text-slate-500 rounded-md">Ngầm</span>
+            </button>
+
+            <!-- 3. Tertiary Action: Xuất file Excel -->
+            <button 
+              id="exportExcelBtn" 
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
+              title="Xuất bảng tổng hợp nhặt hàng ra file Excel (.xlsx)"
+            >
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
+              <span>Xuất file Excel</span>
             </button>
           </div>
 
@@ -1502,6 +1507,42 @@
     </div>
   </div>
 
+  <!-- Floating Background PDF Export Progress Dock (Non-blocking background worker) -->
+  <div 
+    id="pdfExportDock" 
+    class="hidden fixed bottom-6 right-6 z-50 w-88 max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 p-4 transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto no-print"
+  >
+    <div class="flex items-center justify-between gap-3 mb-2.5">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div id="pdfDockIcon" class="w-8 h-8 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600 transition-colors">
+          <svg class="w-4 h-4 animate-spin text-rose-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+            <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div id="pdfDockTitle" class="text-xs font-bold text-slate-900 truncate">Đang tạo file PDF (A4)...</div>
+          <div id="pdfDockSubtitle" class="text-[11px] text-slate-500 font-medium truncate">Đang chuẩn bị trang in...</div>
+        </div>
+      </div>
+      <div id="pdfDockPercent" class="text-xs font-black font-mono text-rose-600 shrink-0 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100">
+        0%
+      </div>
+    </div>
+    <!-- Progress Bar -->
+    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
+      <div id="pdfDockProgressBar" class="h-full bg-rose-600 rounded-full transition-all duration-300 ease-out" style="width: 0%;"></div>
+    </div>
+    <!-- Footer Status -->
+    <div class="flex items-center justify-between text-[10px] text-slate-400 font-medium">
+      <span class="flex items-center gap-1.5">
+        <span id="pdfDockDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+        <span id="pdfDockFootnote">Tiến trình ngầm &bull; Không đơ trang web</span>
+      </span>
+      <button type="button" onclick="dismissPdfDock()" class="hover:text-slate-700 transition-colors text-slate-400 font-semibold cursor-pointer">Đóng</button>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center space-x-2 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none no-print">
     <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
@@ -1624,12 +1665,20 @@
 
     const DEFAULT_COMBO_RULES = [
       {
-        id: "combo_phuc_hoi",
+        id: "combo_phuc_hoi_calcifort_ade",
         category: "combo",
-        name: "Combo Phục Hồi (Cặp 100ml)",
+        name: "Combo Phục hồi _ CALCIFORT B12 + ADE B.COMPLEX",
         productKeyword: "Combo Phục hồi",
         skuKeyword: "",
         components: "1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+      },
+      {
+        id: "combo_pen_strep_dexasone",
+        category: "combo",
+        name: "Combo Pen-strep + Dexasone (Trị viêm da)",
+        productKeyword: "Pen-strep + Dexasone",
+        skuKeyword: "",
+        components: "1 Navet-Pen-Strep (100ml) + 1 Dexasone (100ml)"
       },
       {
         id: "combo_pen_strep_ketofen_calcifort",
@@ -1637,15 +1686,15 @@
         name: "Combo Navet-Pen-Strep + Ketofen + Calcifort B12 (Trị viêm đa khớp)",
         productKeyword: "Navet-Pen-Strep + Ketofen",
         skuKeyword: "",
-        components: "1 NAVET-PEN-STREP (100ml) + 1 NAVET-KETOFEN (100ml) + 1 Calcifort-B12 (100ml)"
+        components: "1 Navet-Pen-Strep (100ml) + 1 Ketofen (100ml) + 1 Calcifort-B12 (100ml)"
       },
       {
-        id: "combo_flor_analgin_butavit",
+        id: "combo_bo_thuoc_co_ban",
         category: "combo",
-        name: "Combo Navet-Flor + Navet Analgin C + Navet-Butavit",
-        productKeyword: "Navet-Flor + Navet Analgin",
+        name: "Combo Bộ thuốc cơ bản (Pen-strep + Analgin C + Butavit + Dexasone)",
+        productKeyword: "Bộ thuốc cơ bản",
         skuKeyword: "",
-        components: "1 Navet-Flor (100ml) + 1 NAVET-ANALGIN C (100ml) + 1 Navet-Butavit (100ml)"
+        components: "1 Navet-Pen-Strep (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml) + 1 Dexasone (100ml)"
       },
       {
         id: "combo_chuyen_ho_hap",
@@ -1653,39 +1702,191 @@
         name: "COMBO Chuyên Hô Hấp _ Navet-Flor + Doxy-T",
         productKeyword: "Navet-Flor + Doxy-T",
         skuKeyword: "",
-        components: "1 Navet-Flor (100ml) + 1 Doxy-T (100ml)"
+        components: "1 Navet-Flor (100ml) + 1 Navet-Doxy-T (100ml)"
       },
       {
-        id: "combo_vo_beo",
+        id: "combo_viem_vu_excel_ketofen",
         category: "combo",
-        name: "COMBO VỖ BÉO LITE",
+        name: "Combo viêm vú: Navet Excel 100 + Ketofen",
+        productKeyword: "Navet Excel 100 + Ketofen",
+        skuKeyword: "",
+        components: "1 Navet-Excel 100 (100ml) + 1 Ketofen (100ml)"
+      },
+      {
+        id: "combo_vo_beo_bioglucan_vitamino",
+        category: "combo",
+        name: "COMBO SẢN PHẨM VỖ BÉO _ Navet-BioGlucan + Vitamino",
+        productKeyword: "Navet-BioGlucan + Vitamino",
+        skuKeyword: "",
+        components: "1 Navet-BioGlucan (1kg) + 1 Vitamino (1kg)"
+      },
+      {
+        id: "combo_vo_beo_lite_betazyme_vitamino",
+        category: "combo",
+        name: "COMBO VỖ BÉO LITE _ Navet BETAZYME + Vitamino LITE",
         productKeyword: "VỖ BÉO LITE",
         skuKeyword: "",
-        components: "1 Betazyme 1kg + 1 Vitamino LITE 1kg"
+        components: "1 Navet BETAZYME (1kg) + 1 Vitamino LITE (1kg)"
       },
       {
-        id: "combo_tieu_chay",
+        id: "combo_tieu_chay_heo_con_ampicol_scour",
         category: "combo",
-        name: "Combo Tiêu Chảy Heo Con",
-        productKeyword: "TIÊU CHẢY HEO CON",
+        name: "Combo TIÊU CHẢY HEO CON _ Navet-Ampicol + Scour Solution",
+        productKeyword: "Navet-Ampicol + Scour Solution",
         skuKeyword: "",
-        components: "1 Navet-Cox 100ml + 1 Fer 200 B12 100ml"
+        components: "1 Navet-Ampicol (100ml) + 1 Scour Solution (100ml)"
       },
       {
-        id: "combo_cox_fer",
+        id: "combo_tri_bo_an_excel_analgin_butavital",
         category: "combo",
-        name: "Combo Navet-Cox + Fer 200 B12",
+        name: "Combo trị bỏ ăn: Navet Excel + Analgin C + Butavital",
+        productKeyword: "trị bỏ ăn",
+        skuKeyword: "",
+        components: "1 Navet-Excel 100 (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+      },
+      {
+        id: "combo_heo_nai_oxytocin_gentamox_calcifort",
+        category: "combo",
+        name: "Combo cho heo nái (Oxytocin + Gentamox + Calcifort + ADE)",
+        productKeyword: "cho heo nái",
+        skuKeyword: "",
+        components: "1 Oxytocin + 1 Gentamox (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+      },
+      {
+        id: "combo_sieu_chong_coi_butavital_calcifort_ade",
+        category: "combo",
+        name: "Combo siêu chống còi (Butavital + Calcifort B12 + ADE.Bcomplex)",
+        productKeyword: "siêu chống còi",
+        skuKeyword: "",
+        components: "1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+      },
+      {
+        id: "combo_flor_analgin_butavit",
+        category: "combo",
+        name: "Combo Navet-Flor + Navet Analgin C + Navet-Butavit (Hô hấp phức hợp)",
+        productKeyword: "Navet-Flor + Navet Analgin",
+        skuKeyword: "",
+        components: "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+      },
+      {
+        id: "combo_sat_trung_navetcide_iodine",
+        category: "combo",
+        name: "Combo sản phẩm sát trùng NAVETCIDE + IODINE",
+        productKeyword: "NAVETCIDE + IODINE",
+        skuKeyword: "",
+        components: "1 Navetcide (1L) + 1 Navet-Iodine (1L)"
+      },
+      {
+        id: "combo_sieu_vo_beo_bio_one_vitamino",
+        category: "combo",
+        name: "COMBO SIÊU VỖ BÉO _ Navet BIO.One + Vitamino",
+        productKeyword: "BIO.One + Vitamino",
+        skuKeyword: "",
+        components: "1 Navet BIO.One (1kg) + 1 Vitamino (1kg)"
+      },
+      {
+        id: "combo_enro_bioglucan_electrolytes",
+        category: "combo",
+        name: "Combo NAVET ENRO + BIOGLUCAN + VITA-ELECTROLYTES",
+        productKeyword: "NAVET ENRO + BIOGLUCAN",
+        skuKeyword: "",
+        components: "1 Navet-Enro (100ml) + 1 Navet-BioGlucan (1kg) + 1 Vita-Electrolytes (1kg)"
+      },
+      {
+        id: "combo_phong_tieu_chay_cox_igy",
+        category: "combo",
+        name: "Combo phòng tiêu chảy heo con: Navet Cox + Navet IGY",
+        productKeyword: "Navet Cox + Navet IGY",
+        skuKeyword: "",
+        components: "1 Navet Cox (100ml) + 1 Navet IGY (100ml)"
+      },
+      {
+        id: "combo_cox_fer_200_b12",
+        category: "combo",
+        name: "Combo Navet Cox + Fer 200 B12",
         productKeyword: "Navet Cox + Fer 200",
         skuKeyword: "",
-        components: "1 Navet-Cox (100ml) + 1 Fer 200 B12 (100ml)"
+        components: "1 Navet Cox (100ml) + 1 Navet-Fer 200-B12 (100ml)"
       },
       {
-        id: "combo_pen_strep_dexasone",
+        id: "combo_gia_suc_sinh_san_eselen_vitaject",
         category: "combo",
-        name: "Combo Pen-strep + Dexasone",
-        productKeyword: "Pen-strep + Dexasone",
+        name: "Combo gia súc sinh sản : Navet E-Selen Lite + Vitaject ADE",
+        productKeyword: "gia súc sinh sản",
         skuKeyword: "",
-        components: "1 NAVET-PEN-STREP (100ml) + 1 DEXASONE (100ml)"
+        components: "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml)"
+      },
+      {
+        id: "combo_cho_de_de",
+        category: "combo",
+        name: "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
+        productKeyword: "cho Dê đẻ",
+        skuKeyword: "",
+        components: "1 Oxytocin + 1 Gentamox (100ml) + 1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml)"
+      },
+      {
+        id: "combo_cho_de_con",
+        category: "combo",
+        name: "Combo cho dê con (Navet Verxil + Fer 200 B12 + Tulamycin + Navet Cox)",
+        productKeyword: "cho dê con",
+        skuKeyword: "",
+        components: "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (100ml) + 1 Navet Cox (100ml)"
+      },
+      {
+        id: "combo_amoxicol_electrolytes",
+        category: "combo",
+        name: "Combo Amoxicol Plus + Electrolytes (Heo nhập đàn)",
+        productKeyword: "Amoxicol Plus + Electrolytes",
+        skuKeyword: "",
+        components: "1 Amoxicol Plus + 1 Vita-Electrolytes (1kg)"
+      },
+      {
+        id: "combo_amoxy_analgin_calcifort",
+        category: "combo",
+        name: "Combo Navet-Amoxy + Navet-Analgin C + Calcifort B12 (Viêm khớp cơ bản)",
+        productKeyword: "Navet-Amoxy + Navet-Analgin C + Calcifort",
+        skuKeyword: "",
+        components: "1 Navet-Amoxy (100ml) + 1 Navet-Analgin C (100ml) + 1 Calcifort-B12 (100ml)"
+      },
+      {
+        id: "combo_mycoplasma_suis_oxytetra_analgin",
+        category: "combo",
+        name: "Combo đặc trị Mycoplasma Suis : Navet Oxytetra 200 + Analgin C + Butavital",
+        productKeyword: "đặc trị Mycoplasma Suis",
+        skuKeyword: "",
+        components: "1 Navet Oxytetra 200 LA (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+      },
+      {
+        id: "combo_azifluxin_analgin_butavit",
+        category: "combo",
+        name: "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT",
+        productKeyword: "AZIFLUXIN + ANALGIN C",
+        skuKeyword: "",
+        components: "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+      },
+      {
+        id: "combo_sat_trung_navetcide_vitaminc",
+        category: "combo",
+        name: "Combo sản phẩm Sát Trùng Navetcide + Vitamin C Antistress",
+        productKeyword: "Navetcide + Vitamin C Antistress",
+        skuKeyword: "",
+        components: "1 Navetcide (1L) + 1 Vitamin C Antistress (1kg)"
+      },
+      {
+        id: "combo_navet_cel_analgin_calcifort_butavit",
+        category: "combo",
+        name: "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavit (Sau sinh)",
+        productKeyword: "Navet-Cel + Analgin C",
+        skuKeyword: "",
+        components: "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 Calcifort-B12 (100ml) + 1 Navet-Butavit (100ml)"
+      },
+      {
+        id: "combo_amoxy_iodine",
+        category: "combo",
+        name: "Combo Navet-Amoxy + Navet-Iodine (Trị viêm da)",
+        productKeyword: "Navet-Amoxy + Navet-Iodine",
+        skuKeyword: "",
+        components: "1 Navet-Amoxy (100ml) + 1 Navet-Iodine (1L)"
       }
     ];
 
@@ -1746,6 +1947,23 @@
 
       if (!comboRules || comboRules.length === 0) {
         comboRules = [...DEFAULT_ALL_RULES];
+      }
+
+      // Ensure all 28 default root combos are always present
+      const existingComboKeys = new Set(comboRules.filter(r => r.category === 'combo').map(r => (r.name || '').toLowerCase().trim()));
+      let addedRootCombos = false;
+      DEFAULT_COMBO_RULES.forEach(dr => {
+        const k = (dr.name || '').toLowerCase().trim();
+        if (!existingComboKeys.has(k)) {
+          comboRules.push(dr);
+          existingComboKeys.add(k);
+          addedRootCombos = true;
+        }
+      });
+      if (addedRootCombos) {
+        try {
+          localStorage.setItem('tiktok_shop_combo_rules_v3', JSON.stringify(comboRules));
+        } catch(e) {}
       }
 
       // Auto deduplicate legacy duplicates if any
@@ -3284,28 +3502,133 @@
       printBtn.addEventListener('click', window.printA4Direct);
     }
 
+    // Floating Background PDF Dock Controller
+    let pdfDockTimer = null;
+    function showPdfDock({ title, subtitle, percent = 0 }) {
+      if (pdfDockTimer) {
+        clearTimeout(pdfDockTimer);
+        pdfDockTimer = null;
+      }
+      const dock = document.getElementById('pdfExportDock');
+      if (!dock) return;
+      dock.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        dock.classList.remove('translate-y-4', 'opacity-0');
+        dock.classList.add('translate-y-0', 'opacity-100');
+      });
+      updatePdfDock({ title, subtitle, percent, state: 'running' });
+    }
+
+    function updatePdfDock({ title, subtitle, percent, state = 'running' }) {
+      const dock = document.getElementById('pdfExportDock');
+      if (!dock) return;
+      const titleEl = document.getElementById('pdfDockTitle');
+      const subEl = document.getElementById('pdfDockSubtitle');
+      const pctEl = document.getElementById('pdfDockPercent');
+      const barEl = document.getElementById('pdfDockProgressBar');
+      const iconEl = document.getElementById('pdfDockIcon');
+
+      if (title && titleEl) titleEl.textContent = title;
+      if (subtitle && subEl) subEl.textContent = subtitle;
+      if (typeof percent === 'number' && pctEl && barEl) {
+        const rounded = Math.min(100, Math.max(0, Math.round(percent)));
+        pctEl.textContent = `${rounded}%`;
+        barEl.style.width = `${rounded}%`;
+      }
+
+      if (state === 'done') {
+        if (iconEl) {
+          iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 text-emerald-600 transition-colors';
+          iconEl.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>';
+        }
+        if (pctEl) {
+          pctEl.className = 'text-xs font-black font-mono text-emerald-600 shrink-0 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100';
+          pctEl.textContent = '100%';
+        }
+        if (barEl) {
+          barEl.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300 ease-out';
+          barEl.style.width = '100%';
+        }
+        if (window.lucide) lucide.createIcons();
+
+        // Auto dismiss dock after 3.5s
+        pdfDockTimer = setTimeout(() => {
+          dismissPdfDock();
+        }, 3500);
+      } else if (state === 'error') {
+        if (iconEl) {
+          iconEl.className = 'w-8 h-8 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600 transition-colors';
+          iconEl.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>';
+        }
+        if (pctEl) {
+          pctEl.className = 'text-xs font-black font-mono text-rose-600 shrink-0 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100';
+          pctEl.textContent = '!';
+        }
+        if (barEl) {
+          barEl.className = 'h-full bg-rose-600 rounded-full transition-all duration-300 ease-out';
+        }
+        if (window.lucide) lucide.createIcons();
+      } else if (state === 'running') {
+        if (iconEl) {
+          iconEl.className = 'w-8 h-8 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600 transition-colors';
+          iconEl.innerHTML = `
+            <svg class="w-4 h-4 animate-spin text-rose-600" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+          `;
+        }
+        if (pctEl) {
+          pctEl.className = 'text-xs font-black font-mono text-rose-600 shrink-0 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100';
+        }
+        if (barEl) {
+          barEl.className = 'h-full bg-rose-600 rounded-full transition-all duration-300 ease-out';
+        }
+      }
+    }
+
+    function dismissPdfDock() {
+      const dock = document.getElementById('pdfExportDock');
+      if (!dock) return;
+      dock.classList.remove('translate-y-0', 'opacity-100');
+      dock.classList.add('translate-y-4', 'opacity-0');
+      setTimeout(() => {
+        dock.classList.add('hidden');
+      }, 300);
+    }
+    window.dismissPdfDock = dismissPdfDock;
+
+    // Non-blocking Direct PDF Export with Background Progress Dock
     window.exportPdfA4Direct = async function() {
       if (!groupedProducts.length && !aggregatedItems.length) {
         showToast('Vui lòng tải hoặc nạp ít nhất 1 file PDF để xuất file!');
         return;
       }
 
-      const downloadBtn = document.getElementById('downloadPdfBtn');
-      const originalHtml = downloadBtn ? downloadBtn.innerHTML : '';
-      if (downloadBtn) {
-        downloadBtn.disabled = true;
-        downloadBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 mr-1.5 animate-spin"></i> Đang tạo PDF...';
-        lucide.createIcons();
+      if (window._isExportingPdf) {
+        showToast('Tiến trình ngầm đang tạo file PDF, vui lòng đợi giây lát...');
+        return;
       }
+      window._isExportingPdf = true;
+
+      // Show dock immediately
+      showPdfDock({
+        title: 'Đang tạo file PDF (A4)...',
+        subtitle: 'Đang chuẩn bị trang in...',
+        percent: 15
+      });
+
+      // Yield so UI thread stays responsive
+      await new Promise(r => setTimeout(r, 80));
 
       try {
         if (typeof html2pdf === 'undefined') {
-          showToast('Đang tải thư viện xuất PDF, vui lòng đợi...');
+          updatePdfDock({ subtitle: 'Đang nạp thư viện PDF...', percent: 25 });
           await new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.src = 'assets/html2pdf.bundle.min.js';
             script.onload = resolve;
-            script.onerror = () => reject(new Error('Không thể nạp thư viện html2pdf. Vui lòng thử lại.'));
+            script.onerror = () => reject(new Error('Không thể nạp thư viện html2pdf.'));
             document.head.appendChild(script);
           });
         }
@@ -3314,9 +3637,12 @@
         const printContainer = document.getElementById('printContainer');
         if (!printContainer) throw new Error('Không tìm thấy nội dung phiếu in.');
 
-        // Create offscreen wrapper positioned behind page content for proper html2canvas capture
+        updatePdfDock({ subtitle: 'Đang dựng bản in chuẩn TikTok Shop...', percent: 45 });
+        await new Promise(r => setTimeout(r, 80));
+
+        // Create offscreen wrapper
         const wrapper = document.createElement('div');
-        wrapper.id = 'pdfRenderWrapper';
+        wrapper.id = 'pdfExportWrapper';
         wrapper.style.position = 'fixed';
         wrapper.style.top = '0';
         wrapper.style.left = '0';
@@ -3331,15 +3657,18 @@
         wrapper.appendChild(clone);
         document.body.appendChild(wrapper);
 
+        updatePdfDock({ subtitle: 'Đang render trang PDF chuẩn nét...', percent: 65 });
+        await new Promise(r => setTimeout(r, 80));
+
         const dateStr = new Date().toISOString().slice(0, 10);
         const fileName = `Phieu_Nhat_Hang_TikTok_Shop_${dateStr}.pdf`;
 
         const opt = {
           margin: [8, 8, 8, 8],
           filename: fileName,
-          image: { type: 'jpeg', quality: 0.95 },
+          image: { type: 'jpeg', quality: 0.93 },
           html2canvas: { 
-            scale: 1.5, 
+            scale: 1.25, 
             useCORS: true, 
             logging: false,
             scrollY: 0,
@@ -3349,19 +3678,34 @@
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
+        updatePdfDock({ subtitle: 'Đang đóng gói file PDF...', percent: 85 });
+        await new Promise(r => setTimeout(r, 50));
+
         await html2pdf().set(opt).from(clone).save();
-        document.body.removeChild(wrapper);
+
+        if (document.body.contains(wrapper)) {
+          document.body.removeChild(wrapper);
+        }
+
+        updatePdfDock({
+          title: 'Đã tải xong file PDF!',
+          subtitle: fileName,
+          percent: 100,
+          state: 'done'
+        });
 
         showToast(`Đã xuất và tải file PDF thành công: ${fileName}`);
       } catch (err) {
         console.error('Lỗi khi xuất file PDF:', err);
+        updatePdfDock({
+          title: 'Lỗi xuất PDF',
+          subtitle: err.message || 'Không thể tạo file',
+          percent: 100,
+          state: 'error'
+        });
         showToast('Lỗi xuất PDF: ' + (err.message || 'Không thể tạo file'));
       } finally {
-        if (downloadBtn) {
-          downloadBtn.disabled = false;
-          downloadBtn.innerHTML = originalHtml;
-          lucide.createIcons();
-        }
+        window._isExportingPdf = false;
       }
     };
 
