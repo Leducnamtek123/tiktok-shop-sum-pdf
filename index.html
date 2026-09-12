@@ -3370,6 +3370,8 @@
     function cleanItemProductName(rawName) {
       if (!rawName) return '';
       let cleaned = rawName.trim();
+      // Remove NickName lines if leaked
+      cleaned = cleaned.replace(/^NickName\s*:\s*.*/i, '');
       // Remove "In transit by: dd/mm/yyyy hh:mm Product Name " or similar TikTok export prefixes
       cleaned = cleaned.replace(/^In\s+transit\s+by[:\s]*[\d/:\s-]+(Product\s+Name\s*[:\-]?\s*)?/i, '');
       // Remove standalone "In transit by: ... " if any
@@ -3387,6 +3389,7 @@
     function cleanSku(s) {
       if (!s) return 'Mặc định';
       let cleaned = s.trim();
+      cleaned = cleaned.replace(/^NickName\s*:\s*.*/i, '').replace(/NickName\s*:\s*.*/i, '');
       cleaned = cleaned.replace(/^Seller\s+SKU\s*/i, '').replace(/Seller\s+SKU/i, '').replace(/^SKU\s*/i, '').replace(/Order\s+ID:\s*\d+/gi, '').trim();
       return cleaned || 'Mặc định';
     }
@@ -3587,13 +3590,26 @@
           const ord = ordersDict[oid];
           const words = ord.slipWords;
 
+          // Find footer boundary to prevent Qty Total, NickName, or Order ID from being parsed as items
+          let footerY = 9999;
+          words.forEach(w => {
+            const t = w.str.trim();
+            // Header is around y=304, footer starts at or below y=320
+            if (w.y > 320) {
+              if (t.includes('Total') || t.includes('NickName') || t === 'Order' || t === 'ID:' || t.includes('Order ID')) {
+                if (w.y < footerY) footerY = w.y;
+              }
+            }
+          });
+
           const filtered = words.filter(w => {
             const t = w.str.trim();
             if (!t) return false;
+            if (w.y >= footerY - 2) return false;
             if (['Product', 'Name', 'SKU', 'Seller', 'Qty', 'Total:', 'Order', 'ID:', 'In transit by:', 'In', 'transit', 'by:'].includes(t)) {
               return false;
             }
-            if (t.includes('Seller SKU') || t.includes('Product Name') || t.includes('Qty Total') || t.includes('In transit by')) {
+            if (t.includes('Seller SKU') || t.includes('Product Name') || t.includes('Qty Total') || t.includes('In transit by') || t.includes('NickName')) {
               return false;
             }
             if (/^\d{2}\/\d{2}\/\d{4}/.test(t)) return false;
@@ -4039,11 +4055,28 @@
                     // Item image lookup for this specific order
                     const rowProdName = cleanItemProductName(o.primaryProduct);
                     const rowSku = cleanSku(o.primarySku);
-                    const rowProductImg = isMultiGroup ? null : (
-                      productImageMap.get(`${rowProdName}|||${rowSku}`) ||
+                    let rowProductImg = productImageMap.get(`${rowProdName}|||${rowSku}`) ||
                       productImageMap.get(rowProdName) ||
-                      findProductImageFuzzy(rowProdName)
-                    );
+                      findProductImageFuzzy(rowProdName);
+
+                    // Collect all item images for multi-item orders
+                    const orderItemImages = [];
+                    if (o.items && o.items.length > 0) {
+                      o.items.forEach(it => {
+                        const itName = cleanItemProductName(it.name);
+                        const itSku = cleanSku(it.sku);
+                        const itImg = productImageMap.get(`${itName}|||${itSku}`) || 
+                          productImageMap.get(itName) || 
+                          findProductImageFuzzy(itName);
+                        if (itImg && !orderItemImages.some(x => x.img === itImg)) {
+                          orderItemImages.push({ name: itName, sku: itSku, img: itImg });
+                        }
+                      });
+                    }
+
+                    if (!rowProductImg && orderItemImages.length > 0) {
+                      rowProductImg = orderItemImages[0].img;
+                    }
 
                     return `
                       <tr class="hover:bg-slate-50/90 transition-colors">
@@ -4071,7 +4104,15 @@
                         </td>
                         <!-- Cột 2: ẢNH SẢN PHẨM (Từ Picking List) -->
                         <td class="py-3.5 px-4 text-center">
-                          ${rowProductImg ? `
+                          ${orderItemImages.length > 1 ? `
+                            <div class="flex flex-wrap items-center justify-center gap-1 max-w-[70px] mx-auto" title="Đơn gồm nhiều sản phẩm">
+                              ${orderItemImages.map(itImg => `
+                                <div class="relative group cursor-pointer w-7 h-7 rounded-md overflow-hidden border border-slate-200 bg-white p-0.5 shadow-2xs transition-transform hover:scale-110" onclick="zoomImage('${escapeQuotes(itImg.img)}', '${escapeQuotes(itImg.name)}')" title="${escapeQuotes(itImg.name)} (${escapeQuotes(itImg.sku)})">
+                                  <img src="${itImg.img}" class="w-full h-full object-contain" alt="Ảnh SP" />
+                                </div>
+                              `).join('')}
+                            </div>
+                          ` : rowProductImg ? `
                             <div class="relative group cursor-pointer w-11 h-11 rounded-lg overflow-hidden border border-slate-200 bg-white p-0.5 shadow-2xs mx-auto shrink-0 transition-transform hover:scale-105" onclick="zoomImage('${escapeQuotes(rowProductImg)}', '${escapeQuotes(rowProdName)}')" title="Nhấp để phóng to ảnh sản phẩm">
                               <img src="${rowProductImg}" class="w-full h-full object-contain" alt="Ảnh SP" />
                               <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[9px] font-bold transition-opacity">
@@ -4079,7 +4120,7 @@
                               </div>
                             </div>
                           ` : `
-                            <div class="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mx-auto" title="${isMultiGroup ? 'Đơn nhiều món' : 'Chưa có ảnh SP (kéo kèm Picking list để tự có ảnh)'}">
+                            <div class="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mx-auto" title="${isMultiGroup ? 'Đơn chưa có ảnh trong phiếu nhặt' : 'Chưa có ảnh SP (kéo kèm Picking list để tự có ảnh)'}">
                               <i data-lucide="${isMultiGroup ? 'layers' : 'package'}" class="w-4 h-4"></i>
                             </div>
                           `}
@@ -4107,18 +4148,19 @@
                               <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-extrabold mr-1.5">ĐƠN ${o.pages.length} TRANG (NHIỀU KIỆN)</span>
                             </div>
                             <div class="flex flex-col gap-1.5">
+                              <div class="font-bold text-slate-900 text-xs line-clamp-2 leading-snug mb-0.5" title="${escapeQuotes(rowProdName)}">${escapeHtml(rowProdName)}</div>
                               <div class="inline-flex items-center">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                                   ${escapeHtml(cleanSku(o.primarySku))}
                                 </span>
                               </div>
-                              ${(!isMultiGroup && findMatchingComboRule(rowProdName, rowSku)) ? `
+                              ${findMatchingComboRule(rowProdName, rowSku) ? `
                                 <div class="text-[11px] text-purple-900 font-bold flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded border border-purple-200/80">
                                   <i data-lucide="boxes" class="w-3 h-3 text-purple-600 shrink-0"></i>
                                   <span>Gồm: ${escapeHtml(findMatchingComboRule(rowProdName, rowSku).components)}</span>
                                 </div>
                               ` : ''}
-                              ${(!isMultiGroup && parseSkuPackagingType(rowSku, rowProdName).isBulk) ? `
+                              ${parseSkuPackagingType(rowSku, rowProdName).isBulk ? `
                                 <div class="text-[11px] text-emerald-900 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
                                   <i data-lucide="package-check" class="w-3 h-3 text-emerald-600 shrink-0"></i>
                                   <span>Quy cách: ${escapeHtml(parseSkuPackagingType(rowSku, rowProdName).label)}</span>
