@@ -1984,8 +1984,13 @@
       if (r.id === 'combo_amoxicol_electrolytes_qc1' || (r.name && r.name.toLowerCase().includes('quy cách 1') && r.name.toLowerCase().includes('amoxicol'))) {
         r.components = "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)";
       }
-      if (r.id === 'combo_amoxicol_electrolytes') {
-        r.components = "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)";
+      if (r.category === 'packaging') {
+        const rProd = (r.productKeyword || '').toLowerCase();
+        const rSku = (r.skuKeyword || '').toLowerCase();
+        const rName = (r.name || '').toLowerCase();
+        if (rProd.includes('combo') || rSku.includes('+') || rName.includes('combo') || rSku.includes('amoxicol') || rSku.includes('electrolytes')) {
+          return null; // Discard invalid packaging rule!
+        }
       }
       return r;
     }
@@ -2530,6 +2535,11 @@
         const pClean = cleanItemProductName(productName);
         const sClean = cleanSku(sku);
         if (!sClean || sClean.includes('Order ID:') || sClean === 'Mặc định' || sClean === '-') return;
+
+        // Skip any combo or composite SKU with '+' from becoming packaging rules!
+        if (sClean.includes('+')) return;
+        const pLow = (productName || '').toLowerCase();
+        if (pLow.startsWith('combo ') || pLow.includes(' combo ') || pLow.includes('combo:') || pLow.includes('bộ đôi') || pLow.includes('cặp đôi')) return;
 
         const thungM = sClean.match(/thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
         const hopM = sClean.match(/hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
@@ -3115,10 +3125,19 @@
     function findMatchingPackagingRule(productName = '', skuStr = '') {
       const p = (productName || '').toLowerCase();
       const s = (skuStr || '').toLowerCase();
+
+      // Guard: Combos and composite SKUs with '+' are bundles of different items, NEVER a bulk packaging rule!
+      if (s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:') || p.includes('bộ đôi') || p.includes('cặp đôi')) {
+        return null;
+      }
+
       for (const rule of comboRules) {
         if (rule.category !== 'packaging') continue;
-        const matchProduct = !rule.productKeyword || p.includes(rule.productKeyword.toLowerCase());
-        const matchSku = rule.skuKeyword && s.includes(rule.skuKeyword.toLowerCase());
+        const rProd = (rule.productKeyword || '').toLowerCase();
+        const rSku = (rule.skuKeyword || '').toLowerCase();
+        if (rProd.includes('combo') || rSku.includes('+')) continue; // Ignore invalid packaging rules
+        const matchProduct = !rProd || p.includes(rProd);
+        const matchSku = rSku && s.includes(rSku);
         if (matchProduct && matchSku) return rule;
       }
       return null;
@@ -3422,6 +3441,11 @@
       const s = (skuStr || '').trim();
       const p = (productName || '').toLowerCase();
 
+      // Guard: If SKU contains '+' or product is a combo, it is a bundle of items, NEVER a bulk pack multiplier
+      if (s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:') || p.includes('bộ đôi') || p.includes('cặp đôi')) {
+        return { isBulk: false, type: 'lẻ', packSize: 1, rest: '', label: 'Lẻ' };
+      }
+
       // Priority 1: User-configured Packaging Rules (category === 'packaging')
       const matchedPkg = findMatchingPackagingRule(productName, skuStr);
       if (matchedPkg) {
@@ -3433,11 +3457,6 @@
           label: `${matchedPkg.name} (${matchedPkg.packSize} ${matchedPkg.unit || 'món lẻ'})`,
           matchedRule: matchedPkg
         };
-      }
-
-      // If SKU contains '+' or product is a combo, it is a bundle of items, never a bulk pack multiplier
-      if (s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:')) {
-        return { isBulk: false, type: 'lẻ', packSize: 1, rest: '', label: 'Lẻ' };
       }
 
       // Priority 2: Standard regex for Thùng / Hộp
@@ -5597,6 +5616,8 @@
 
     // Consolidate Data & Build Parent-Child Hierarchy
     function processAggregatedData(parsedFilesData) {
+      if (!parsedFilesData) parsedFilesData = lastParsedFilesData;
+      if (!parsedFilesData || !Array.isArray(parsedFilesData)) return;
       const map = new Map();
       let totalDeclaredOrders = 0;
       let allOrdersGlobal = new Set();
