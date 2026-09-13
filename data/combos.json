@@ -36,6 +36,15 @@
     "unit": "Gói"
   },
   {
+    "id": "pkg_combo_phuc_hoi_thung_3_cap",
+    "category": "packaging",
+    "name": "Combo Phục Hồi (Thùng 3 cặp)",
+    "productKeyword": "Combo Phục hồi",
+    "skuKeyword": "Thùng 3 cặp",
+    "packSize": 3,
+    "unit": "Cặp 100ml"
+  },
+  {
     "id": "combo_phuc_hoi_calcifort_ade",
     "category": "combo",
     "name": "Combo Phục hồi _ CALCIFORT B12 + ADE B.COMPLEX",
@@ -121,7 +130,7 @@
     "name": "Combo cho heo nái (Oxytocin + Gentamox + Calcifort + ADE)",
     "productKeyword": "cho heo nái",
     "skuKeyword": "",
-    "components": "1 Oxytocin + 1 Gentamox (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+    "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
   },
   {
     "id": "combo_sieu_chong_coi_butavital_calcifort_ade",
@@ -193,7 +202,7 @@
     "name": "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
     "productKeyword": "cho Dê đẻ",
     "skuKeyword": "",
-    "components": "1 Oxytocin + 1 Gentamox (100ml) + 1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml)"
+    "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml)"
   },
   {
     "id": "combo_cho_de_con",
