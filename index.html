@@ -1785,6 +1785,14 @@
         components: "1 Navet BETAZYME (1kg) + 1 Vitamino LITE (1kg)"
       },
       {
+        id: "combo_vo_beo_b_betazyme_vitamino",
+        category: "combo",
+        name: "Combo Vỗ Béo B (Betazyme + Vitamino)",
+        productKeyword: "Vỗ Béo B",
+        skuKeyword: "",
+        components: "1 Betazyme (1kg) + 1 Vitamino (1kg)"
+      },
+      {
         id: "combo_tieu_chay_heo_con_ampicol_scour",
         category: "combo",
         name: "Combo TIÊU CHẢY HEO CON _ Navet-Ampicol + Scour Solution",
@@ -1998,6 +2006,10 @@
       }
       if (r.id === 'combo_cho_de_de' || (r.name && r.name.toLowerCase().includes('cho dê đẻ') && r.components && !r.components.toLowerCase().includes('hộp 10 ống'))) {
         r.components = "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml)";
+      }
+      if (r.id === 'combo_vo_beo_b_betazyme_vitamino' || (r.name && r.name.toLowerCase().includes('vỗ béo b'))) {
+        r.productKeyword = 'Vỗ Béo B';
+        r.components = "1 Betazyme (1kg) + 1 Vitamino (1kg)";
       }
       if (r.category === 'packaging') {
         const rSku = (r.skuKeyword || '').toLowerCase();
