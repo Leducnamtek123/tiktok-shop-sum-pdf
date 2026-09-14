@@ -6334,16 +6334,21 @@
                     <span><strong>🧩 Combo gồm:</strong> ${escapeHtml(comboRule.components)}</span>
                   </div>
                 ` : ''}
-                ${pack.isBulk ? `
+                ${group.packagingInfo ? `
                   <div class="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-[11px]">
                     <i data-lucide="package-check" class="w-3 h-3 text-emerald-600 shrink-0"></i>
-                    <span><strong>📦 Lấy thực tế:</strong> ${group.totalQty} thùng ➔ <strong>Quy đổi:</strong> ${group.totalQty * pack.packSize} ${escapeHtml(pack.rest || 'món lẻ')}</span>
+                    <span><strong>📦 Lấy thực tế:</strong> ${escapeHtml(group.packagingInfo.actualPickText)} ➔ <strong>Quy đổi:</strong> ${escapeHtml(group.packagingInfo.equivalentText)}</span>
                   </div>
-                ` : ''}
+                ` : (pack.isBulk ? `
+                  <div class="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-[11px]">
+                    <i data-lucide="package-check" class="w-3 h-3 text-emerald-600 shrink-0"></i>
+                    <span><strong>📦 Lấy thực tế:</strong> ${group.totalQty} ${pack.type} ➔ <strong>Quy đổi:</strong> ${group.totalQty * pack.packSize} ${escapeHtml(pack.rest || 'món lẻ')}</span>
+                  </div>
+                ` : '')}
               </td>
               <td class="py-3.5 px-5">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${pack.isBulk ? 'bg-purple-50 text-purple-800 border border-purple-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
-                  ${pack.isBulk ? `📦 Thùng (${pack.packSize}) • ` : ''}${escapeHtml(v.sku)}
+                  ${pack.isBulk ? `📦 ${pack.type ? (pack.type.charAt(0).toUpperCase() + pack.type.slice(1)) : 'Thùng'} (${pack.packSize}) • ` : ''}${escapeHtml(v.sku)}
                 </span>
                 <div class="mt-1.5 flex items-center gap-1.5 no-print" onclick="event.stopPropagation()">
                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lô:</span>
@@ -7437,6 +7442,18 @@
             ? `<img src="${group.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
 
+          const conversionBadge = group.packagingInfo ? `
+            <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 5px; margin-top: 3px; display: inline-block; line-height: 1.25;">
+              ⚡ <strong>Lấy:</strong> ${escapeHtml(group.packagingInfo.actualPickText)} ➔ <strong>Quy đổi:</strong> ${escapeHtml(group.packagingInfo.equivalentText)}
+            </div>
+          ` : '';
+
+          const getPackBadgeHtml = (p) => {
+            if (!p || !p.isBulk) return '';
+            const typeTitle = p.type ? (p.type.charAt(0).toUpperCase() + p.type.slice(1)) : 'Thùng';
+            return `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 ${typeTitle} ${p.packSize} ${escapeHtml(p.rest || 'món')}</div>`;
+          };
+
           if (group.isSingleVariant) {
             const v = group.variants[0];
             const pack = parseSkuPackagingType(v.sku, group.productName);
@@ -7450,6 +7467,7 @@
                 <td style="vertical-align: top; padding-right: 8px;">
                   <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(group.productName)}</div>
                   ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
+                  ${conversionBadge}
                   ${((group.comboAdditions && group.comboAdditions.length > 0) || (v.comboAdditions && v.comboAdditions.length > 0)) ? `
                     <div style="font-size: 7.2pt; color: #6b21a8; font-weight: 700; background: #faf5ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1.5px 5px; display: inline-block; margin-top: 3px; line-height: 1.25;">
                       ➕ ${consolidateComboAdditions(v.comboAdditions || group.comboAdditions || []).map(c => `Đã gồm +${c.qty} từ combo ${escapeHtml(c.comboName)}`).join(' • ')}
@@ -7458,7 +7476,7 @@
                 </td>
                 <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt;">
                   <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
-                  ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
+                  ${getPackBadgeHtml(pack)}
                 </td>
                 <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top;">
                   ${group.totalQty}
@@ -7476,12 +7494,6 @@
           // Multi-Variant: Always kept together as an atomic unit
           const varCount = group.variants.length;
           let groupHtml = '';
-
-          const conversionBadge = group.packagingInfo ? `
-            <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 5px; margin-top: 3px; display: inline-block; line-height: 1.25;">
-              ⚡ <strong>Lấy:</strong> ${escapeHtml(group.packagingInfo.actualPickText)} ➔ <strong>Quy đổi:</strong> ${escapeHtml(group.packagingInfo.equivalentText)}
-            </div>
-          ` : '';
 
           group.variants.forEach((v, vIdx) => {
             const isFirstVar = (vIdx === 0);
@@ -7502,7 +7514,7 @@
                   </td>
                   <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
-                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
+                    ${getPackBadgeHtml(pack)}
                   </td>
                   <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
@@ -7520,7 +7532,7 @@
                 <tr class="${trClass}" data-item-idx="${idx}">
                   <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
-                    ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
+                    ${getPackBadgeHtml(pack)}
                   </td>
                   <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
@@ -7540,6 +7552,7 @@
           // Flat Mode
           const itemFlat = item;
           const pack = parseSkuPackagingType(itemFlat.sku, itemFlat.productName);
+          const typeTitle = pack.type ? (pack.type.charAt(0).toUpperCase() + pack.type.slice(1)) : 'Thùng';
           const imgHtml = itemFlat.imageUrl 
             ? `<img src="${itemFlat.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
@@ -7553,10 +7566,15 @@
               <td style="vertical-align: top; padding-right: 8px;">
                 <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(itemFlat.productName)}</div>
                 ${itemFlat.sellerSku && itemFlat.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Mã SKU: ${escapeHtml(itemFlat.sellerSku)}</div>` : ''}
+                ${pack.isBulk ? `
+                  <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 5px; margin-top: 3px; display: inline-block; line-height: 1.25;">
+                    ⚡ <strong>Lấy:</strong> ${itemFlat.totalQty} ${pack.type} (${pack.packSize} ${escapeHtml(pack.rest || 'món')}) ➔ <strong>Quy đổi:</strong> ${itemFlat.totalQty * pack.packSize} ${escapeHtml(pack.rest || 'món lẻ')}
+                  </div>
+                ` : ''}
               </td>
               <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt;">
                 <div style="word-break: break-word;">${escapeHtml(itemFlat.sku)}</div>
-                ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 Thùng ${pack.packSize} ${pack.rest || 'món'}</div>` : ''}
+                ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 ${typeTitle} ${pack.packSize} ${escapeHtml(pack.rest || 'món')}</div>` : ''}
               </td>
               <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top;">
                 ${itemFlat.totalQty}
