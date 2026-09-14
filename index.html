@@ -1673,6 +1673,33 @@
     // Default shop packaging & combo rules
     const DEFAULT_PACKAGING_RULES = [
       {
+        id: "pkg_thung_24_chai",
+        category: "packaging",
+        name: "Quy cách Thùng 24 chai",
+        productKeyword: "",
+        skuKeyword: "Thùng 24 chai",
+        packSize: 24,
+        unit: "Chai 100ml"
+      },
+      {
+        id: "pkg_thung_12_chai",
+        category: "packaging",
+        name: "Quy cách Thùng 12 chai",
+        productKeyword: "",
+        skuKeyword: "Thùng 12 chai",
+        packSize: 12,
+        unit: "Chai 100ml"
+      },
+      {
+        id: "pkg_thung_6_chai",
+        category: "packaging",
+        name: "Quy cách Thùng 6 chai",
+        productKeyword: "",
+        skuKeyword: "Thùng 6 chai",
+        packSize: 6,
+        unit: "Chai 100ml"
+      },
+      {
         id: "pkg_navetcide_12",
         category: "packaging",
         name: "NAVETCIDE (Thùng 12 chai)",
@@ -1682,15 +1709,6 @@
         unit: "Chai 1 lít"
       },
       {
-        id: "pkg_calcifort_6",
-        category: "packaging",
-        name: "Calcifort-B12 (Thùng 6 chai)",
-        productKeyword: "Calcifort-B12",
-        skuKeyword: "Thùng 6 chai",
-        packSize: 6,
-        unit: "Chai 100ml"
-      },
-      {
         id: "pkg_thung_12_goi",
         category: "packaging",
         name: "Quy cách Thùng 12 gói",
@@ -1698,15 +1716,6 @@
         skuKeyword: "Thùng 12",
         packSize: 12,
         unit: "Gói"
-      },
-      {
-        id: "pkg_amox_1kg_6goi",
-        category: "packaging",
-        name: "Navet-Amoxicol Plus (Hộp 1kg + 6 gói 100g)",
-        productKeyword: "Navet-Amoxicol Plus",
-        skuKeyword: "Hộp 1kg",
-        packSize: 1,
-        unit: "Hộp"
       },
       {
         id: "pkg_combo_phuc_hoi_thung_3_cap",
@@ -2015,6 +2024,9 @@
         r.name = "Combo gia súc sinh sản : Navet E-Selen Lite + Vitaject ADE + Prostag";
         r.productKeyword = "gia súc sinh sản";
         r.components = "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml) + 1 Prostag (20ml)";
+      }
+      if (r.id === 'pkg_amox_1kg_6goi') {
+        return null; // Discard deprecated invalid packaging rule
       }
       if (r.category === 'packaging') {
         const rSku = (r.skuKeyword || '').toLowerCase();
@@ -3510,7 +3522,8 @@
 
       // Priority 1: User-configured Packaging Rules (category === 'packaging')
       const matchedPkg = findMatchingPackagingRule(productName, skuStr);
-      if (matchedPkg) {
+      if (matchedPkg && parseInt(matchedPkg.packSize, 10) > 1) {
+        const packSize = parseInt(matchedPkg.packSize, 10);
         let unit = matchedPkg.unit || 'món';
         const skuVolMatch = s.match(/(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)?\s*\d+\s*(?:lit|lít|ml|gam|gr|kg|cc|mg|(?:l(?![a-zà-ỹA-ZÀ-Ỹ]))|(?:g(?![a-zà-ỹA-ZÀ-Ỹ])))\b/iu);
         if (skuVolMatch) {
@@ -3525,12 +3538,13 @@
             }
           }
         }
+        const pkgType = (matchedPkg.name || matchedPkg.skuKeyword || '').toLowerCase().includes('hộp') ? 'hộp' : 'thùng';
         return {
           isBulk: true,
-          type: 'thùng',
-          packSize: matchedPkg.packSize || 1,
+          type: pkgType,
+          packSize: packSize,
           rest: unit,
-          label: `${matchedPkg.name} (${matchedPkg.packSize} ${unit})`,
+          label: `${matchedPkg.name} (${packSize} ${unit})`,
           matchedRule: matchedPkg
         };
       }
