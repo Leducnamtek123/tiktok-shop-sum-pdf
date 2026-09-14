@@ -205,6 +205,14 @@
     "components": "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml) + 1 Prostag (20ml)"
   },
   {
+    "id": "combo_len_giong_eselen_vitaject",
+    "category": "combo",
+    "name": "Combo lên giống : Navet E-Selen Lite + Vitaject ADE",
+    "productKeyword": "lên giống",
+    "skuKeyword": "",
+    "components": "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml)"
+  },
+  {
     "id": "combo_cho_de_de",
     "category": "combo",
     "name": "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
