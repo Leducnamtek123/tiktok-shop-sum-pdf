@@ -1875,10 +1875,10 @@
       {
         id: "combo_gia_suc_sinh_san_eselen_vitaject",
         category: "combo",
-        name: "Combo gia súc sinh sản : Navet E-Selen Lite + Vitaject ADE",
+        name: "Combo gia súc sinh sản : Navet E-Selen Lite + Vitaject ADE + Prostag",
         productKeyword: "gia súc sinh sản",
         skuKeyword: "",
-        components: "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml)"
+        components: "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml) + 1 Prostag (20ml)"
       },
       {
         id: "combo_cho_de_de",
@@ -2010,6 +2010,11 @@
       if (r.id === 'combo_vo_beo_b_betazyme_vitamino' || (r.name && r.name.toLowerCase().includes('vỗ béo b'))) {
         r.productKeyword = 'Vỗ Béo B';
         r.components = "1 Betazyme (1kg) + 1 Vitamino (1kg)";
+      }
+      if (r.id === 'combo_gia_suc_sinh_san_eselen_vitaject' || (r.name && r.name.toLowerCase().includes('gia súc sinh sản') && r.components && !r.components.toLowerCase().includes('prostag'))) {
+        r.name = "Combo gia súc sinh sản : Navet E-Selen Lite + Vitaject ADE + Prostag";
+        r.productKeyword = "gia súc sinh sản";
+        r.components = "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml) + 1 Prostag (20ml)";
       }
       if (r.category === 'packaging') {
         const rSku = (r.skuKeyword || '').toLowerCase();
@@ -3506,12 +3511,26 @@
       // Priority 1: User-configured Packaging Rules (category === 'packaging')
       const matchedPkg = findMatchingPackagingRule(productName, skuStr);
       if (matchedPkg) {
+        let unit = matchedPkg.unit || 'món';
+        const skuVolMatch = s.match(/(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)?\s*\d+\s*(?:lit|lít|ml|gam|gr|kg|cc|mg|(?:l(?![a-zà-ỹA-ZÀ-Ỹ]))|(?:g(?![a-zà-ỹA-ZÀ-Ỹ])))\b/iu);
+        if (skuVolMatch) {
+          const volStr = skuVolMatch[0].trim();
+          if (!unit || /^(?:món|cái)$/i.test(unit.trim())) {
+            unit = volStr;
+          } else if (/^(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)$/i.test(unit.trim())) {
+            if (/^(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)/i.test(volStr)) {
+              unit = volStr;
+            } else {
+              unit = `${unit.trim()} ${volStr}`;
+            }
+          }
+        }
         return {
           isBulk: true,
           type: 'thùng',
           packSize: matchedPkg.packSize || 1,
-          rest: matchedPkg.unit || 'món',
-          label: `${matchedPkg.name} (${matchedPkg.packSize} ${matchedPkg.unit || 'món lẻ'})`,
+          rest: unit,
+          label: `${matchedPkg.name} (${matchedPkg.packSize} ${unit})`,
           matchedRule: matchedPkg
         };
       }
@@ -3585,24 +3604,70 @@
         pickParts.push(`${l.count} ${l.name}`);
       });
 
-      // Equivalent conversion: "22 Chai 100ml"
+      // Helper to extract normalized volume/weight (e.g. "1kg", "100g", "100ml")
+      const getVolWeight = (str) => {
+        if (!str) return '';
+        const m = str.match(/\b(\d+(?:[.,]\d+)?)\s*(lit|lít|ml|gam|gr|kg|cc|mg|(?:l(?![a-zà-ỹA-ZÀ-Ỹ]))|(?:g(?![a-zà-ỹA-ZÀ-Ỹ])))\b/iu);
+        if (!m) return '';
+        const num = m[1].replace(',', '.');
+        let u = m[2].toLowerCase();
+        if (u === 'lít' || u === 'lit') u = 'l';
+        if (u === 'gam' || u === 'gr') u = 'g';
+        return `${num}${u}`;
+      };
+
+      // Equivalent conversion: "22 Chai 100ml" or "33 Gói 1kg + 3 Gói 100g"
       let eqDescriptions = [];
       let accountedLooseKeys = new Set();
 
       bulkItems.forEach(b => {
-        const bRestLower = (b.rest || '').toLowerCase().replace(/\s+/g, '');
         let matchedLooseCount = 0;
-        let unitLabel = b.rest || 'cái';
+        let matchedLooseVariant = null;
+        let bestLooseIdx = -1;
+        let bestScore = -1;
+
+        const bCombined = `${b.variant.sku} ${b.rest || ''}`;
+        const bVol = getVolWeight(bCombined);
 
         looseItems.forEach((l, lIdx) => {
-          const lNameLower = l.name.toLowerCase().replace(/\s+/g, '');
-          if (bRestLower && (lNameLower.includes(bRestLower) || bRestLower.includes(lNameLower))) {
-            matchedLooseCount += l.count;
-            accountedLooseKeys.add(lIdx);
-            unitLabel = l.name;
+          if (accountedLooseKeys.has(lIdx)) return;
+
+          const lVol = getVolWeight(l.name);
+
+          // Hard rejection: Volume/weight conflict (e.g. bulk is 1kg vs loose is 100g)
+          if (bVol && lVol && bVol !== lVol) {
+            return;
+          }
+
+          let score = 0;
+          if (matchSkuVariant(l.name, b.variant.sku) || matchSkuVariant(b.rest, l.name)) {
+            score += 25;
+          }
+
+          const bRestLower = (b.rest || '').toLowerCase().replace(/\s+/g, '');
+          const lClean = l.name.toLowerCase().replace(/\s+/g, '');
+          if (bRestLower && (lClean.includes(bRestLower) || bRestLower.includes(lClean))) {
+            score += 15;
+          }
+
+          if (bVol && lVol && bVol === lVol) {
+            score += 50;
+          }
+
+          if (score > bestScore && score >= 20) {
+            bestScore = score;
+            bestLooseIdx = lIdx;
           }
         });
 
+        if (bestLooseIdx >= 0) {
+          const matchedLoose = looseItems[bestLooseIdx];
+          matchedLooseCount = matchedLoose.count;
+          matchedLooseVariant = matchedLoose;
+          accountedLooseKeys.add(bestLooseIdx);
+        }
+
+        const unitLabel = matchedLooseVariant ? matchedLooseVariant.name : (b.rest || 'món');
         const totalEq = (b.count * b.packSize) + matchedLooseCount;
         eqDescriptions.push(`${totalEq} ${unitLabel}`);
       });
