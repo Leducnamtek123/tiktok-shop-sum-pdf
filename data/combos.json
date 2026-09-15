@@ -36,11 +36,38 @@
     "unit": "Gói"
   },
   {
+    "id": "pkg_combo_phuc_hoi_thung_15_cap",
+    "category": "packaging",
+    "name": "Combo Phục Hồi (Thùng 15 cặp)",
+    "productKeyword": "Combo Phục hồi",
+    "skuKeyword": "15 cặp",
+    "packSize": 15,
+    "unit": "Cặp 100ml"
+  },
+  {
+    "id": "pkg_thung_15_cap",
+    "category": "packaging",
+    "name": "Quy cách Thùng 15 cặp",
+    "productKeyword": "",
+    "skuKeyword": "15 cặp",
+    "packSize": 15,
+    "unit": "Cặp 100ml"
+  },
+  {
     "id": "pkg_combo_phuc_hoi_thung_3_cap",
     "category": "packaging",
     "name": "Combo Phục Hồi (Thùng 3 cặp)",
     "productKeyword": "Combo Phục hồi",
-    "skuKeyword": "Thùng 3 cặp",
+    "skuKeyword": "3 cặp",
+    "packSize": 3,
+    "unit": "Cặp 100ml"
+  },
+  {
+    "id": "pkg_thung_3_cap",
+    "category": "packaging",
+    "name": "Quy cách Thùng 3 cặp",
+    "productKeyword": "",
+    "skuKeyword": "3 cặp",
     "packSize": 3,
     "unit": "Cặp 100ml"
   },

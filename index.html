@@ -1718,11 +1718,38 @@
         unit: "Gói"
       },
       {
+        id: "pkg_combo_phuc_hoi_thung_15_cap",
+        category: "packaging",
+        name: "Combo Phục Hồi (Thùng 15 cặp)",
+        productKeyword: "Combo Phục hồi",
+        skuKeyword: "15 cặp",
+        packSize: 15,
+        unit: "Cặp 100ml"
+      },
+      {
+        id: "pkg_thung_15_cap",
+        category: "packaging",
+        name: "Quy cách Thùng 15 cặp",
+        productKeyword: "",
+        skuKeyword: "15 cặp",
+        packSize: 15,
+        unit: "Cặp 100ml"
+      },
+      {
         id: "pkg_combo_phuc_hoi_thung_3_cap",
         category: "packaging",
         name: "Combo Phục Hồi (Thùng 3 cặp)",
         productKeyword: "Combo Phục hồi",
-        skuKeyword: "Thùng 3 cặp",
+        skuKeyword: "3 cặp",
+        packSize: 3,
+        unit: "Cặp 100ml"
+      },
+      {
+        id: "pkg_thung_3_cap",
+        category: "packaging",
+        name: "Quy cách Thùng 3 cặp",
+        productKeyword: "",
+        skuKeyword: "3 cặp",
         packSize: 3,
         unit: "Cặp 100ml"
       }
@@ -2037,6 +2064,33 @@
         r.name = "Combo lên giống : Navet E-Selen Lite + Vitaject ADE";
         r.productKeyword = "lên giống";
         r.components = "1 Navet E-Selen Lite (1kg) + 1 Vitaject ADE (100ml)";
+      }
+      if (r.id === 'pkg_combo_phuc_hoi_thung_15_cap' || (r.category === 'packaging' && r.name && r.name.toLowerCase().includes('15 cặp') && r.name.toLowerCase().includes('phục hồi'))) {
+        r.id = 'pkg_combo_phuc_hoi_thung_15_cap';
+        r.category = 'packaging';
+        r.name = "Combo Phục Hồi (Thùng 15 cặp)";
+        r.productKeyword = "Combo Phục hồi";
+        r.skuKeyword = "15 cặp";
+        r.packSize = 15;
+        r.unit = "Cặp 100ml";
+      }
+      if (r.id === 'pkg_combo_phuc_hoi_thung_3_cap' || (r.category === 'packaging' && r.name && r.name.toLowerCase().includes('3 cặp') && r.name.toLowerCase().includes('phục hồi'))) {
+        r.id = 'pkg_combo_phuc_hoi_thung_3_cap';
+        r.category = 'packaging';
+        r.name = "Combo Phục Hồi (Thùng 3 cặp)";
+        r.productKeyword = "Combo Phục hồi";
+        r.skuKeyword = "3 cặp";
+        r.packSize = 3;
+        r.unit = "Cặp 100ml";
+      }
+      if (r.id === 'pkg_thung_15_cap' || (r.category === 'packaging' && r.name && r.name.toLowerCase().includes('15 cặp') && !r.productKeyword)) {
+        r.id = 'pkg_thung_15_cap';
+        r.category = 'packaging';
+        r.name = "Quy cách Thùng 15 cặp";
+        r.productKeyword = "";
+        r.skuKeyword = "15 cặp";
+        r.packSize = 15;
+        r.unit = "Cặp 100ml";
       }
       if (r.id === 'pkg_amox_1kg_6goi') {
         return null; // Discard deprecated invalid packaging rule
@@ -3192,21 +3246,42 @@
     // 4. MATCHING HELPERS & EXPORTS TO WINDOW
     // ==========================================
     function findMatchingPackagingRule(productName = '', skuStr = '') {
-      const p = (productName || '').toLowerCase();
-      const s = (skuStr || '').toLowerCase();
+      const p = (productName || '').normalize('NFC').toLowerCase();
+      const s = (skuStr || '').normalize('NFC').toLowerCase();
+      const pNoTone = removeVietnameseTones(p);
+      const sNoTone = removeVietnameseTones(s);
 
-      // Guard: Combos and composite SKUs with '+' are bundles of different items, NEVER a bulk packaging rule!
-      if (s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:') || p.includes('bộ đôi') || p.includes('cặp đôi')) {
+      // Guard: Composite SKUs with '+' are bundles of different items, NEVER a bulk packaging rule!
+      if (s.includes('+')) {
         return null;
       }
 
+      const isCombo = p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:') || p.includes('bộ đôi') || p.includes('cặp đôi') ||
+                      pNoTone.startsWith('combo ') || pNoTone.includes(' combo ');
+
       for (const rule of comboRules) {
         if (rule.category !== 'packaging') continue;
-        const rProd = (rule.productKeyword || '').toLowerCase();
-        const rSku = (rule.skuKeyword || '').toLowerCase();
-        if (rProd.includes('combo') || rSku.includes('+')) continue; // Ignore invalid packaging rules
-        const matchProduct = !rProd || p.includes(rProd);
-        const matchSku = rSku && s.includes(rSku);
+        const rProd = (rule.productKeyword || '').normalize('NFC').toLowerCase();
+        const rSku = (rule.skuKeyword || '').normalize('NFC').toLowerCase();
+        const rProdNoTone = removeVietnameseTones(rProd);
+        const rSkuNoTone = removeVietnameseTones(rSku);
+
+        if (rSku.includes('+')) continue; // Ignore invalid packaging rules
+
+        if (isCombo) {
+          // If product is a combo, ONLY match rules specifically configured for this combo,
+          // or rules whose skuKeyword explicitly denotes pairs/sets (cặp, cap, bộ, bo, combo, set)
+          const isExplicitPairOrComboRule = (rProd && (p.includes(rProd) || (rProdNoTone && pNoTone.includes(rProdNoTone)))) ||
+                                           /(?:cặp|cap|bộ|bo|combo|set)\b/iu.test(rSku) ||
+                                           /(?:cặp|cap|bộ|bo|combo|set)\b/iu.test(rSkuNoTone);
+          if (!isExplicitPairOrComboRule) continue;
+        } else {
+          // If product is NOT a combo, don't match combo-specific packaging rules
+          if (rProd.includes('combo') || rProdNoTone.includes('combo')) continue;
+        }
+
+        const matchProduct = !rProd || p.includes(rProd) || (rProdNoTone && pNoTone.includes(rProdNoTone));
+        const matchSku = rSku && (s.includes(rSku) || (rSkuNoTone && sNoTone.includes(rSkuNoTone)));
         if (matchProduct && matchSku) return rule;
       }
       return null;
@@ -3215,6 +3290,7 @@
     function normalizeMatchText(str) {
       if (!str) return '';
       return str
+        .normalize('NFC')
         .toLowerCase()
         .replace(/[\-_–—]/g, '-')
         .replace(/\s*-\s*/g, '-')
@@ -3227,28 +3303,39 @@
       if (!productName && !skuStr) return null;
       const pNorm = normalizeMatchText(productName);
       const sNorm = normalizeMatchText(skuStr);
+      const pNoTone = removeVietnameseTones(pNorm);
+      const sNoTone = removeVietnameseTones(sNorm);
 
       let fallbackRule = null;
 
       for (const rule of comboRules) {
         if (rule.category !== 'combo') continue;
         const kwNorm = normalizeMatchText(rule.productKeyword);
+        const kwNoTone = removeVietnameseTones(kwNorm);
         const nameNorm = normalizeMatchText((rule.name || '').split('(')[0]);
+        const nameNoTone = removeVietnameseTones(nameNorm);
         const skuRuleNorm = normalizeMatchText(rule.skuKeyword);
+        const skuRuleNoTone = removeVietnameseTones(skuRuleNorm);
 
         let matchProd = false;
         if (!kwNorm) {
           matchProd = true;
-        } else if (pNorm.includes(kwNorm)) {
+        } else if (pNorm.includes(kwNorm) || (kwNoTone && pNoTone.includes(kwNoTone))) {
           matchProd = true;
-        } else if (nameNorm && pNorm.includes(nameNorm)) {
+        } else if (nameNorm && (pNorm.includes(nameNorm) || (nameNoTone && pNoTone.includes(nameNoTone)))) {
+          matchProd = true;
+        } else if (rule.id === 'combo_vo_beo_b_betazyme_vitamino' && (
+          (pNoTone.includes('vo beo b') || pNoTone.includes('vo beo')) &&
+          pNoTone.includes('betazyme') && pNoTone.includes('vitamino') && !pNoTone.includes('lite')
+        )) {
           matchProd = true;
         } else if (rule.id === 'combo_chuyen_ho_hap' && (pNorm.includes('chuyen ho hap') || pNorm.includes('chuyên hô hấp'))) {
           matchProd = true;
         }
 
         if (matchProd) {
-          if (skuRuleNorm && sNorm && sNorm.includes(skuRuleNorm)) {
+          const matchSku = skuRuleNorm && (sNorm.includes(skuRuleNorm) || (skuRuleNoTone && sNoTone.includes(skuRuleNoTone)));
+          if (matchSku) {
             return rule;
           }
           if (!skuRuleNorm && !fallbackRule) {
@@ -3524,9 +3611,11 @@
 
     // Packaging Parsing & Smart Conversion Utilities
     function parseSkuPackagingType(skuStr, productName = '') {
-      const s = (skuStr || '').trim();
-      const p = (productName || '').toLowerCase();
-      const isCombo = s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:') || p.includes('bộ đôi') || p.includes('cặp đôi');
+      const s = (skuStr || '').normalize('NFC').trim();
+      const p = (productName || '').normalize('NFC').toLowerCase();
+      const pNoTone = removeVietnameseTones(p);
+      const isCombo = s.includes('+') || p.startsWith('combo ') || p.includes(' combo ') || p.includes('combo:') || p.includes('bộ đôi') || p.includes('cặp đôi') ||
+                      pNoTone.startsWith('combo ') || pNoTone.includes(' combo ');
 
       // Guard: If SKU contains '+', it is a bundle of distinct items, NEVER a bulk pack multiplier
       if (s.includes('+')) {
@@ -3562,42 +3651,49 @@
         };
       }
 
-      // If product is a combo, only explicit pair/set multipliers (e.g. "Thùng 3 cặp 100ml", "3 cặp") count as bulk packaging!
+      // If product is a combo, only explicit pair/set multipliers (e.g. "Thùng 15 cặp", "15 cặp", "Thùng 3 cặp", "3 cặp") count as bulk packaging!
       if (isCombo) {
-        const comboThungMatch = s.match(/(?:thùng|lô|hộp)?\s*(\d+)\s*(?:cặp|bộ|combo|set)\b/i) || s.match(/(\d+)\s*cặp\b/i);
+        const comboThungMatch = s.match(/(?:thùng|lô|hộp)?\s*(\d+)\s*(?:cặp|cap|bộ|bo|combo|set)\b/iu) || 
+                                s.match(/(\d+)\s*(?:cặp|cap)\b/iu);
         if (comboThungMatch) {
           const packSize = parseInt(comboThungMatch[1], 10);
           if (packSize > 1) {
-            return { isBulk: true, type: 'thùng', packSize, rest: 'cặp', label: `Thùng (${packSize} cặp)` };
+            const volM = s.match(/\b\d+\s*(?:ml|l|lit|lít|g|kg)\b/iu);
+            const unitStr = volM ? `Cặp ${volM[0]}` : 'Cặp 100ml';
+            return { isBulk: true, type: 'thùng', packSize, rest: unitStr, label: `Thùng (${packSize} ${unitStr})` };
           }
         }
         return { isBulk: false, type: 'lẻ', packSize: 1, rest: '', label: 'Lẻ' };
       }
 
-      // Priority 2: Standard regex for loose products (Thùng / Hộp / Lô)
-      const thungMatch = s.match(/thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+      // Priority 2: Standard regex for loose products (Thùng / Hộp / Lô / Cặp)
+      const thungMatch = s.match(/thùng\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/iu);
       if (thungMatch) {
         const packSize = parseInt(thungMatch[1], 10);
-        const rest = (thungMatch[2] || '').trim();
-        return { isBulk: true, type: 'thùng', packSize, rest, label: `Thùng (${packSize} ${rest || 'món'})` };
+        let rest = (thungMatch[2] || '').trim();
+        if (/^cặp\b/iu.test(rest) || /^cap\b/iu.test(rest)) {
+          if (!/\d+\s*ml/i.test(rest)) rest = 'Cặp 100ml';
+        }
+        return { isBulk: true, type: 'thùng', packSize, rest: rest || 'món', label: `Thùng (${packSize} ${rest || 'món'})` };
       }
-      const capMatch = s.match(/(\d+)\s*cặp\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+      const capMatch = s.match(/(\d+)\s*(?:cặp|cap)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/iu);
       if (capMatch && parseInt(capMatch[1], 10) > 1) {
         const packSize = parseInt(capMatch[1], 10);
-        const rest = (capMatch[2] || 'cặp').trim();
-        return { isBulk: true, type: 'thùng', packSize, rest, label: `Thùng ${packSize} cặp` };
+        let rest = (capMatch[2] || 'Cặp 100ml').trim();
+        if (!/\d+\s*ml/i.test(rest) && (rest.toLowerCase() === 'cặp' || rest.toLowerCase() === 'cap')) rest = 'Cặp 100ml';
+        return { isBulk: true, type: 'thùng', packSize, rest, label: `Thùng (${packSize} ${rest})` };
       }
-      const hopMatch = s.match(/hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/i);
+      const hopMatch = s.match(/hộp\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/iu);
       if (hopMatch) {
         const packSize = parseInt(hopMatch[1], 10);
         const rest = (hopMatch[2] || '').trim();
         return { isBulk: true, type: 'hộp', packSize, rest, label: `Hộp (${packSize} ${rest || 'món'})` };
       }
-      const countMatch = s.match(/^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)/i);
+      const countMatch = s.match(/^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)/iu);
       if (countMatch && parseInt(countMatch[1], 10) > 1) {
         const packSize = parseInt(countMatch[1], 10);
         const rest = (countMatch[2] || '').trim();
-        const isVolumeOrWeight = /^(?:ml|l|lit|lít|g|gam|kg|cc|mg)$/i.test(rest);
+        const isVolumeOrWeight = /^(?:ml|l|lit|lít|g|gam|kg|cc|mg)$/iu.test(rest);
         if (!isVolumeOrWeight) {
           return { isBulk: true, type: 'lô', packSize, rest, label: `Lô ${packSize} ${rest || 'món'}` };
         }
@@ -5639,7 +5735,7 @@
         }
 
         // Parse words and full text
-        const fullPageText = textContent.items.map(it => it.str).join(' ');
+        const fullPageText = textContent.items.map(it => (it.str || '').normalize('NFC')).join(' ');
         
         // Extract metadata from page 1 using regex
         if (pIdx === 1) {
@@ -5655,7 +5751,7 @@
 
         let words = [];
         for (const item of textContent.items) {
-          const str = item.str.trim();
+          const str = (item.str || '').normalize('NFC').trim();
           if (!str) continue;
           const x0 = item.transform[4];
           const top = pageHeight - item.transform[5];
@@ -5882,9 +5978,9 @@
               // If SKU is not a composite list of items (does not contain '+'), check for bundle multipliers:
               // e.g. "Thùng 3 cặp 100ml", "3 cặp 100ml", "Thùng 5 cặp", "Thùng 2 bộ", "Thùng 3 combo"
               if (!pack.isBulk && !sName.includes('+')) {
-                const capMatch = sName.match(/(?:thùng|lô|hộp)?\s*(\d+)\s*(?:cặp|bộ|combo|set)\b/i) ||
-                                 sName.match(/(\d+)\s*cặp\b/i) ||
-                                 sName.match(/^thùng\s+(\d+)\b/i);
+                const capMatch = sName.match(/(?:thùng|lô|hộp)?\s*(\d+)\s*(?:cặp|cap|bộ|bo|combo|set)\b/iu) ||
+                                 sName.match(/(\d+)\s*(?:cặp|cap)\b/iu) ||
+                                 sName.match(/^thùng\s+(\d+)\b/iu);
                 if (capMatch) {
                   const multiplier = parseInt(capMatch[1], 10);
                   if (multiplier > 1) {
