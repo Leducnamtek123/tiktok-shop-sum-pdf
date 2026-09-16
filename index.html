@@ -1333,11 +1333,11 @@
               <i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i>
               <span>Thêm Mới</span>
             </button>
-            <button type="button" onclick="autoScanPackagingFromLoadedFiles()" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Tự động nhận diện quy cách thùng từ các file đã nạp">
+            <button type="button" onclick="autoScanPackagingFromLoadedFiles()" class="hidden items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Tự động nhận diện quy cách thùng từ các file đã nạp">
               <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
               <span>Quét Thùng</span>
             </button>
-            <button type="button" onclick="deduplicateAllRules(true)" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Dọn dẹp và gộp các quy tắc thùng bị trùng lặp">
+            <button type="button" onclick="deduplicateAllRules(true)" class="hidden items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Dọn dẹp và gộp các quy tắc thùng bị trùng lặp">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
               <span>Dọn Trùng</span>
             </button>
@@ -1445,11 +1445,11 @@
               <i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i>
               <span>Thêm Mới</span>
             </button>
-            <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Tự động tìm kiếm các bộ combo trong các file đã nạp">
+            <button type="button" onclick="autoScanCombosFromLoadedFiles()" class="hidden items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Tự động tìm kiếm các bộ combo trong các file đã nạp">
               <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-1 text-indigo-600"></i>
               <span>Quét Combo</span>
             </button>
-            <button type="button" onclick="deduplicateAllRules(true)" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Dọn dẹp và gộp các combo bị trùng lặp">
+            <button type="button" onclick="deduplicateAllRules(true)" class="hidden items-center px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-2xs cursor-pointer" title="Dọn dẹp và gộp các combo bị trùng lặp">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
               <span>Dọn Trùng</span>
             </button>
@@ -2647,6 +2647,9 @@
     }
 
     function autoScanPackagingFromLoadedFiles() {
+      showToast('Đang dùng cấu hình cố định: không tự quét quy cách từ PDF.');
+      return;
+
       const candidates = [];
       let duplicatesSkipped = 0;
 
@@ -2949,6 +2952,9 @@
 
     // Smart and bulletproof combo scanner with duplicate prevention
     function autoScanCombosFromLoadedFiles() {
+      showToast('Đang dùng cấu hình cố định: không tự quét combo từ PDF.');
+      return;
+
       const candidates = [];
       let duplicatesSkipped = 0;
 
@@ -3124,7 +3130,7 @@
           <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200 space-y-2">
             <i data-lucide="package" class="w-7 h-7 mx-auto text-slate-400"></i>
             <div class="font-bold text-slate-700 text-sm">Chưa có quy cách đóng gói nào</div>
-            <div class="text-xs text-slate-500">Bấm nút "+ Thêm Mới" hoặc "Quét Thùng" để nạp từ file.</div>
+            <div class="text-xs text-slate-500">Bấm "+ Thêm Mới" để thêm quy cách đã xác nhận.</div>
           </div>
         `;
         lucide.createIcons();
@@ -3194,7 +3200,7 @@
           <div class="p-8 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200 space-y-2">
             <i data-lucide="boxes" class="w-7 h-7 mx-auto text-slate-400"></i>
             <div class="font-bold text-slate-700 text-sm">Chưa có định nghĩa combo nào</div>
-            <div class="text-xs text-slate-500">Bấm nút "+ Thêm Mới" hoặc "Quét Combo" để nạp từ file.</div>
+            <div class="text-xs text-slate-500">Bấm "+ Thêm Mới" để thêm combo đã xác nhận.</div>
           </div>
         `;
         lucide.createIcons();
@@ -3245,6 +3251,58 @@
     // ==========================================
     // 4. MATCHING HELPERS & EXPORTS TO WINDOW
     // ==========================================
+    function removeVietnameseTones(str) {
+      return (str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[đĐ]/g, match => match === 'Đ' ? 'D' : 'd')
+        .normalize('NFC');
+    }
+
+    function assemblePdfTextByPosition(words, lineTolerance = 4, joinGap = 2.8) {
+      if (!words || words.length === 0) return '';
+
+      const sorted = [...words].sort((a, b) => Math.abs(a.top - b.top) > lineTolerance ? a.top - b.top : a.x0 - b.x0);
+      const lines = [];
+
+      sorted.forEach(word => {
+        let line = lines.find(existing => Math.abs(existing.top - word.top) <= lineTolerance);
+        if (!line) {
+          line = { top: word.top, words: [] };
+          lines.push(line);
+        }
+        line.words.push(word);
+        line.top = (line.top * (line.words.length - 1) + word.top) / line.words.length;
+      });
+
+      return lines
+        .sort((a, b) => a.top - b.top)
+        .map(line => {
+          const lineWords = line.words.sort((a, b) => a.x0 - b.x0);
+          let text = '';
+          let prevRight = null;
+
+          lineWords.forEach(word => {
+            const part = (word.text || '').normalize('NFC').trim();
+            if (!part) return;
+
+            if (!text) {
+              text = part;
+            } else {
+              const gap = prevRight === null ? Infinity : word.x0 - prevRight;
+              text += gap <= joinGap ? part : ' ' + part;
+            }
+            prevRight = word.x0 + (word.width || 0);
+          });
+
+          return text;
+        })
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .normalize('NFC');
+    }
+
     function findMatchingPackagingRule(productName = '', skuStr = '') {
       const p = (productName || '').normalize('NFC').toLowerCase();
       const s = (skuStr || '').normalize('NFC').toLowerCase();
@@ -3305,6 +3363,12 @@
       const sNorm = normalizeMatchText(skuStr);
       const pNoTone = removeVietnameseTones(pNorm);
       const sNoTone = removeVietnameseTones(sNorm);
+      const isDeclaredComboProduct = pNoTone.startsWith('combo ') ||
+        pNoTone.includes(' combo ') ||
+        pNoTone.includes('combo:') ||
+        pNoTone.includes('bo doi') ||
+        pNoTone.includes('cap doi');
+      const hasComboCompositionSignal = pNorm.includes('+');
 
       let fallbackRule = null;
 
@@ -3318,9 +3382,7 @@
         const skuRuleNoTone = removeVietnameseTones(skuRuleNorm);
 
         let matchProd = false;
-        if (!kwNorm) {
-          matchProd = true;
-        } else if (pNorm.includes(kwNorm) || (kwNoTone && pNoTone.includes(kwNoTone))) {
+        if (kwNorm && (pNorm.includes(kwNorm) || (kwNoTone && pNoTone.includes(kwNoTone)))) {
           matchProd = true;
         } else if (nameNorm && (pNorm.includes(nameNorm) || (nameNoTone && pNoTone.includes(nameNoTone)))) {
           matchProd = true;
@@ -3334,6 +3396,14 @@
         }
 
         if (matchProd) {
+          const keywordTokens = kwNoTone.split(/\s+/).filter(Boolean);
+          const isGenericKeyword = kwNoTone &&
+            !kwNoTone.includes('+') &&
+            keywordTokens.length <= 3;
+          if (isGenericKeyword && !isDeclaredComboProduct && !(hasComboCompositionSignal && pNoTone.startsWith(kwNoTone)) && !(nameNoTone && pNoTone.includes(nameNoTone))) {
+            continue;
+          }
+
           const matchSku = skuRuleNorm && (sNorm.includes(skuRuleNorm) || (skuRuleNoTone && sNoTone.includes(skuRuleNoTone)));
           if (matchSku) {
             return rule;
@@ -3512,7 +3582,7 @@
       if (!str) return [];
       const sClean = str.replace(/\b\d+\s*(?:ml|g|kg|l|chai|goi|hop|can)\b/gi, '');
       const words = sClean.toLowerCase().match(/[a-zA-Z0-9À-ỹ]+/g) || [];
-      const noise = new Set(['combo', 'bo', 'sung', 'cho', 'giup', 'va', 'cua', 'loai', 'thu', 'cung', 'chong', 'tri', 'sau', 'tiem', 'phong', 'vac', 'xin', 'dac', 'tri']);
+      const noise = new Set(['combo', 'navet', 'bo', 'sung', 'cho', 'giup', 'va', 'cua', 'loai', 'thu', 'cung', 'chong', 'tri', 'sau', 'tiem', 'phong', 'vac', 'xin', 'dac', 'tri']);
       return words.filter(w => w.length >= 2 && !noise.has(w));
     }
 
@@ -3718,13 +3788,19 @@
         return null;
       }
 
+      // Helper to format unit label without redundant leading count (e.g. "1 Cặp 100ml" -> "Cặp 100ml")
+      const formatUnitLabel = (str) => {
+        if (!str) return 'món';
+        return str.replace(/^1\s+(?=[a-zA-ZÀ-ỹ])/iu, '').trim();
+      };
+
       // Physical picking breakdown: "1 thùng (6 chai 100ml) + 16 Chai 100ml"
       const pickParts = [];
       bulkItems.forEach(b => {
         pickParts.push(`${b.count} ${b.type} (${b.packSize} ${b.rest || 'cái'})`);
       });
       looseItems.forEach(l => {
-        pickParts.push(`${l.count} ${l.name}`);
+        pickParts.push(`${l.count} ${formatUnitLabel(l.name)}`);
       });
 
       // Helper to extract normalized volume/weight (e.g. "1kg", "100g", "100ml")
@@ -3739,37 +3815,34 @@
         return `${num}${u}`;
       };
 
-      // Equivalent conversion: "22 Chai 100ml" or "33 Gói 1kg + 3 Gói 100g"
-      let eqDescriptions = [];
-      let accountedLooseKeys = new Set();
+      // Equivalent conversion: aggregate by unit so multiple bulk items of the same product sum together (e.g. 1 thùng 12 + 1 thùng 6 + 8 lẻ ➔ 26 Chai 100ml)
+      const targetMap = looseItems.map(l => ({
+        label: formatUnitLabel(l.name),
+        qty: l.count,
+        vol: getVolWeight(l.name)
+      }));
+
+      const standaloneBulkMap = new Map();
 
       bulkItems.forEach(b => {
-        let matchedLooseCount = 0;
-        let matchedLooseVariant = null;
+        const bCombined = `${b.variant.sku} ${b.rest || ''}`;
+        const bVol = getVolWeight(bCombined);
+        const bRestClean = (b.rest || '').toLowerCase().replace(/\s+/g, '');
+
         let bestLooseIdx = -1;
         let bestScore = -1;
 
-        const bCombined = `${b.variant.sku} ${b.rest || ''}`;
-        const bVol = getVolWeight(bCombined);
-
-        looseItems.forEach((l, lIdx) => {
-          if (accountedLooseKeys.has(lIdx)) return;
-
-          const lVol = getVolWeight(l.name);
-
-          // Hard rejection: Volume/weight conflict (e.g. bulk is 1kg vs loose is 100g)
-          if (bVol && lVol && bVol !== lVol) {
-            return;
-          }
+        targetMap.forEach((t, idx) => {
+          const lVol = t.vol;
+          if (bVol && lVol && bVol !== lVol) return;
 
           let score = 0;
-          if (matchSkuVariant(l.name, b.variant.sku) || matchSkuVariant(b.rest, l.name)) {
+          if (matchSkuVariant(t.label, b.variant.sku) || matchSkuVariant(b.rest, t.label)) {
             score += 25;
           }
 
-          const bRestLower = (b.rest || '').toLowerCase().replace(/\s+/g, '');
-          const lClean = l.name.toLowerCase().replace(/\s+/g, '');
-          if (bRestLower && (lClean.includes(bRestLower) || bRestLower.includes(lClean))) {
+          const lClean = t.label.toLowerCase().replace(/\s+/g, '');
+          if (bRestClean && (lClean.includes(bRestClean) || bRestClean.includes(lClean))) {
             score += 15;
           }
 
@@ -3779,25 +3852,36 @@
 
           if (score > bestScore && score >= 20) {
             bestScore = score;
-            bestLooseIdx = lIdx;
+            bestLooseIdx = idx;
           }
         });
 
-        if (bestLooseIdx >= 0) {
-          const matchedLoose = looseItems[bestLooseIdx];
-          matchedLooseCount = matchedLoose.count;
-          matchedLooseVariant = matchedLoose;
-          accountedLooseKeys.add(bestLooseIdx);
-        }
+        const addedQty = b.count * b.packSize;
 
-        const unitLabel = matchedLooseVariant ? matchedLooseVariant.name : (b.rest || 'món');
-        const totalEq = (b.count * b.packSize) + matchedLooseCount;
-        eqDescriptions.push(`${totalEq} ${unitLabel}`);
+        if (bestLooseIdx >= 0) {
+          targetMap[bestLooseIdx].qty += addedQty;
+        } else {
+          // Group standalone bulk items of the same unit/volume together
+          const uKey = (bVol ? `vol_${bVol}` : `txt_${bRestClean}`) || 'mon';
+          if (!standaloneBulkMap.has(uKey)) {
+            standaloneBulkMap.set(uKey, {
+              label: formatUnitLabel(b.rest || 'món'),
+              qty: 0
+            });
+          }
+          standaloneBulkMap.get(uKey).qty += addedQty;
+        }
       });
 
-      looseItems.forEach((l, lIdx) => {
-        if (!accountedLooseKeys.has(lIdx)) {
-          eqDescriptions.push(`${l.count} ${l.name}`);
+      let eqDescriptions = [];
+      targetMap.forEach(t => {
+        if (t.qty > 0) {
+          eqDescriptions.push(`${t.qty} ${t.label}`);
+        }
+      });
+      standaloneBulkMap.forEach(s => {
+        if (s.qty > 0) {
+          eqDescriptions.push(`${s.qty} ${s.label}`);
         }
       });
 
@@ -5860,8 +5944,7 @@
       // Assemble full product names & attach images
       const assembledNames = {};
       for (const [nVal, wList] of Object.entries(productNames)) {
-        wList.sort((a, b) => Math.abs(a.top - b.top) > 4 ? a.top - b.top : a.x0 - b.x0);
-        assembledNames[nVal] = wList.map(w => w.text).join(' ').trim();
+        assembledNames[nVal] = assemblePdfTextByPosition(wList);
       }
 
       for (const item of allSkus) {
