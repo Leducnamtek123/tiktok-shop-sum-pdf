@@ -80,6 +80,14 @@
     "components": "1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
   },
   {
+    "id": "combo_sieu_phuc_hoi_ade_calcifort_butavital",
+    "category": "combo",
+    "name": "Combo siêu phục hồi (ADE B.Complex + Calcifort B12 + Butavital)",
+    "productKeyword": "siêu phục hồi",
+    "skuKeyword": "",
+    "components": "1 ADE B.COMPLEX (100ml) + 1 CALCIFORT B12 (100ml) + 1 NAVET-BUTAVITAL (100ml)"
+  },
+  {
     "id": "combo_pen_strep_dexasone",
     "category": "combo",
     "name": "Combo Pen-strep + Dexasone (Trị viêm da)",
@@ -98,10 +106,10 @@
   {
     "id": "combo_bo_thuoc_co_ban",
     "category": "combo",
-    "name": "Combo Bộ thuốc cơ bản (Pen-strep + Analgin C + Butavit + Dexasone)",
+    "name": "Combo Bộ thuốc cơ bản (Pen-strep + Analgin C + Butavital + Dexasone)",
     "productKeyword": "Bộ thuốc cơ bản",
     "skuKeyword": "",
-    "components": "1 Navet-Pen-Strep (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml) + 1 Dexasone (100ml)"
+    "components": "1 Navet-Pen-Strep (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 Dexasone (100ml)"
   },
   {
     "id": "combo_chuyen_ho_hap",
@@ -157,7 +165,7 @@
     "name": "Combo trị bỏ ăn: Navet Excel + Analgin C + Butavital",
     "productKeyword": "trị bỏ ăn",
     "skuKeyword": "",
-    "components": "1 Navet-Excel 100 (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+    "components": "1 Navet-Excel 100 (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
   },
   {
     "id": "combo_heo_nai_oxytocin_gentamox_calcifort",
@@ -173,15 +181,15 @@
     "name": "Combo siêu chống còi (Butavital + Calcifort B12 + ADE.Bcomplex)",
     "productKeyword": "siêu chống còi",
     "skuKeyword": "",
-    "components": "1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
+    "components": "1 NAVET-BUTAVITAL (100ml) + 1 Calcifort-B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
   },
   {
     "id": "combo_flor_analgin_butavit",
     "category": "combo",
-    "name": "Combo Navet-Flor + Navet Analgin C + Navet-Butavit (Hô hấp phức hợp)",
+    "name": "Combo Navet-Flor + Navet Analgin C + Navet-Butavital (Hô hấp phức hợp)",
     "productKeyword": "Navet-Flor + Navet Analgin",
     "skuKeyword": "",
-    "components": "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+    "components": "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
   },
   {
     "id": "combo_sat_trung_navetcide_iodine",
@@ -245,7 +253,7 @@
     "name": "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
     "productKeyword": "cho Dê đẻ",
     "skuKeyword": "",
-    "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 Navet-Butavit (100ml) + 1 Calcifort-B12 (100ml)"
+    "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 Calcifort-B12 (100ml)"
   },
   {
     "id": "combo_cho_de_con",
@@ -301,15 +309,15 @@
     "name": "Combo đặc trị Mycoplasma Suis : Navet Oxytetra 200 + Analgin C + Butavital",
     "productKeyword": "đặc trị Mycoplasma Suis",
     "skuKeyword": "",
-    "components": "1 Navet Oxytetra 200 LA (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+    "components": "1 Navet Oxytetra 200 LA (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
   },
   {
     "id": "combo_azifluxin_analgin_butavit",
     "category": "combo",
-    "name": "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT",
+    "name": "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVITAL",
     "productKeyword": "AZIFLUXIN + ANALGIN C",
     "skuKeyword": "",
-    "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 Navet-Butavit (100ml)"
+    "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
   },
   {
     "id": "combo_sat_trung_navetcide_vitaminc",
@@ -322,10 +330,10 @@
   {
     "id": "combo_navet_cel_analgin_calcifort_butavit",
     "category": "combo",
-    "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavit (Sau sinh)",
+    "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavital (Sau sinh)",
     "productKeyword": "Navet-Cel + Analgin C",
     "skuKeyword": "",
-    "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 Calcifort-B12 (100ml) + 1 Navet-Butavit (100ml)"
+    "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 Calcifort-B12 (100ml) + 1 NAVET-BUTAVITAL (100ml)"
   },
   {
     "id": "combo_amoxy_iodine",
