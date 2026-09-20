@@ -166,8 +166,9 @@
     /* TikTok Shop Table Print Styling - Active for both @media print and Direct PDF export */
     .tiktok-print-table {
         width: 100% !important;
-        border-collapse: collapse !important;
-        margin-top: 4px !important;
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        margin-top: 0 !important;
         font-size: 8.5pt !important;
       }
       .tiktok-print-table th {
@@ -192,6 +193,7 @@
         border-bottom: 0.5pt solid #e2e8f0 !important;
         padding: 5px 6px !important;
         vertical-align: top !important;
+        box-sizing: border-box !important;
       }
       .tiktok-print-table tr {
         page-break-inside: avoid !important;
@@ -323,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.0</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.1</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -3827,12 +3829,26 @@
       return null;
     }
 
+    function cleanComboTitleForPrint(rawName) {
+      if (!rawName) return 'Combo';
+      let name = rawName.trim();
+      name = name.replace(/^combo[:\s_-]+/i, '').trim();
+      const cutIdx = name.search(/(?: đặc trị|_ trị|: trị|\(trị| - trị|\. trị)/i);
+      if (cutIdx > 0) {
+        name = name.substring(0, cutIdx).trim();
+      }
+      name = name.replace(/\s*_\s*/g, ' + ').trim();
+      name = name.replace(/^[+\s]+|[+\s.,-]+$/g, '').trim();
+      return name || 'Combo';
+    }
+
     function consolidateComboAdditions(additions) {
       if (!additions || additions.length === 0) return [];
       const map = {};
       additions.forEach(a => {
-        const key = cleanItemProductName(a.comboName || a.ruleName || 'Combo');
-        map[key] = (map[key] || 0) + a.qty;
+        const raw = a.ruleName || a.comboName || 'Combo';
+        const key = cleanComboTitleForPrint(raw);
+        map[key] = (map[key] || 0) + (a.qty || 1);
       });
       return Object.entries(map).map(([comboName, qty]) => ({ comboName, qty }));
     }
@@ -3916,7 +3932,9 @@
         if (/^cặp\b/iu.test(rest) || /^cap\b/iu.test(rest)) {
           if (!/\d+\s*ml/i.test(rest)) rest = 'Cặp 100ml';
         }
-        return { isBulk: true, type: 'thùng', packSize, rest: rest || 'món', label: `Thùng (${packSize} ${rest || 'món'})` };
+        if (packSize > 1) {
+          return { isBulk: true, type: 'thùng', packSize, rest: rest || 'món', label: `Thùng (${packSize} ${rest || 'món'})` };
+        }
       }
       const capMatch = s.match(/(\d+)\s*(?:cặp|cap)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/iu);
       if (capMatch && parseInt(capMatch[1], 10) > 1) {
@@ -3929,7 +3947,10 @@
       if (hopMatch) {
         const packSize = parseInt(hopMatch[1], 10);
         const rest = (hopMatch[2] || '').trim();
-        return { isBulk: true, type: 'hộp', packSize, rest, label: `Hộp (${packSize} ${rest || 'món'})` };
+        const isVolumeOrWeight = /^(?:ml|l|lit|lít|g|gam|kg|cc|mg)$/iu.test(rest);
+        if (packSize > 1 && !isVolumeOrWeight) {
+          return { isBulk: true, type: 'hộp', packSize, rest, label: `Hộp (${packSize} ${rest || 'món'})` };
+        }
       }
       const countMatch = s.match(/^(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)/iu);
       if (countMatch && parseInt(countMatch[1], 10) > 1) {
@@ -4421,6 +4442,12 @@
         });
 
         for (let i = 0; i < totalPages; i++) {
+          // Temporarily isolate current page at top: 0, left: 0 to prevent vertical offset drift & bleed
+          pages.forEach((p, idx) => {
+            p.style.display = (idx === i) ? 'block' : 'none';
+            p.style.margin = '0';
+          });
+
           const pageEl = pages[i];
           const pct = 30 + Math.round(((i + 1) / totalPages) * 60);
           updatePdfDock({
@@ -4435,7 +4462,12 @@
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
-            windowWidth: 794
+            width: 794,
+            height: 1123,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: 794,
+            windowHeight: 1123
           });
 
           if (i > 0) {
@@ -4445,6 +4477,12 @@
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
           pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
         }
+
+        // Restore all pages display & margins
+        pages.forEach(p => {
+          p.style.display = '';
+          p.style.margin = '';
+        });
 
         // Reset printContainer styling
         printContainer.style.display = '';
@@ -8011,20 +8049,54 @@
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
 
           const conversionBadge = group.packagingInfo ? `
-            <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 5px; margin-top: 3px; display: inline-block; line-height: 1.25;">
+            <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 4px; padding: 3px 6px; margin-top: 4px; display: block; width: 100%; box-sizing: border-box; line-height: 1.35;">
               ⚡ <strong>Lấy:</strong> ${escapeHtml(group.packagingInfo.actualPickText)} ➔ <strong>Quy đổi:</strong> ${escapeHtml(group.packagingInfo.equivalentText)}
             </div>
           ` : '';
 
-          const getPackBadgeHtml = (p) => {
-            if (!p || !p.isBulk) return '';
-            const typeTitle = p.type ? (p.type.charAt(0).toUpperCase() + p.type.slice(1)) : 'Thùng';
-            return `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 ${typeTitle} ${p.packSize} ${escapeHtml(p.rest || 'món')}</div>`;
+          const renderPrintComboAdditions = (additions) => {
+            const consolidated = consolidateComboAdditions(additions);
+            if (!consolidated || consolidated.length === 0) return '';
+            return `
+              <div style="font-size: 7.2pt; color: #6b21a8; font-weight: 700; background: #faf5ff; border: 0.5pt solid #d8b4fe; border-radius: 4px; padding: 3px 6px; margin-top: 4px; display: block; width: 100%; box-sizing: border-box; line-height: 1.35;">
+                ${consolidated.map(c => `<div style="margin: 0.5px 0;">➕ Đã gồm +${c.qty} từ: ${escapeHtml(c.comboName)}</div>`).join('')}
+              </div>
+            `;
+          };
+
+          const renderPrintSkuCell = (v, pName) => {
+            const pack = parseSkuPackagingType(v.sku, pName);
+            const skuText = (v.sku || '').trim();
+            const skuLower = skuText.toLowerCase();
+
+            if (pack.isBulk) {
+              const isAlreadyDescribed = skuLower.includes(pack.type.toLowerCase());
+              if (isAlreadyDescribed) {
+                return `
+                  <div style="font-weight: 700; color: #6b21a8; font-size: 8pt; line-height: 1.35; word-break: break-word;">
+                    <span style="font-size: 8.5pt;">📦</span> ${escapeHtml(skuText)}
+                  </div>
+                `;
+              } else {
+                const typeTitle = pack.type ? (pack.type.charAt(0).toUpperCase() + pack.type.slice(1)) : 'Thùng';
+                return `
+                  <div style="color: #1e293b; font-weight: 600; font-size: 8pt; line-height: 1.35; word-break: break-word;">${escapeHtml(skuText)}</div>
+                  <div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1.5px 5px; display: block; width: fit-content; margin-top: 3px; line-height: 1.2;">
+                    📦 ${typeTitle} ${pack.packSize} ${escapeHtml(pack.rest || 'món')}
+                  </div>
+                `;
+              }
+            }
+
+            return `
+              <div style="color: #1e293b; font-weight: 500; font-size: 8pt; line-height: 1.35; word-break: break-word;">
+                ${escapeHtml(skuText)}
+              </div>
+            `;
           };
 
           if (group.isSingleVariant) {
             const v = group.variants[0];
-            const pack = parseSkuPackagingType(v.sku, group.productName);
             const lastColHtml = renderPrintLastColumn(v.key, group.productName, v.orderIds);
             const trackingsHtml = renderPrintTrackingNumbers(v.trackingNumbers, v.orderIds);
 
@@ -8036,15 +8108,10 @@
                   <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(group.productName)}</div>
                   ${v.sellerSku && v.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Mã SKU: ${escapeHtml(v.sellerSku)}</div>` : ''}
                   ${conversionBadge}
-                  ${((group.comboAdditions && group.comboAdditions.length > 0) || (v.comboAdditions && v.comboAdditions.length > 0)) ? `
-                    <div style="font-size: 7.2pt; color: #6b21a8; font-weight: 700; background: #faf5ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1.5px 5px; display: inline-block; margin-top: 3px; line-height: 1.25;">
-                      ➕ ${consolidateComboAdditions(v.comboAdditions || group.comboAdditions || []).map(c => `Đã gồm +${c.qty} từ combo ${escapeHtml(c.comboName)}`).join(' • ')}
-                    </div>
-                  ` : ''}
+                  ${renderPrintComboAdditions(v.comboAdditions || group.comboAdditions || [])}
                 </td>
-                <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt;">
-                  <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
-                  ${getPackBadgeHtml(pack)}
+                <td style="vertical-align: top; width: 110px;">
+                  ${renderPrintSkuCell(v, group.productName)}
                 </td>
                 <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top;">
                   ${group.totalQty}
@@ -8066,7 +8133,6 @@
           group.variants.forEach((v, vIdx) => {
             const isFirstVar = (vIdx === 0);
             const isLastVar = (vIdx === varCount - 1);
-            const pack = parseSkuPackagingType(v.sku, group.productName);
             const lastColHtml = renderPrintLastColumn(v.key, group.productName, v.orderIds);
             const trackingsHtml = renderPrintTrackingNumbers(v.trackingNumbers, v.orderIds);
             const trClass = isLastVar ? 'group-border-bottom' : '';
@@ -8079,10 +8145,10 @@
                   <td rowspan="${varCount}" style="vertical-align: top; border-bottom: 1.25pt solid #94a3b8; padding-right: 8px;">
                     <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(group.productName)}</div>
                     ${conversionBadge}
+                    ${renderPrintComboAdditions(group.comboAdditions || [])}
                   </td>
-                  <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
-                    <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
-                    ${getPackBadgeHtml(pack)}
+                  <td style="vertical-align: top; width: 110px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${renderPrintSkuCell(v, group.productName)}
                   </td>
                   <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
@@ -8098,9 +8164,8 @@
             } else {
               groupHtml += `
                 <tr class="${trClass}" data-item-idx="${idx}">
-                  <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
-                    <div style="word-break: break-word;">${escapeHtml(v.sku)}</div>
-                    ${getPackBadgeHtml(pack)}
+                  <td style="vertical-align: top; width: 110px; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
+                    ${renderPrintSkuCell(v, group.productName)}
                   </td>
                   <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top; border-bottom: ${isLastVar ? '1.25pt solid #94a3b8' : '0.5pt dashed #cbd5e1'};">
                     ${v.totalQty}
@@ -8120,7 +8185,6 @@
           // Flat Mode
           const itemFlat = item;
           const pack = parseSkuPackagingType(itemFlat.sku, itemFlat.productName);
-          const typeTitle = pack.type ? (pack.type.charAt(0).toUpperCase() + pack.type.slice(1)) : 'Thùng';
           const imgHtml = itemFlat.imageUrl 
             ? `<img src="${itemFlat.imageUrl}" class="tiktok-print-img" alt="Thumbnail" />`
             : `<div class="tiktok-print-img flex items-center justify-center text-slate-300 font-bold" style="font-size: 14pt;">📦</div>`;
@@ -8135,14 +8199,14 @@
                 <div style="font-weight: 700; color: #0f172a; font-size: 8.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">${escapeHtml(itemFlat.productName)}</div>
                 ${itemFlat.sellerSku && itemFlat.sellerSku !== '-' ? `<div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Mã SKU: ${escapeHtml(itemFlat.sellerSku)}</div>` : ''}
                 ${pack.isBulk ? `
-                  <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 3px; padding: 2px 5px; margin-top: 3px; display: inline-block; line-height: 1.25;">
+                  <div style="font-size: 7.2pt; color: #065f46; background: #ecfdf5; border: 0.5pt solid #a7f3d0; border-radius: 4px; padding: 3px 6px; margin-top: 4px; display: block; width: 100%; box-sizing: border-box; line-height: 1.35;">
                     ⚡ <strong>Lấy:</strong> ${itemFlat.totalQty} ${pack.type} (${pack.packSize} ${escapeHtml(pack.rest || 'món')}) ➔ <strong>Quy đổi:</strong> ${itemFlat.totalQty * pack.packSize} ${escapeHtml(pack.rest || 'món lẻ')}
                   </div>
                 ` : ''}
+                ${renderPrintComboAdditions(itemFlat.comboAdditions || [])}
               </td>
-              <td style="vertical-align: top; width: 110px; color: #1e293b; font-weight: 500; font-size: 8pt;">
-                <div style="word-break: break-word;">${escapeHtml(itemFlat.sku)}</div>
-                ${pack.isBulk ? `<div style="font-size: 7pt; color: #6b21a8; font-weight: 700; background: #f3e8ff; border: 0.5pt solid #d8b4fe; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 2px;">📦 ${typeTitle} ${pack.packSize} ${escapeHtml(pack.rest || 'món')}</div>` : ''}
+              <td style="vertical-align: top; width: 110px;">
+                ${renderPrintSkuCell(itemFlat, itemFlat.productName)}
               </td>
               <td style="text-align: center; font-weight: 800; font-size: 11pt; color: #0f172a; width: 40px; vertical-align: top;">
                 ${itemFlat.totalQty}
@@ -8158,9 +8222,20 @@
         }
       }
 
-      // 2. Measure actual heights of all items in hidden container
+      // 2. Measure actual heights of all items in hidden container with exact thead columns
       measureHost.innerHTML = `
         <table class="tiktok-print-table" style="width: 738px; table-layout: fixed;">
+          <thead>
+            <tr>
+              <th style="width: 28px; text-align: center;">No</th>
+              <th style="width: 44px; text-align: center;">Ảnh</th>
+              <th style="text-align: left;">Tên sản phẩm</th>
+              <th style="width: 110px; text-align: left;">SKU / Phân loại</th>
+              <th style="width: 40px; text-align: center;">SL</th>
+              <th style="width: 145px; text-align: left;">Mã vận đơn</th>
+              <th style="width: 145px; text-align: left;">${printColumnMode === 'batch' ? 'Số lô &amp; Hạn dùng' : 'Mã đơn hàng'}</th>
+            </tr>
+          </thead>
           <tbody>
             ${itemsToPrint.map((it, idx) => renderItemRowsHtml(it, idx)).join('')}
           </tbody>
@@ -8274,8 +8349,8 @@
         const isP1 = (pageNum === 1);
 
         const headerHtml = isP1 ? `
-          <!-- Official Brand Header -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2pt solid #0f172a; padding-bottom: 8px; margin-bottom: 6px;">
+          <!-- Official Brand Header (Page 1) -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; margin-bottom: 4px;">
             <div style="display: flex; align-items: center; gap: 14px;">
               <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 36px; object-fit: contain;" />
               <div style="border-left: 1.5pt solid #cbd5e1; padding-left: 12px;">
@@ -8297,16 +8372,21 @@
             </div>
           </div>
         ` : `
-          <!-- Running Header on subsequent pages -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5pt solid #0f172a; padding-bottom: 5px; margin-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 20px; object-fit: contain;" />
-              <span style="font-size: 9pt; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: -0.01em;">
-                Picking List &bull; ${printColumnMode === 'batch' ? 'Phiếu xuất kho' : 'Phiếu nhặt hàng'} (Trang tiếp theo)
-              </span>
+          <!-- Running Header on subsequent pages (Trang 2+) -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 6px; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <img src="assets/tiktok_shop_logo.png" alt="TikTok Shop" style="height: 22px; object-fit: contain;" />
+              <div style="border-left: 1.5pt solid #cbd5e1; padding-left: 10px; display: flex; flex-direction: column;">
+                <span style="font-size: 9.5pt; font-weight: 900; text-transform: uppercase; color: #0f172a; letter-spacing: -0.01em; line-height: 1.1;">
+                  Picking List &bull; <span style="font-weight: 600; color: #475569;">${printColumnMode === 'batch' ? 'Phiếu xuất kho' : 'Phiếu nhặt hàng'}</span>
+                </span>
+                <span style="font-size: 7pt; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 1px;">
+                  TikTok Shop Logistics &bull; ${printColumnMode === 'batch' ? 'Theo dõi số lô &amp; hạn dùng' : 'Gom món &amp; cộng dồn kho vận'}
+                </span>
+              </div>
             </div>
-            <div style="font-size: 8pt; color: #64748b; font-weight: 600;">
-              <span>Trang ${pageNum} / ${totalPages} &bull; ${nowStr}</span>
+            <div style="text-align: right; font-size: 8pt; color: #334155; line-height: 1.3;">
+              <div>Trang <strong style="color: #0f172a; font-size: 9pt;">${pageNum}</strong> / <strong>${totalPages}</strong> &bull; <span style="color: #64748b;">${nowStr}</span></div>
             </div>
           </div>
         `;
