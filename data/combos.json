@@ -27,6 +27,33 @@
     "unit": "Chai 100ml"
   },
   {
+    "id": "pkg_navetcide_thung_4_can",
+    "category": "packaging",
+    "name": "NAVETCIDE (Thùng 4 can 5L)",
+    "productKeyword": "NAVETCIDE",
+    "skuKeyword": "Thùng 4 can",
+    "packSize": 4,
+    "unit": "Can 5 lít"
+  },
+  {
+    "id": "pkg_navetcide_can_5l",
+    "category": "packaging",
+    "name": "NAVETCIDE (Can 5 lít)",
+    "productKeyword": "NAVETCIDE",
+    "skuKeyword": "Can 5",
+    "packSize": 1,
+    "unit": "Can 5 lít"
+  },
+  {
+    "id": "pkg_navetcide_12",
+    "category": "packaging",
+    "name": "NAVETCIDE (Thùng 12 chai)",
+    "productKeyword": "NAVETCIDE",
+    "skuKeyword": "Thùng 12",
+    "packSize": 12,
+    "unit": "Chai 1 lít"
+  },
+  {
     "id": "pkg_thung_12_goi",
     "category": "packaging",
     "name": "Quy cách Thùng 12 gói",
