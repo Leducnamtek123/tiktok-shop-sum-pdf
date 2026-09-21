@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.1</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.2</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -2094,10 +2094,10 @@
     {
         "id": "combo_azifluxin_analgin_butavit",
         "category": "combo",
-        "name": "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVITAL",
+        "name": "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT (Hô hấp do Mycoplasma)",
         "productKeyword": "AZIFLUXIN + ANALGIN C",
         "skuKeyword": "",
-        "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
+        "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVIT (100ml)"
     },
     {
         "id": "combo_sat_trung_navetcide_vitaminc",
@@ -2231,11 +2231,9 @@
           return null; // Discard invalid packaging rule!
         }
       }
-      if (r.components && /butavit/i.test(r.components)) {
-        r.components = r.components.replace(/Navet-Butavit/gi, 'NAVET-BUTAVITAL').replace(/Butavit/gi, 'NAVET-BUTAVITAL');
-      }
-      if (r.name && /butavit/i.test(r.name)) {
-        r.name = r.name.replace(/Navet-Butavit/gi, 'NAVET-BUTAVITAL').replace(/Butavit/gi, 'NAVET-BUTAVITAL');
+      if (r.id === 'combo_azifluxin_analgin_butavit') {
+        r.name = "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT (Hô hấp do Mycoplasma)";
+        r.components = "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVIT (100ml)";
       }
       return r;
     }
@@ -3653,9 +3651,6 @@
             qty = parseInt(mTrail[2], 10) || 1;
           }
         }
-        if (/butavita?l?\b/i.test(name) || /navet[- ]?butavit/i.test(name)) {
-          name = 'NAVET-BUTAVITAL';
-        }
         let sku = '';
         const mParen = name.match(/\(([^)]+)\)/);
         if (mParen) {
@@ -3667,6 +3662,16 @@
             sku = mVol[1].trim();
             name = name.replace(mVol[0], '').replace(/\s+/g, ' ').trim();
           }
+        }
+        if (/\bnavet[- ]?butavital\b|\bbutavital\b/i.test(name)) {
+          name = 'NAVET-BUTAVITAL';
+        } else if (/\bnavet[- ]?butavit\b|\bbutavit\b/i.test(name)) {
+          name = 'NAVET-BUTAVIT';
+        }
+        if (/\bampicoli(?:[- ]?c)?\b/i.test(name)) {
+          name = 'NAVET-AMPICOLI-C';
+        } else if (/\bnavet[- ]?ampicol\b|\bampicol\b/i.test(name)) {
+          name = 'NAVET-AMPICOL';
         }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
@@ -3737,13 +3742,21 @@
     }
 
 
+    // Helper: Word-boundary substring matcher
+    function containsWholeWord(haystack, needle) {
+      if (!haystack || !needle) return false;
+      const escaped = needle.trim().replace(/[\.\*\+\?\^\(\)\[\]\{\}\\\|\/]/g, '\\$&');
+      const regex = new RegExp('(?:^|[^a-zA-Z0-9À-ỹ])' + escaped + '(?:$|[^a-zA-Z0-9À-ỹ])', 'i');
+      return regex.test(haystack);
+    }
+
     // Helper: Token-based fuzzy matcher to pair a combo component with an existing loose product
     function getProductTokens(str) {
       if (!str) return [];
       const sClean = str.replace(/\b\d+\s*(?:ml|g|kg|l|chai|goi|hop|can)\b/gi, '');
       const words = sClean.toLowerCase().match(/[a-zA-Z0-9À-ỹ]+/g) || [];
       const noise = new Set(['combo', 'navet', 'bo', 'sung', 'cho', 'giup', 'va', 'cua', 'loai', 'thu', 'cung', 'chong', 'tri', 'sau', 'tiem', 'phong', 'vac', 'xin', 'dac', 'tri']);
-      return words.filter(w => w.length >= 2 && !noise.has(w)).map(w => w === 'butavit' ? 'butavital' : w);
+      return words.filter(w => w.length >= 2 && !noise.has(w));
     }
 
     function findMatchingTargetCandidate(compName, compSku, candidates) {
@@ -3759,6 +3772,20 @@
         const candPName = cand.productName || '';
         const candClean = cleanItemProductName(candPName).toLowerCase().replace(/[\-_–—]/g, ' ').replace(/\s+/g, ' ').trim();
         const candDosage = getProductDosageTokens(candPName);
+
+        // Strict distinction: Ampicol (injectable) vs Ampicoli / Ampicoli-C (powder)
+        const isCompAmpicoli = /\bampicoli\b/i.test(compName);
+        const isCandAmpicoli = /\bampicoli\b/i.test(candPName);
+        if (isCompAmpicoli !== isCandAmpicoli && (/\bampicol\b/i.test(compName) || /\bampicol\b/i.test(candPName))) {
+          continue; // Incompatible: Never pair Ampicol with Ampicoli
+        }
+
+        // Strict distinction: Butavit vs Butavital
+        const isCompButavital = /\bbutavital\b/i.test(compName);
+        const isCandButavital = /\bbutavital\b/i.test(candPName);
+        if (isCompButavital !== isCandButavital && (/\bbutavit\b/i.test(compName) || /\bbutavit\b/i.test(candPName))) {
+          continue; // Incompatible: Never pair Butavit with Butavital
+        }
 
         // 1. Strict Dosage / Concentration verification
         // If comp has dosage tokens (like '200' in Fer 200), cand MUST have it!
@@ -3792,10 +3819,8 @@
 
         if (cClean === candClean) {
           nameScore = 100;
-        } else if (candClean.startsWith(cClean) || cClean.startsWith(candClean)) {
+        } else if (containsWholeWord(candClean, cClean) || containsWholeWord(cClean, candClean)) {
           nameScore = 85;
-        } else if (candClean.includes(cClean) || cClean.includes(candClean)) {
-          nameScore = 70;
         } else if (cTokens.size > 0 && candTokens.size > 0) {
           let matchCount = 0;
           for (const t of cTokens) {
@@ -4883,6 +4908,14 @@
       // 1. Direct exact or normalized check (without SKU composite keys)
       for (const [key, url] of productImageMap.entries()) {
         if (key.includes('|||')) continue;
+        const isKeyAmpicoli = /\bampicoli\b/i.test(key);
+        const isSearchAmpicoli = /\bampicoli\b/i.test(name);
+        if (isKeyAmpicoli !== isSearchAmpicoli && (/\bampicol\b/i.test(key) || /\bampicol\b/i.test(name))) continue;
+
+        const isKeyButavital = /\bbutavital\b/i.test(key);
+        const isSearchButavital = /\bbutavital\b/i.test(name);
+        if (isKeyButavital !== isSearchButavital && (/\bbutavit\b/i.test(key) || /\bbutavit\b/i.test(name))) continue;
+
         const kNorm = key.toLowerCase().replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         if (kNorm === cleanN) return url;
       }
@@ -4899,12 +4932,20 @@
         // If candidate key is a combo but we are searching for a single item, DO NOT match!
         if (isKeyCombo && !isSearchingCombo) continue;
 
+        const isKeyAmpicoli = /\bampicoli\b/i.test(key);
+        const isSearchAmpicoli = /\bampicoli\b/i.test(name);
+        if (isKeyAmpicoli !== isSearchAmpicoli && (/\bampicol\b/i.test(key) || /\bampicol\b/i.test(name))) continue;
+
+        const isKeyButavital = /\bbutavital\b/i.test(key);
+        const isSearchButavital = /\bbutavital\b/i.test(name);
+        if (isKeyButavital !== isSearchButavital && (/\bbutavit\b/i.test(key) || /\bbutavit\b/i.test(name))) continue;
+
         const kNorm = kLower.replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         const kMain = kNorm.split(':')[0].trim();
         const nMain = cleanN.split(':')[0].trim();
 
         if (kMain === nMain && kMain.length >= 3) return url;
-        if (kNorm.startsWith(cleanN) || cleanN.startsWith(kNorm)) return url;
+        if (containsWholeWord(kNorm, cleanN) || containsWholeWord(cleanN, kNorm)) return url;
       }
 
       // 3. Word boundary substring match for significant names
@@ -4914,6 +4955,14 @@
         const isKeyCombo = kLower.startsWith('combo') || kLower.includes('+') || kLower.includes('combo:');
         const isSearchingCombo = cleanN.startsWith('combo') || cleanN.includes('+');
         if (isKeyCombo && !isSearchingCombo) continue;
+
+        const isKeyAmpicoli = /\bampicoli\b/i.test(key);
+        const isSearchAmpicoli = /\bampicoli\b/i.test(name);
+        if (isKeyAmpicoli !== isSearchAmpicoli && (/\bampicol\b/i.test(key) || /\bampicol\b/i.test(name))) continue;
+
+        const isKeyButavital = /\bbutavital\b/i.test(key);
+        const isSearchButavital = /\bbutavital\b/i.test(name);
+        if (isKeyButavital !== isSearchButavital && (/\bbutavit\b/i.test(key) || /\bbutavit\b/i.test(name))) continue;
 
         const kNorm = kLower.replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         if (cleanN.length >= 4) {
