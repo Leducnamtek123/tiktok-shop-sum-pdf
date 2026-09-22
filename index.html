@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.2</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.3</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -2122,6 +2122,30 @@
         "productKeyword": "Navet-Amoxy + Navet-Iodine",
         "skuKeyword": "",
         "components": "1 Navet-Amoxy (100ml) + 1 Navet-Iodine (1L)"
+    },
+    {
+        "id": "combo_khang_gum_interferon_100ml",
+        "category": "combo",
+        "name": "Combo Kháng Gum + Interferon - Quy cách 1 (1 Kháng Gum 100ml + 1 Interferon 1tr UI)",
+        "productKeyword": "Kháng Gum + Interferon",
+        "skuKeyword": "100ml",
+        "components": "1 NAVET-KHÁNG GUM (100ml) + 1 NAVET-INTERFERON (Chai 1 triệu IU)"
+    },
+    {
+        "id": "combo_khang_gum_interferon_500ml",
+        "category": "combo",
+        "name": "Combo Kháng Gum + Interferon - Quy cách 2 (1 Kháng Gum 500ml + 5 Interferon 1tr UI)",
+        "productKeyword": "Kháng Gum + Interferon",
+        "skuKeyword": "500ml",
+        "components": "1 NAVET-KHÁNG GUM (500ml) + 5 NAVET-INTERFERON (Chai 1 triệu IU)"
+    },
+    {
+        "id": "combo_khang_gum_interferon",
+        "category": "combo",
+        "name": "Combo Kháng Gum + Interferon (Phòng & Trị Gumboro)",
+        "productKeyword": "Kháng Gum + Interferon",
+        "skuKeyword": "",
+        "components": "1 NAVET-KHÁNG GUM (100ml) + 1 NAVET-INTERFERON (Chai 1 triệu IU)"
     }
 ];
 
@@ -2234,6 +2258,23 @@
       if (r.id === 'combo_azifluxin_analgin_butavit') {
         r.name = "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT (Hô hấp do Mycoplasma)";
         r.components = "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVIT (100ml)";
+      }
+      if (r.id === 'combo_khang_gum_interferon_100ml') {
+        r.name = "Combo Kháng Gum + Interferon - Quy cách 1 (1 Kháng Gum 100ml + 1 Interferon 1tr UI)";
+        r.components = "1 NAVET-KHÁNG GUM (100ml) + 1 NAVET-INTERFERON (Chai 1 triệu IU)";
+        r.productKeyword = "Kháng Gum + Interferon";
+        r.skuKeyword = "100ml";
+      }
+      if (r.id === 'combo_khang_gum_interferon_500ml') {
+        r.name = "Combo Kháng Gum + Interferon - Quy cách 2 (1 Kháng Gum 500ml + 5 Interferon 1tr UI)";
+        r.components = "1 NAVET-KHÁNG GUM (500ml) + 5 NAVET-INTERFERON (Chai 1 triệu IU)";
+        r.productKeyword = "Kháng Gum + Interferon";
+        r.skuKeyword = "500ml";
+      }
+      if (r.id === 'combo_khang_gum_interferon') {
+        r.name = "Combo Kháng Gum + Interferon (Phòng & Trị Gumboro)";
+        r.components = "1 NAVET-KHÁNG GUM (100ml) + 1 NAVET-INTERFERON (Chai 1 triệu IU)";
+        r.productKeyword = "Kháng Gum + Interferon";
       }
       return r;
     }
@@ -3531,6 +3572,11 @@
           matchProd = true;
         } else if (rule.id === 'combo_chuyen_ho_hap' && (pNorm.includes('chuyen ho hap') || pNorm.includes('chuyên hô hấp'))) {
           matchProd = true;
+        } else if (rule.id && rule.id.startsWith('combo_khang_gum_interferon') && (
+          (pNoTone.includes('khang gum') || pNoTone.includes('gumboro') || pNoTone.includes('khang the gum')) &&
+          pNoTone.includes('interferon')
+        )) {
+          matchProd = true;
         }
 
         if (matchProd) {
@@ -3657,7 +3703,7 @@
           sku = mParen[1].trim();
           name = name.replace(/\(([^)]+)\)/, '').trim();
         } else {
-          const mVol = name.match(/(\d+\s*(?:ml|g|gam|kg|l|lit|lít|can|chai|gói|hộp|lọ|túi|vỉ))\b/i);
+          const mVol = name.match(/(\d+\s*(?:ml|g|gam|kg|l|lit|lít|can|chai|gói|hộp|lọ|túi|vỉ|tr\s*ui|triệu\s*(?:ui|iu)))\b/i);
           if (mVol) {
             sku = mVol[1].trim();
             name = name.replace(mVol[0], '').replace(/\s+/g, ' ').trim();
@@ -3672,6 +3718,15 @@
           name = 'NAVET-AMPICOLI-C';
         } else if (/\bnavet[- ]?ampicol\b|\bampicol\b/i.test(name)) {
           name = 'NAVET-AMPICOL';
+        }
+        if (/\b(?:navet[- ]?)?kh[aá]ng[- ]?gum\b|\bgumboro\b/i.test(name)) {
+          name = 'NAVET-KHÁNG GUM';
+        }
+        if (/\b(?:navet[- ]?)?interferon\b/i.test(name)) {
+          name = 'NAVET-INTERFERON';
+          if (!sku || /(?:1\s*tr|1\s*triệu)\s*(?:ui|iu)/i.test(sku)) {
+            sku = 'Chai 1 triệu IU';
+          }
         }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
@@ -3707,6 +3762,10 @@
       const s = (candSku || '').toLowerCase().replace(/\s+/g, '');
       if (c === s) return true;
 
+      // Interferon dosage / SKU check (1tr UI, 1 triệu IU, 1 triệu UI, Chai 1 triệu IU)
+      const isInterferonDosage = (str) => /(?:1\s*tr|1\s*triệu|1\.000\.000)\s*(?:ui|iu)/i.test(str);
+      if (isInterferonDosage(c) && isInterferonDosage(s)) return true;
+
       // Special checks for form/packaging conflicts (Chai vs Hộp vs Gói vs Can vs Ống)
       if ((c.includes('hộp') || c.includes('ống')) && s.includes('chai')) return false;
       if (c.includes('chai') && (s.includes('hộp') || s.includes('ống'))) return false;
@@ -3724,11 +3783,16 @@
       if (c.includes('20ml') && s.includes('100ml')) return false;
       if (c.includes('1l') && s.includes('100ml')) return false;
       if (c.includes('100ml') && s.includes('1l')) return false;
+      if (c.includes('500ml') && s.includes('100ml')) return false;
+      if (c.includes('100ml') && s.includes('500ml')) return false;
+      if (c.includes('500ml') && s.includes('1l')) return false;
+      if (c.includes('1l') && s.includes('500ml')) return false;
       if ((c.includes('1l') || c.includes('1lit') || c.includes('1lít')) && (s.includes('5l') || s.includes('5lit') || s.includes('5lít'))) return false;
       if ((c.includes('5l') || c.includes('5lit') || c.includes('5lít')) && (s.includes('1l') || s.includes('1lit') || s.includes('1lít'))) return false;
       if (c.includes('can') && (s.includes('chai') || s.includes('gói') || s.includes('hộp'))) return false;
       if (s.includes('can') && (c.includes('chai') || c.includes('gói') || c.includes('hộp'))) return false;
       if (c.includes('5l') && s.includes('5l')) return true;
+      if (c.includes('500ml') && s.includes('500ml')) return true;
 
       if (s.includes(c) || c.includes(s)) return true;
 
