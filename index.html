@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.5</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.6</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -1951,7 +1951,7 @@
         "id": "combo_heo_nai_oxytocin_gentamox_calcifort",
         "category": "combo",
         "name": "Combo cho heo nái (Oxytocin + Gentamox + Calcifort + ADE)",
-        "productKeyword": "cho heo nái",
+        "productKeyword": "cho heo nái, Oxytocin + Gentamox",
         "skuKeyword": "",
         "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)"
     },
@@ -2175,7 +2175,8 @@
       if (r.components && /calcifort[- ]?b12/i.test(r.components)) {
         r.components = r.components.replace(/calcifort[- ]?b12/gi, 'CALCIFORT B12');
       }
-      if (r.id === 'combo_heo_nai_oxytocin_gentamox_calcifort' || (r.name && r.name.toLowerCase().includes('cho heo nái') && r.components && !r.components.toLowerCase().includes('hộp 10 ống'))) {
+      if (r.id === 'combo_heo_nai_oxytocin_gentamox_calcifort' || (r.name && r.name.toLowerCase().includes('cho heo nái'))) {
+        r.productKeyword = "cho heo nái, Oxytocin + Gentamox";
         r.components = "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)";
       }
       if (r.id === 'combo_cho_de_de' || (r.name && r.name.toLowerCase().includes('cho dê đẻ') && r.components && !r.components.toLowerCase().includes('hộp 10 ống'))) {
@@ -3555,14 +3556,22 @@
       const sNorm = normalizeMatchText(skuStr);
       const pNoTone = removeVietnameseTones(pNorm);
       const sNoTone = removeVietnameseTones(sNorm);
+
+      // Tách tên chính trước dấu hai chấm (:) và phần công dụng/đối tượng sau dấu hai chấm
+      const parts = pNorm.split(/:|\s-\s/);
+      const primaryNorm = parts[0] ? parts[0].trim() : pNorm;
+      const primaryNoTone = removeVietnameseTones(primaryNorm);
+
       const isDeclaredComboProduct = pNoTone.startsWith('combo ') ||
         pNoTone.includes(' combo ') ||
         pNoTone.includes('combo:') ||
         pNoTone.includes('bo doi') ||
-        pNoTone.includes('cap doi');
+        pNoTone.includes('cap doi') ||
+        pNoTone.includes('bo san pham');
       const hasComboCompositionSignal = pNorm.includes('+');
 
-      let fallbackRule = null;
+      let bestRule = null;
+      let bestScore = -1;
 
       for (const rule of comboRules) {
         if (rule.category !== 'combo') continue;
@@ -3573,53 +3582,113 @@
         const skuRuleNorm = normalizeMatchText(rule.skuKeyword);
         const skuRuleNoTone = removeVietnameseTones(skuRuleNorm);
 
+        // Chống nhầm lẫn chéo combo (Cross-combo guards):
+        // 1. Combo heo nái (Oxytocin + Gentamox) tuyệt đối không nuốt chửng Combo Navet-Cel
+        if (rule.id === 'combo_heo_nai_oxytocin_gentamox_calcifort') {
+          if ((pNoTone.includes('cel') || pNoTone.includes('navet-cel') || pNoTone.includes('navet cel') || pNoTone.includes('butavit')) &&
+              !pNoTone.includes('oxytocin') && !pNoTone.includes('gentamox')) {
+            continue;
+          }
+        }
+        // 2. Combo dê đẻ không nuốt heo nái hoặc Navet-Cel
+        if (rule.id === 'combo_cho_de_de') {
+          if (!pNoTone.includes('de de') && !pNoTone.includes('de') && (pNoTone.includes('heo nai') || pNoTone.includes('cel'))) {
+            continue;
+          }
+        }
+
         let matchProd = false;
-        if (kwNorm && (pNorm.includes(kwNorm) || (kwNoTone && pNoTone.includes(kwNoTone)))) {
+        let matchedKw = '';
+        let score = 0;
+
+        // Kiểm tra danh sách từ khóa phân tách bằng dấu phẩy
+        const kwList = kwNoTone ? kwNoTone.split(',').map(s => s.trim()).filter(Boolean) : [];
+        for (const kw of kwList) {
+          if (kw && pNoTone.includes(kw)) {
+            matchProd = true;
+            if (kw.length > matchedKw.length) matchedKw = kw;
+          }
+        }
+
+        if (!matchProd && nameNoTone && pNoTone.includes(nameNoTone)) {
           matchProd = true;
-        } else if (nameNorm && (pNorm.includes(nameNorm) || (nameNoTone && pNoTone.includes(nameNoTone)))) {
-          matchProd = true;
-        } else if (rule.id === 'combo_vo_beo_b_betazyme_vitamino' && (
+          matchedKw = nameNoTone;
+        }
+
+        // Bộ đối soát chuyên biệt cho các combo đặc thù
+        if (rule.id === 'combo_vo_beo_b_betazyme_vitamino' && (
           (pNoTone.includes('vo beo b') || pNoTone.includes('vo beo')) &&
           pNoTone.includes('betazyme') && pNoTone.includes('vitamino') && !pNoTone.includes('lite')
         )) {
           matchProd = true;
+          matchedKw = matchedKw || 'vo beo b';
+          score += 50;
         } else if (rule.id === 'combo_chuyen_ho_hap' && (pNorm.includes('chuyen ho hap') || pNorm.includes('chuyên hô hấp'))) {
           matchProd = true;
+          matchedKw = matchedKw || 'chuyen ho hap';
+          score += 50;
         } else if (rule.id && rule.id.startsWith('combo_khang_gum_interferon') && (
           (pNoTone.includes('khang gum') || pNoTone.includes('gumboro') || pNoTone.includes('khang the gum')) &&
           pNoTone.includes('interferon')
         )) {
           matchProd = true;
+          matchedKw = matchedKw || 'khang gum';
+          score += 50;
         } else if (rule.id === 'combo_navet_cel_analgin_calcifort_butavit' && (
           (pNoTone.includes('cel') || pNoTone.includes('navet-cel') || pNoTone.includes('navet cel')) &&
           (pNoTone.includes('analgin') || pNoTone.includes('calcifort') || pNoTone.includes('butavit') || pNoTone.includes('butavital') || pNoTone.includes('sau sinh') || pNoTone.includes('viem nhiem'))
         )) {
           matchProd = true;
+          matchedKw = matchedKw || 'navet-cel';
+          score += 120;
         } else if (rule.id === 'combo_navet_cel_analgin_calcifort_butavit' && (
           pNoTone.includes('sau sinh') && (pNoTone.includes('butavit') || pNoTone.includes('calcifort') || pNoTone.includes('cel'))
         )) {
           matchProd = true;
+          matchedKw = matchedKw || 'sau sinh';
+          score += 90;
+        } else if (rule.id === 'combo_heo_nai_oxytocin_gentamox_calcifort' && (
+          pNoTone.includes('oxytocin') && pNoTone.includes('gentamox')
+        )) {
+          matchProd = true;
+          matchedKw = matchedKw || 'oxytocin + gentamox';
+          score += 100;
         }
 
         if (matchProd) {
-          const keywordTokens = kwNoTone.split(/\s+/).filter(Boolean);
-          const isGenericKeyword = kwNoTone &&
-            !kwNoTone.includes('+') &&
+          const keywordTokens = matchedKw ? matchedKw.split(/\s+/).filter(Boolean) : [];
+          const isGenericKeyword = matchedKw &&
+            !matchedKw.includes('+') &&
             keywordTokens.length <= 3;
-          if (isGenericKeyword && !isDeclaredComboProduct && !(hasComboCompositionSignal && pNoTone.startsWith(kwNoTone)) && !(nameNoTone && pNoTone.includes(nameNoTone))) {
+          if (isGenericKeyword && !isDeclaredComboProduct && !(hasComboCompositionSignal && pNoTone.startsWith(matchedKw)) && !(nameNoTone && pNoTone.includes(nameNoTone))) {
             continue;
           }
 
+          // Điểm độ dài từ khóa (từ khóa cụ thể có điểm cao hơn)
+          score += (matchedKw.length * 2) + (keywordTokens.length * 5);
+
+          // Điểm ưu tiên vượt trội nếu từ khóa xuất hiện ở TÊN CHÍNH (trước dấu hai chấm)
+          if (matchedKw && primaryNoTone.includes(matchedKw)) {
+            score += 200;
+          }
+
+          // Kiểm tra khớp SKU nếu luật có yêu cầu SKU
           const matchSku = skuRuleNorm && (sNorm.includes(skuRuleNorm) || (skuRuleNoTone && sNoTone.includes(skuRuleNoTone)));
           if (matchSku) {
-            return rule;
+            score += 1000;
+          } else if (skuRuleNorm) {
+            // Luật yêu cầu SKU nhưng không khớp thì bỏ qua
+            continue;
           }
-          if (!skuRuleNorm && !fallbackRule) {
-            fallbackRule = rule;
+
+          // Chọn luật có độ phù hợp (score) cao nhất
+          if (score > bestScore) {
+            bestScore = score;
+            bestRule = rule;
           }
         }
       }
-      return fallbackRule;
+      return bestRule;
     }
 
     // Expose all modal and rule functions to window
