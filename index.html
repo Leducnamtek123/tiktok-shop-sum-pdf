@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.4</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.5</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -2110,10 +2110,10 @@
     {
         "id": "combo_navet_cel_analgin_calcifort_butavit",
         "category": "combo",
-        "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavital (Sau sinh)",
-        "productKeyword": "Navet-Cel + Analgin C",
+        "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavit (Sau sinh)",
+        "productKeyword": "Navet-Cel + Analgin C, Butavit, Sau sinh",
         "skuKeyword": "",
-        "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 CALCIFORT B12 (100ml) + 1 NAVET-BUTAVITAL (100ml)"
+        "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 CALCIFORT B12 (100ml) + 1 NAVET-BUTAVIT (100ml)"
     },
     {
         "id": "combo_amoxy_iodine",
@@ -2180,6 +2180,16 @@
       }
       if (r.id === 'combo_cho_de_de' || (r.name && r.name.toLowerCase().includes('cho dê đẻ') && r.components && !r.components.toLowerCase().includes('hộp 10 ống'))) {
         r.components = "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)";
+      }
+      if (r.id === 'combo_navet_cel_analgin_calcifort_butavit' || (
+        r.name && (r.name.toLowerCase().includes('navet-cel') || r.name.toLowerCase().includes('navet cel') || r.name.toLowerCase().includes('sau sinh')) &&
+        (r.name.toLowerCase().includes('butavit') || r.name.toLowerCase().includes('butavital') || r.name.toLowerCase().includes('analgin'))
+      )) {
+        r.id = 'combo_navet_cel_analgin_calcifort_butavit';
+        r.category = 'combo';
+        r.name = "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavit (Sau sinh)";
+        r.productKeyword = "Navet-Cel + Analgin C, Butavit, Sau sinh";
+        r.components = "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 CALCIFORT B12 (100ml) + 1 NAVET-BUTAVIT (100ml)";
       }
       if (r.id === 'combo_vo_beo_b_betazyme_vitamino' || (r.name && r.name.toLowerCase().includes('vỗ béo b'))) {
         r.productKeyword = 'Vỗ Béo B';
@@ -3580,6 +3590,15 @@
           pNoTone.includes('interferon')
         )) {
           matchProd = true;
+        } else if (rule.id === 'combo_navet_cel_analgin_calcifort_butavit' && (
+          (pNoTone.includes('cel') || pNoTone.includes('navet-cel') || pNoTone.includes('navet cel')) &&
+          (pNoTone.includes('analgin') || pNoTone.includes('calcifort') || pNoTone.includes('butavit') || pNoTone.includes('butavital') || pNoTone.includes('sau sinh') || pNoTone.includes('viem nhiem'))
+        )) {
+          matchProd = true;
+        } else if (rule.id === 'combo_navet_cel_analgin_calcifort_butavit' && (
+          pNoTone.includes('sau sinh') && (pNoTone.includes('butavit') || pNoTone.includes('calcifort') || pNoTone.includes('cel'))
+        )) {
+          matchProd = true;
         }
 
         if (matchProd) {
@@ -3733,6 +3752,12 @@
         }
         if (/\bcalcifort(?:[- ]?b12)?\b/i.test(name)) {
           name = 'CALCIFORT B12';
+        }
+        if (/\b(?:navet[- ]?)?cel\b/i.test(name)) {
+          name = 'NAVET-CEL';
+        }
+        if (/\b(?:navet[- ]?)?analgin(?:[- ]?c)?\b/i.test(name)) {
+          name = 'NAVET-ANALGIN C';
         }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }

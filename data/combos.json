@@ -357,10 +357,10 @@
   {
     "id": "combo_navet_cel_analgin_calcifort_butavit",
     "category": "combo",
-    "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavital (Sau sinh)",
-    "productKeyword": "Navet-Cel + Analgin C",
+    "name": "Combo Navet-Cel + Analgin C + Calcifort B12 + Butavit (Sau sinh)",
+    "productKeyword": "Navet-Cel + Analgin C, Butavit, Sau sinh",
     "skuKeyword": "",
-    "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 CALCIFORT B12 (100ml) + 1 NAVET-BUTAVITAL (100ml)"
+    "components": "1 Navet-Cel (100ml) + 1 Navet-Analgin C (100ml) + 1 CALCIFORT B12 (100ml) + 1 NAVET-BUTAVIT (100ml)"
   },
   {
     "id": "combo_amoxy_iodine",
