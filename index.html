@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.6</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.7</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -1966,10 +1966,10 @@
     {
         "id": "combo_flor_analgin_butavit",
         "category": "combo",
-        "name": "Combo Navet-Flor + Navet Analgin C + Navet-Butavital (Hô hấp phức hợp)",
-        "productKeyword": "Navet-Flor + Navet Analgin",
+        "name": "Combo Navet-Flor + Navet Analgin C + Navet-Butavit (Hô hấp phức hợp)",
+        "productKeyword": "Navet-Flor + Navet Analgin, Navet-Flor + Analgin C, Flor + Analgin + Butavit, Flor + Butavit",
         "skuKeyword": "",
-        "components": "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
+        "components": "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVIT (100ml)"
     },
     {
         "id": "combo_sat_trung_navetcide_iodine",
@@ -2272,6 +2272,12 @@
       if (r.id === 'combo_azifluxin_analgin_butavit') {
         r.name = "COMBO NAVET - AZIFLUXIN + ANALGIN C + BUTAVIT (Hô hấp do Mycoplasma)";
         r.components = "1 Navet-Azifluxin (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVIT (100ml)";
+      }
+      if (r.id === 'combo_flor_analgin_butavit' || (r.name && r.name.toLowerCase().includes('flor') && (r.name.toLowerCase().includes('analgin') || r.name.toLowerCase().includes('butavit')))) {
+        r.id = 'combo_flor_analgin_butavit';
+        r.name = "Combo Navet-Flor + Navet Analgin C + Navet-Butavit (Hô hấp phức hợp)";
+        r.productKeyword = "Navet-Flor + Navet Analgin, Navet-Flor + Analgin C, Flor + Analgin + Butavit, Flor + Butavit";
+        r.components = "1 Navet-Flor (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVIT (100ml)";
       }
       if (r.id === 'combo_khang_gum_interferon_100ml') {
         r.name = "Combo Kháng Gum + Interferon - Quy cách 1 (1 Kháng Gum 100ml + 1 Interferon 1tr UI)";
@@ -3558,7 +3564,8 @@
       const sNoTone = removeVietnameseTones(sNorm);
 
       // Tách tên chính trước dấu hai chấm (:) và phần công dụng/đối tượng sau dấu hai chấm
-      const parts = pNorm.split(/:|\s-\s/);
+      const sForParts = pNorm.replace(/^(?:combo|bo san pham|cap doi|bo doi)\s*[:\-]\s*/i, '');
+      const parts = sForParts.split(/:|\s-\s/);
       const primaryNorm = parts[0] ? parts[0].trim() : pNorm;
       const primaryNoTone = removeVietnameseTones(primaryNorm);
 
@@ -3653,6 +3660,13 @@
           matchProd = true;
           matchedKw = matchedKw || 'oxytocin + gentamox';
           score += 100;
+        } else if (rule.id === 'combo_flor_analgin_butavit' && (
+          (pNoTone.includes('flor') || pNoTone.includes('navet-flor') || pNoTone.includes('navet flor')) &&
+          (pNoTone.includes('butavit') || pNoTone.includes('butavital') || pNoTone.includes('analgin'))
+        )) {
+          matchProd = true;
+          matchedKw = matchedKw || 'navet-flor + analgin + butavit';
+          score += 120;
         }
 
         if (matchProd) {
@@ -3827,6 +3841,9 @@
         }
         if (/\b(?:navet[- ]?)?analgin(?:[- ]?c)?\b/i.test(name)) {
           name = 'NAVET-ANALGIN C';
+        }
+        if (/\b(?:navet[- ]?)?flor\b/i.test(name)) {
+          name = 'NAVET-FLOR';
         }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
