@@ -6223,6 +6223,14 @@
         return;
       }
 
+      // Check if user accidentally uploaded the exported Picking List output PDF
+      const exportedFile = pdfFiles.find(f => /phieu[-_ ]?nhat[-_ ]?hang/i.test(f.name));
+      if (exportedFile) {
+        showToast('⚠️ Bạn đang nạp file Phiếu Nhặt Hàng (kết quả đã xuất ra). Vui lòng nạp file PDF Picking List gốc từ TikTok Shop!', 6000);
+        alert('⚠️ Chú ý: File "' + exportedFile.name + '" là PHIẾU XUẤT KHO ĐÃ TỔNG HỢP (dùng để in ra giấy cho nhân viên nhặt hàng), KHÔNG PHẢI file dữ liệu gốc từ TikTok Shop.\n\n👉 Để hệ thống đọc và tổng hợp đơn, bạn vui lòng nạp file PDF "Picking list" gốc tải trực tiếp từ TikTok Shop Seller Center (ví dụ: Picking list_1.pdf, Picking list_2.pdf...) nhé!');
+        return;
+      }
+
       const shippingFiles = [];
       const pickingFiles = [];
 
@@ -6283,6 +6291,9 @@
             lastParsedFilesData[existingIdx] = fileData;
           } else {
             lastParsedFilesData.push(fileData);
+          }
+          if (!fileData || !fileData.items || fileData.items.length === 0) {
+            showToast('⚠️ Không tìm thấy đơn hàng nào trong file "' + pf.name + '". Hãy đảm bảo đây là file Picking List gốc từ TikTok Shop!', 6000);
           }
         } catch (err) {
           console.error("Lỗi khi đọc file " + pf.name, err);
