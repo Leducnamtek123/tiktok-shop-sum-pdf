@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.7</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.8</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -3845,6 +3845,17 @@
         if (/\b(?:navet[- ]?)?flor\b/i.test(name)) {
           name = 'NAVET-FLOR';
         }
+        if (/\bvitamino\s+lite\b/i.test(name)) {
+          name = 'NAVET-VITAMINO LITE';
+        } else if (/\bvitamino\b/i.test(name)) {
+          name = 'NAVET-VITAMINO';
+        }
+        if (/\b(?:navet[- ]?)?bioglucan\b/i.test(name)) {
+          name = 'NAVET-BIOGLUCAN';
+        }
+        if (/\b(?:navet[- ]?)?betazyme\b/i.test(name)) {
+          name = 'NAVET BETAZYME';
+        }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
       return res;
@@ -3968,6 +3979,20 @@
           continue; // Incompatible: Never pair Butavit with Butavital
         }
 
+        // Strict distinction: LITE vs Non-LITE (e.g. Vitamino vs Vitamino LITE, Betazyme vs Betazyme LITE, E-Selen vs E-Selen LITE)
+        const isCompLite = /\blite\b/i.test(compName);
+        const isCandLite = /\blite\b/i.test(candPName);
+        if (isCompLite !== isCandLite) {
+          continue; // Incompatible: Never pair standard product with LITE variant
+        }
+
+        // Strict distinction: PLUS vs Non-PLUS (e.g. Amoxicol vs Amoxicol Plus)
+        const isCompPlus = /\bplus\b/i.test(compName);
+        const isCandPlus = /\bplus\b/i.test(candPName);
+        if (isCompPlus !== isCandPlus) {
+          continue; // Incompatible: Never pair standard product with PLUS variant
+        }
+
         // 1. Strict Dosage / Concentration verification
         // If comp has dosage tokens (like '200' in Fer 200), cand MUST have it!
         if (cDosage.size > 0) {
@@ -3981,9 +4006,9 @@
           if (conflict) continue;
         }
 
-        // If cand has special dosage tokens (like '200', '50%') and comp does NOT have it, conflict!
+        // If cand has special dosage tokens (like '200', '50%', '100', 'lite', 'plus', 'pro', 'la') and comp does NOT have it, conflict!
         if (candDosage.size > 0 && cDosage.size === 0) {
-          const criticalDosages = ['200', '50%'];
+          const criticalDosages = ['200', '50%', '100', 'lite', 'plus', 'pro', 'la'];
           let conflict = false;
           for (const cd of criticalDosages) {
             if (candDosage.has(cd)) {
@@ -5102,6 +5127,10 @@
         const isSearchButavital = /\bbutavital\b/i.test(name);
         if (isKeyButavital !== isSearchButavital && (/\bbutavit\b/i.test(key) || /\bbutavit\b/i.test(name))) continue;
 
+        const isKeyLite = /\blite\b/i.test(key);
+        const isSearchLite = /\blite\b/i.test(name);
+        if (isKeyLite !== isSearchLite && (/\bvitamino\b/i.test(key) || /\bvitamino\b/i.test(name) || /\bbetazyme\b/i.test(key) || /\bbetazyme\b/i.test(name) || /\be[- ]?selen\b/i.test(key) || /\be[- ]?selen\b/i.test(name))) continue;
+
         const kNorm = key.toLowerCase().replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         if (kNorm === cleanN) return url;
       }
@@ -5126,6 +5155,10 @@
         const isSearchButavital = /\bbutavital\b/i.test(name);
         if (isKeyButavital !== isSearchButavital && (/\bbutavit\b/i.test(key) || /\bbutavit\b/i.test(name))) continue;
 
+        const isKeyLite = /\blite\b/i.test(key);
+        const isSearchLite = /\blite\b/i.test(name);
+        if (isKeyLite !== isSearchLite && (/\bvitamino\b/i.test(key) || /\bvitamino\b/i.test(name) || /\bbetazyme\b/i.test(key) || /\bbetazyme\b/i.test(name) || /\be[- ]?selen\b/i.test(key) || /\be[- ]?selen\b/i.test(name))) continue;
+
         const kNorm = kLower.replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         const kMain = kNorm.split(':')[0].trim();
         const nMain = cleanN.split(':')[0].trim();
@@ -5149,6 +5182,10 @@
         const isKeyButavital = /\bbutavital\b/i.test(key);
         const isSearchButavital = /\bbutavital\b/i.test(name);
         if (isKeyButavital !== isSearchButavital && (/\bbutavit\b/i.test(key) || /\bbutavit\b/i.test(name))) continue;
+
+        const isKeyLite = /\blite\b/i.test(key);
+        const isSearchLite = /\blite\b/i.test(name);
+        if (isKeyLite !== isSearchLite && (/\bvitamino\b/i.test(key) || /\bvitamino\b/i.test(name) || /\bbetazyme\b/i.test(key) || /\bbetazyme\b/i.test(name) || /\be[- ]?selen\b/i.test(key) || /\be[- ]?selen\b/i.test(name))) continue;
 
         const kNorm = kLower.replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         if (cleanN.length >= 4) {
