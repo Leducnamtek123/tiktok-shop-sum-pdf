@@ -1,3 +1,58 @@
+# Cập nhật Logistics Pro v3.8: Tách biệt tuyệt đối dòng sản phẩm LITE (Vitamino vs Vitamino LITE)
+
+## 1. Vấn đề thực tế từ phản hồi khách hàng (07/10/2026)
+- **Ảnh đính kèm tin nhắn**:
+  - *"Combo vỗ béo: Bioglucan với Vitamino mọi hôm đang đúng, nay nhảy qua Vitamino Lite"*
+  - *"Dạ"*
+  - *"Cái vỗ béo Lite mới là Vitamino Lite á a"*
+- **Bằng chứng trên phiếu nhặt hàng (Picking List dòng 34)**:
+  - Dòng 34 hiển thị: `NAVET-VITAMINO LITE : bổ sung vitamin và acid amin...` (Gói 1Kg, Số lượng: 15).
+  - Chi tiết gộp đơn gồm:
+    - `+ Đã gồm +3 từ: SẢN PHẨM VỖ BÉO + Navet-BioGlucan + Vitamino` (Vitamino thường, 3 gói)
+    - `+ Đã gồm +3 từ: Vỗ Béo B (Betazyme + Vitamino)` (Vitamino thường, 3 gói)
+    - `+ Đã gồm +7 từ: VỖ BÉO LITE + Navet BETAZYME + Vitamino LITE` (Vitamino LITE, 7 gói)
+    - Tổng: 3 + 3 + 7 = 15 gói, tất cả bị gom vào `NAVET-VITAMINO LITE`. Sản phẩm `NAVET-VITAMINO` (thường) biến mất khỏi danh sách nhặt hàng!
+
+## 2. Nguyên nhân cốt lõi (Root Cause)
+1. **Tại sao mọi hôm đúng, hôm nay lại bị nhảy sang Vitamino LITE?**:
+   - Mọi hôm, trong lô đơn hàng xuất ra PDF **chỉ có combo vỗ béo thường** (hoặc nếu có sản phẩm lẻ `NAVET-VITAMINO` thường). Khi không có ứng viên nào mang tên `NAVET-VITAMINO LITE` trong PDF, thuật toán không tìm thấy ứng viên sai nên nó tự động tạo dòng mới `NAVET-VITAMINO` chuẩn xác.
+   - Hôm nay, trong cùng 1 đợt xuất PDF xuất hiện cả 2 dòng: combo vỗ béo thường (6 gói Vitamino thường) VÀ combo vỗ béo LITE (7 gói Vitamino LITE).
+2. **Lỗi trong bộ lọc ứng viên `findMatchingTargetCandidate`**:
+   - Khi bóc tách thành phần `Vitamino` thường từ combo `SẢN PHẨM VỖ BÉO` và `Vỗ Béo B`, hàm tìm kiếm ứng viên tương đồng trong PDF.
+   - Trong PDF có sẵn ứng viên `NAVET-VITAMINO LITE`.
+   - Trước đây, `criticalDosages` chỉ kiểm tra `['200', '50%']`. Từ khóa `lite` không nằm trong danh sách hàm lượng/biến thể xung đột.
+   - Do đó, từ khóa `vitamino` khớp 100% từ đơn, điểm số vượt ngưỡng và nuốt chửng thành phần `Vitamino` thường vào ứng viên `NAVET-VITAMINO LITE`!
+
+## 3. Các điểm đã khắc phục triệt để trên Logistics Pro v3.8
+1. **Khóa chặn tương thích nghiêm ngặt biến thể LITE và PLUS trong `findMatchingTargetCandidate`**:
+   - Bổ sung rào chắn logic cứng:
+     ```javascript
+     const isCompLite = /\blite\b/i.test(compName);
+     const isCandLite = /\blite\b/i.test(candPName);
+     if (isCompLite !== isCandLite) continue; // Tuyệt đối không ghép sản phẩm thường với bản LITE
+
+     const isCompPlus = /\bplus\b/i.test(compName);
+     const isCandPlus = /\bplus\b/i.test(candPName);
+     if (isCompPlus !== isCandPlus) continue; // Tuyệt đối không ghép sản phẩm thường với bản PLUS
+     ```
+   - Mở rộng tập từ khóa dosage/variant xung đột: `criticalDosages = ['200', '50%', '100', 'lite', 'plus', 'pro', 'la']`.
+2. **Chuẩn hóa chữ hoa trong `parseComboComponents`**:
+   - Tự động chuẩn hóa phân biệt rõ ràng: `NAVET-VITAMINO LITE`, `NAVET-VITAMINO`, `NAVET-BIOGLUCAN`, `NAVET BETAZYME`.
+3. **Bảo vệ tra cứu ảnh sản phẩm trong `findProductImageFuzzy`**:
+   - Đặt chặn phân biệt `isKeyLite !== isSearchLite` cho cả 3 vòng lặp tra cứu ảnh catalog (`Vitamino`, `Betazyme`, `E-Selen`), tránh việc Vitamino thường hiển thị nhầm ảnh gói Vitamino Lite hoặc ngược lại.
+4. **Nâng cấp badge giao diện lên `Logistics Pro v3.8`**.
+
+## 4. Kiểm thử & Triển khai
+- Chạy test suite `scratch/test_vitamino_lite.js`:
+  - `NAVET-VITAMINO` tách biệt độc lập: 6 gói.
+  - `NAVET-VITAMINO LITE` tách biệt độc lập: 7 gói.
+  - 100% test cases pass.
+- Chạy regression test `scratch/test_flor_butavit.js`: 7/7 suites pass không có xung đột.
+- Đã deploy bản v3.8 lên VPS `76.13.211.166`, restart service `tiktok-tools-api.service`.
+- Live site: [https://tiktok-tools.nodelee.tech](https://tiktok-tools.nodelee.tech) (đã verify badge v3.8).
+
+---
+
 # Cập nhật Logistics Pro v3.7: Khắc phục lỗi đọc lộn Combo Flor + Analgin C + Butavit thành Butavital
 
 ## 1. Vấn đề thực tế từ đơn hàng ngày 01/10/2026
