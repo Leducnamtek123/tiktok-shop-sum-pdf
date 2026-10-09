@@ -1,3 +1,56 @@
+# Cập nhật Logistics Pro v3.9: Tách biệt tuyệt đối quy cách XÔ vs GÓI (Khắc phục lỗi nhảy số lượng 4 Xô Vitamino)
+
+## 1. Vấn đề thực tế từ phản hồi khách hàng (09/10/2026)
+- **Ảnh đính kèm tin nhắn**:
+  - *"2 file sáng nay có 1 xô Vitamino à e"*
+  - *"Mà tool nó nhảy ra 4 xô"*
+- **Bằng chứng trên 2 file Picking List**:
+  - `10-09_08-00-18_Picking list_1.pdf` (Trang 6, dòng 49):
+    - Đơn `586476989596927298`: `NAVET-VITAMINO`, SKU: `Xô 10 gói 1kg`, Số lượng: **1**.
+    - Trang 1, dòng 2: `COMBO SẢN PHẨM VỖ BÉO _ Navet-BioGlucan + Vitamino`, Số lượng: **1** (chứa 1 gói Vitamino 1kg).
+  - `10-09_08-00-29_Picking list_2.pdf` (Trang 1, dòng 1):
+    - Đơn `586480120816764250` & `586480618713810541`: `COMBO SẢN PHẨM VỖ BÉO`, Số lượng: **2** (chứa 2 gói Vitamino 1kg).
+  - Trang 2, dòng 16: `NAVET-VITAMINO`, SKU: `Gói 1kg`, Số lượng: **6**.
+- **Hiện tượng**:
+  - Tool gom 3 gói Vitamino (1kg) từ combo `SẢN PHẨM VỖ BÉO` vào dòng `Xô 10 gói 1kg`!
+  - 1 xô gốc + 3 gói từ combo = **4 Xô**!
+
+## 2. Nguyên nhân cốt lõi (Root Cause)
+1. **Quy cách `Xô` chưa được nhận diện là bao bì nguyên khối (Bulk container)**:
+   - Trong `parseSkuPackagingType`, tool mới chỉ hỗ trợ `thùng`, `hộp`, `cặp`, `lô`, chưa có regex cho `xô` (`Xô 10 gói 1kg`).
+2. **Lỗi lọt chuỗi trong `matchSkuVariant`**:
+   - `compSku` của combo là `'1kg'`.
+   - `candSku` là `'Xô 10 gói 1kg'`.
+   - Khi so sánh chuỗi: `'xô10gói1kg'.includes('1kg')` trả về `true`!
+   - Không có kiểm tra tương thích từ khóa `xô` và `thùng`.
+3. **Lỗi trừ điểm thay vì loại bỏ trong `findMatchingTargetCandidate`**:
+   - Trước đây khi SKU không khớp, tool chỉ trừ 50 điểm (`nameScore -= 50`).
+   - Tên sản phẩm khớp 100 điểm, trừ 50 điểm còn 50 điểm (vẫn $\ge 40$), khiến ứng viên sai lệch SKU vẫn bị nhận làm `matchCand`!
+
+## 3. Các điểm đã khắc phục triệt để trên Logistics Pro v3.9
+1. **Bổ sung nhận diện quy cách `Xô` trong `parseSkuPackagingType`**:
+   - Phân biệt chính xác giữa Xô đóng gói lẻ (`Xô 5kg`, `Xô 10kg`) và Xô đóng gói buôn nhiều món (`Xô 10 gói 1kg` $\rightarrow$ `isBulk: true, packSize: 10`).
+2. **Khóa chặn container type `Xô` và `Thùng` trong `matchSkuVariant`**:
+   - `isCompXo !== isCandXo` $\rightarrow$ `return false;` (Sản phẩm gói/lẻ tuyệt đối không bao giờ khớp với Xô).
+   - `isCompThung !== isCandThung` $\rightarrow$ `return false;` (Sản phẩm lẻ tuyệt đối không ghép vào Thùng).
+   - Bổ sung rào chắn xung đột `xô` với `gói`, `chai`, `can`, `hộp`, `ống`.
+   - Bổ sung kiểm tra xung đột trọng lượng: `1kg` vs `5kg`, `10kg`, `500g`, `250g`.
+3. **Loại bỏ dứt điểm ứng viên sai lệch SKU trong `findMatchingTargetCandidate`**:
+   - Nếu `compSku` có chỉ định quy cách (ví dụ `1kg`) mà `cand.sku` không khớp (`!isSkuMatch`), lập tức `continue`, tuyệt đối không gán `matchCand` sai quy cách.
+4. **Nâng cấp badge giao diện lên `Logistics Pro v3.9`**.
+
+## 4. Kiểm thử & Triển khai
+- Chạy toàn bộ các bộ test tự động:
+  - `scratch/test_xo_vitamino.js`: Case có cả Xô và Gói $\rightarrow$ Vitamino combo khớp vào `Gói 1kg` (tổng 9 gói), Xô giữ nguyên 1 xô. Case chỉ có Xô $\rightarrow$ tự động tách dòng mới `Gói 1kg`.
+  - `scratch/test_eval_index_html.js`: 100% test cases pass trực tiếp trên logic `index.html`.
+  - `scratch/test_full_combos_regression.js`: Tất cả 48 combo rules và kiểm thử biến thể pass 100%.
+  - `scratch/test_flor_butavit.js`, `scratch/test_vitamino_lite.js`, `scratch/test_e2e_pdf.js`: Tất cả pass không có regression.
+- Đã deploy bản v3.9 lên VPS `76.13.211.166` qua SSH/SFTP, restart service `tiktok-tools-api.service` (trạng thái `active`).
+- Đã commit và push code lên GitHub `origin/main`.
+- Live site: [https://tiktok-tools.nodelee.tech](https://tiktok-tools.nodelee.tech) (badge v3.9).
+
+---
+
 # Cập nhật Logistics Pro v3.8: Tách biệt tuyệt đối dòng sản phẩm LITE (Vitamino vs Vitamino LITE)
 
 ## 1. Vấn đề thực tế từ phản hồi khách hàng (07/10/2026)
