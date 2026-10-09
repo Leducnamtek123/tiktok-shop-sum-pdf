@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.8</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.9</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -3875,13 +3875,22 @@
       const cBulk = parseSkuPackagingType(compSku);
       const sBulk = parseSkuPackagingType(candSku);
 
-      // CRITICAL RULE: Bulk packaging (Thùng / Hộp X chai / Lô X) can NEVER match a loose/single unit!
+      // CRITICAL RULE: Bulk packaging (Thùng / Xô / Hộp X chai / Lô X) can NEVER match a loose/single unit!
       if (cBulk.isBulk !== sBulk.isBulk) {
         return false;
       }
       if (cBulk.isBulk && sBulk.isBulk) {
         if (cBulk.packSize !== sBulk.packSize) return false;
       }
+
+      // Container type incompatibility (Xô, Thùng, Can)
+      const isCompXo = /(?:\bxô\b|\bxo\b)/iu.test(compSku);
+      const isCandXo = /(?:\bxô\b|\bxo\b)/iu.test(candSku);
+      if (isCompXo !== isCandXo) return false;
+
+      const isCompThung = /(?:\bthùng\b|\bthung\b)/iu.test(compSku);
+      const isCandThung = /(?:\bthùng\b|\bthung\b)/iu.test(candSku);
+      if (isCompThung !== isCandThung) return false;
 
       if (!compSku || ['mặc định', 'default', ''].includes(compSku.toLowerCase().trim())) {
         return !sBulk.isBulk;
@@ -3894,15 +3903,17 @@
       const isInterferonDosage = (str) => /(?:1\s*tr|1\s*triệu|1\.000\.000)\s*(?:ui|iu)/i.test(str);
       if (isInterferonDosage(c) && isInterferonDosage(s)) return true;
 
-      // Special checks for form/packaging conflicts (Chai vs Hộp vs Gói vs Can vs Ống)
+      // Special checks for form/packaging conflicts (Chai vs Hộp vs Gói vs Can vs Ống vs Xô)
       if ((c.includes('hộp') || c.includes('ống')) && s.includes('chai')) return false;
       if (c.includes('chai') && (s.includes('hộp') || s.includes('ống'))) return false;
-      if (c.includes('gói') && (s.includes('chai') || s.includes('can') || s.includes('hộp'))) return false;
-      if (c.includes('chai') && (s.includes('gói') || s.includes('can'))) return false;
+      if (c.includes('gói') && (s.includes('chai') || s.includes('can') || s.includes('hộp') || s.includes('xô') || s.includes('xo') || s.includes('thùng'))) return false;
+      if (c.includes('chai') && (s.includes('gói') || s.includes('can') || s.includes('xô') || s.includes('xo') || s.includes('thùng'))) return false;
 
       // Special checks for weight/volume conflicts
-      if (c.includes('1kg') && s.includes('100g')) return false;
-      if (c.includes('100g') && s.includes('1kg')) return false;
+      if (c.includes('1kg') && (s.includes('100g') || s.includes('500g') || s.includes('250g') || s.includes('5kg') || s.includes('10kg'))) return false;
+      if (s.includes('1kg') && (c.includes('100g') || c.includes('500g') || c.includes('250g') || c.includes('5kg') || c.includes('10kg'))) return false;
+      if (c.includes('100g') && (s.includes('1kg') || s.includes('500g') || s.includes('250g'))) return false;
+      if (s.includes('100g') && (c.includes('1kg') || c.includes('500g') || c.includes('250g'))) return false;
       if (c.includes('100ml') && s.includes('10ml')) return false;
       if (c.includes('10ml') && s.includes('100ml')) return false;
       if (c.includes('20ml') && s.includes('2ml')) return false;
@@ -3917,8 +3928,8 @@
       if (c.includes('1l') && s.includes('500ml')) return false;
       if ((c.includes('1l') || c.includes('1lit') || c.includes('1lít')) && (s.includes('5l') || s.includes('5lit') || s.includes('5lít'))) return false;
       if ((c.includes('5l') || c.includes('5lit') || c.includes('5lít')) && (s.includes('1l') || s.includes('1lit') || s.includes('1lít'))) return false;
-      if (c.includes('can') && (s.includes('chai') || s.includes('gói') || s.includes('hộp'))) return false;
-      if (s.includes('can') && (c.includes('chai') || c.includes('gói') || c.includes('hộp'))) return false;
+      if (c.includes('can') && (s.includes('chai') || s.includes('gói') || s.includes('hộp') || s.includes('xô'))) return false;
+      if (s.includes('can') && (c.includes('chai') || c.includes('gói') || c.includes('hộp') || c.includes('xô'))) return false;
       if (c.includes('5l') && s.includes('5l')) return true;
       if (c.includes('500ml') && s.includes('500ml')) return true;
 
@@ -4041,13 +4052,12 @@
         if (nameScore < 30) continue;
 
         // 3. Multi-variant / SKU Match Adjustment
-        const isSkuMatch = matchSkuVariant(compSku, cand.sku);
         if (compSku && !['mặc định', 'default', ''].includes(compSku.toLowerCase().trim())) {
-          if (isSkuMatch) {
-            nameScore += 50; // Strong boost for matching variant (e.g. 1kg -> Gói 1kg)
-          } else {
-            nameScore -= 50; // Heavy penalty for mismatching variant (e.g. 1kg vs Gói 100g)
+          const isSkuMatch = matchSkuVariant(compSku, cand.sku);
+          if (!isSkuMatch) {
+            continue; // Candidate variant explicitly conflicts with requested compSku (e.g. Xô vs Gói, 1kg vs 100g)
           }
+          nameScore += 50; // Strong boost for matching variant (e.g. 1kg -> Gói 1kg)
         }
 
         if (nameScore > bestScore) {
@@ -4165,6 +4175,17 @@
         }
         if (packSize > 1) {
           return { isBulk: true, type: 'thùng', packSize, rest: rest || 'món', label: `Thùng (${packSize} ${rest || 'món'})` };
+        }
+      }
+      const xoMatch = s.match(/(?:xô|xo)\s+(\d+)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/iu);
+      if (xoMatch) {
+        const packSize = parseInt(xoMatch[1], 10);
+        const rest = (xoMatch[2] || '').trim();
+        const isVolumeOrWeight = /^(?:ml|l|lit|lít|g|gam|kg|cc|mg)$/iu.test(rest);
+        if (packSize > 1 && !isVolumeOrWeight) {
+          return { isBulk: true, type: 'xô', packSize, rest: rest || 'gói', label: `Xô (${packSize} ${rest || 'gói'})` };
+        } else {
+          return { isBulk: false, type: 'xô', packSize: 1, rest: rest || '', label: `Xô ${packSize}${rest ? ' ' + rest : ''}` };
         }
       }
       const capMatch = s.match(/(\d+)\s*(?:cặp|cap)\s*([a-zA-ZÀ-ỹ0-9\s]+)?/iu);
