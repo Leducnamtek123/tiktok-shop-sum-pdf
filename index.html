@@ -325,7 +325,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-none">Bộ Công Cụ Kho Vận</h1>
-            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.9</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 rounded-md">Logistics Pro v3.10</span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium mt-0.5 hidden sm:block">Gộp Phiếu Nhặt Hàng &bull; Sắp Xếp Mã Vận Đơn Theo Món</p>
         </div>
@@ -2146,6 +2146,14 @@
         "productKeyword": "Kháng Gum + Interferon",
         "skuKeyword": "",
         "components": "1 NAVET-KHÁNG GUM (100ml) + 1 NAVET-INTERFERON (Chai 1 triệu IU)"
+    },
+    {
+        "id": "combo_tieu_chay_lite_betazyme_enro_electrolytes",
+        "category": "combo",
+        "name": "COMBO TIÊU CHẢY LITE _ Navet-Betazyme + Navet-Enro 100 + Navet-Electrolytes",
+        "productKeyword": "TIÊU CHẢY LITE, tieu chay lite, Betazyme + Enro 100 + Navet-Electrolytes, Betazyme + Enro + Electrolytes",
+        "skuKeyword": "",
+        "components": "1 Navet-Betazyme (1kg) + 1 Navet-Enro 100 (100ml) + 1 NAVET-ELECTROLYTES (1kg)"
     }
 ];
 
@@ -2159,6 +2167,13 @@
         } else {
           r.category = 'packaging';
         }
+      }
+      if (r.id === 'combo_tieu_chay_lite_betazyme_enro_electrolytes' || (r.name && r.name.toLowerCase().includes('tiêu chảy lite'))) {
+        r.id = 'combo_tieu_chay_lite_betazyme_enro_electrolytes';
+        r.category = 'combo';
+        r.name = "COMBO TIÊU CHẢY LITE _ Navet-Betazyme + Navet-Enro 100 + Navet-Electrolytes";
+        r.productKeyword = "TIÊU CHẢY LITE, tieu chay lite, Betazyme + Enro 100 + Navet-Electrolytes, Betazyme + Enro + Electrolytes";
+        r.components = "1 Navet-Betazyme (1kg) + 1 Navet-Enro 100 (100ml) + 1 NAVET-ELECTROLYTES (1kg)";
       }
       if (r.id === 'combo_chuyen_ho_hap' || (r.name && r.name.toLowerCase().includes('chuyên hô hấp'))) {
         r.productKeyword = 'Chuyên Hô Hấp';
@@ -3603,6 +3618,10 @@
             continue;
           }
         }
+        // 3. Combo tiêu chảy heo con (Ampicol + Scour) không nuốt Combo Tiêu Chảy Lite
+        if (rule.id === 'combo_tieu_chay_heo_con_ampicol_scour' && pNoTone.includes('lite')) {
+          continue;
+        }
 
         let matchProd = false;
         let matchedKw = '';
@@ -3667,6 +3686,13 @@
           matchProd = true;
           matchedKw = matchedKw || 'navet-flor + analgin + butavit';
           score += 120;
+        } else if (rule.id === 'combo_tieu_chay_lite_betazyme_enro_electrolytes' && (
+          pNoTone.includes('tieu chay lite') || 
+          (pNoTone.includes('betazyme') && (pNoTone.includes('enro') || pNoTone.includes('electrolytes')))
+        )) {
+          matchProd = true;
+          matchedKw = matchedKw || 'tieu chay lite';
+          score += 150;
         }
 
         if (matchProd) {
@@ -3856,6 +3882,14 @@
         if (/\b(?:navet[- ]?)?betazyme\b/i.test(name)) {
           name = 'NAVET BETAZYME';
         }
+        if (/\bnavet[- ]?electrolytes?\b/i.test(name)) {
+          name = 'NAVET-ELECTROLYTES';
+        } else if (/\bvita[- ]?electrolytes?\b/i.test(name)) {
+          name = 'VITA-ELECTROLYTES';
+        }
+        if (/\b(?:navet[- ]?)?enro(?:[- ]?100)?\b/i.test(name)) {
+          name = 'NAVET-ENRO 100';
+        }
         res.push({ name, qty, sku: sku || 'Mặc định' });
       }
       return res;
@@ -4002,6 +4036,18 @@
         const isCandPlus = /\bplus\b/i.test(candPName);
         if (isCompPlus !== isCandPlus) {
           continue; // Incompatible: Never pair standard product with PLUS variant
+        }
+
+        // Strict distinction: VITA-ELECTROLYTES vs NAVET-ELECTROLYTES
+        const isCompVitaElec = /\bvita[- ]?electrolytes?\b/i.test(compName);
+        const isCandVitaElec = /\bvita[- ]?electrolytes?\b/i.test(candPName);
+        const isCompNavetElec = /\bnavet[- ]?electrolytes?\b/i.test(compName);
+        const isCandNavetElec = /\bnavet[- ]?electrolytes?\b/i.test(candPName);
+        if (isCompVitaElec && !isCandVitaElec && isCandNavetElec) {
+          continue; // Never pair Vita-Electrolytes with Navet-Electrolytes
+        }
+        if (isCompNavetElec && !isCandNavetElec && isCandVitaElec) {
+          continue; // Never pair Navet-Electrolytes with Vita-Electrolytes
         }
 
         // 1. Strict Dosage / Concentration verification
@@ -5152,6 +5198,13 @@
         const isSearchLite = /\blite\b/i.test(name);
         if (isKeyLite !== isSearchLite && (/\bvitamino\b/i.test(key) || /\bvitamino\b/i.test(name) || /\bbetazyme\b/i.test(key) || /\bbetazyme\b/i.test(name) || /\be[- ]?selen\b/i.test(key) || /\be[- ]?selen\b/i.test(name))) continue;
 
+        const isKeyVitaElec = /\bvita[- ]?electrolytes?\b/i.test(key);
+        const isSearchVitaElec = /\bvita[- ]?electrolytes?\b/i.test(name);
+        const isKeyNavetElec = /\bnavet[- ]?electrolytes?\b/i.test(key);
+        const isSearchNavetElec = /\bnavet[- ]?electrolytes?\b/i.test(name);
+        if (isKeyVitaElec && !isSearchVitaElec && isSearchNavetElec) continue;
+        if (isKeyNavetElec && !isSearchNavetElec && isSearchVitaElec) continue;
+
         const kNorm = key.toLowerCase().replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         if (kNorm === cleanN) return url;
       }
@@ -5180,6 +5233,13 @@
         const isSearchLite = /\blite\b/i.test(name);
         if (isKeyLite !== isSearchLite && (/\bvitamino\b/i.test(key) || /\bvitamino\b/i.test(name) || /\bbetazyme\b/i.test(key) || /\bbetazyme\b/i.test(name) || /\be[- ]?selen\b/i.test(key) || /\be[- ]?selen\b/i.test(name))) continue;
 
+        const isKeyVitaElec2 = /\bvita[- ]?electrolytes?\b/i.test(key);
+        const isSearchVitaElec2 = /\bvita[- ]?electrolytes?\b/i.test(name);
+        const isKeyNavetElec2 = /\bnavet[- ]?electrolytes?\b/i.test(key);
+        const isSearchNavetElec2 = /\bnavet[- ]?electrolytes?\b/i.test(name);
+        if (isKeyVitaElec2 && !isSearchVitaElec2 && isSearchNavetElec2) continue;
+        if (isKeyNavetElec2 && !isSearchNavetElec2 && isSearchVitaElec2) continue;
+
         const kNorm = kLower.replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         const kMain = kNorm.split(':')[0].trim();
         const nMain = cleanN.split(':')[0].trim();
@@ -5207,6 +5267,13 @@
         const isKeyLite = /\blite\b/i.test(key);
         const isSearchLite = /\blite\b/i.test(name);
         if (isKeyLite !== isSearchLite && (/\bvitamino\b/i.test(key) || /\bvitamino\b/i.test(name) || /\bbetazyme\b/i.test(key) || /\bbetazyme\b/i.test(name) || /\be[- ]?selen\b/i.test(key) || /\be[- ]?selen\b/i.test(name))) continue;
+
+        const isKeyVitaElec3 = /\bvita[- ]?electrolytes?\b/i.test(key);
+        const isSearchVitaElec3 = /\bvita[- ]?electrolytes?\b/i.test(name);
+        const isKeyNavetElec3 = /\bnavet[- ]?electrolytes?\b/i.test(key);
+        const isSearchNavetElec3 = /\bnavet[- ]?electrolytes?\b/i.test(name);
+        if (isKeyVitaElec3 && !isSearchVitaElec3 && isSearchNavetElec3) continue;
+        if (isKeyNavetElec3 && !isSearchNavetElec3 && isSearchVitaElec3) continue;
 
         const kNorm = kLower.replace(/[\-_–—:]/g, ' ').replace(/\s+/g, ' ').trim();
         if (cleanN.length >= 4) {
@@ -6722,7 +6789,23 @@
               const skuComponents = parseComboComponents(sName);
               const matchedCount = skuComponents.filter(c => findMatchingTargetCandidate(c.name, c.sku, nonComboCandidates)).length;
               if (matchedCount >= 2 || (matchedCount > 0 && matchedCount === skuComponents.length)) {
-                components = skuComponents;
+                // Preserve specific component identities from comboRule.components (e.g. VITA-ELECTROLYTES vs NAVET-ELECTROLYTES)
+                components = skuComponents.map((sc, idx) => {
+                  const ruleComp = components.find(rc => {
+                    const rcClean = cleanItemProductName(rc.name).toLowerCase();
+                    const scClean = cleanItemProductName(sc.name).toLowerCase();
+                    return rcClean.includes(scClean) || scClean.includes(rcClean) || containsWholeWord(rcClean, scClean) || containsWholeWord(scClean, rcClean);
+                  }) || components[idx];
+
+                  if (ruleComp) {
+                    return {
+                      name: ruleComp.name,
+                      qty: sc.qty,
+                      sku: sc.sku || ruleComp.sku
+                    };
+                  }
+                  return sc;
+                });
               }
             }
 

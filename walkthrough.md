@@ -1,3 +1,55 @@
+# Cập nhật Logistics Pro v3.10: Thêm Combo Tiêu Chảy Lite & Tách biệt tuyệt đối VITA-ELECTROLYTES vs NAVET-ELECTROLYTES
+
+## 1. Yêu cầu thực tế từ khách hàng (11/10/2026)
+- **Ảnh đính kèm từ khách hàng**:
+  - Banner TikTok Shop: `COMBO TIÊU CHẢY LITE` gồm 3 món:
+    1. `NAVET-BETAZYME` (1kg)
+    2. `NAVET-ENRO 100` (100ml)
+    3. `NAVET-ELECTROLYTES` (gói màu xanh lá 1kg)
+  - Tin nhắn phản hồi:
+    - *"Combo tiêu chảy Lite: Navet-Betazyme 1kg, Navet-Enro 100 100ml, Navet-Electrolytes 1kg"*
+    - *"qua bên a mới đăng bán món này lên shop"*
+    - *"Quên nhắn e"*
+    - *"Nên nay bị sai"*
+    - *"Combo này xưa giờ tool nó vẫn đúng"*
+    - *"Qua đăng này lên nên nay nó đọc lộn qua Electrolytes gói này chứ không còn thành gói kia nữa"*
+    - [Ảnh đính kèm phân biệt gói `VITA-ELECTROLYTES` túi màu xanh dương và `NAVET-ELECTROLYTES` túi màu xanh lá]
+
+## 2. Nguyên nhân cốt lõi (Root Cause)
+1. **Chưa có định nghĩa luật combo cho `COMBO TIÊU CHẢY LITE`**:
+   - Khách mới đăng bán combo này trên TikTok Shop nên tool chưa có luật bóc tách 3 món thành phần.
+2. **Xung đột tên gọi giữa 2 dòng sản phẩm điện giải mới & cũ**:
+   - Trước đây shop chỉ có 1 dòng điện giải duy nhất là `VITA-ELECTROLYTES` (gói xanh dương).
+   - Shop mới đăng bán thêm `NAVET-ELECTROLYTES` (gói xanh lá) cho Combo Tiêu Chảy Lite.
+   - Khi đơn hàng `Combo Amoxicol Plus + Electrolytes` (SKU: `Amoxicol Plus 100g + Electrolytes 1kg`) được bóc tách:
+     - Từ khóa SKU chỉ ghi ngắn gọn `Electrolytes 1kg`.
+     - Cơ chế ghi đè biến thể từ SKU (`skuComponents`) đã ghi đè tên chuẩn `VITA-ELECTROLYTES` bằng tên chung chung `Electrolytes`.
+     - Khi tra cứu ứng viên, `Electrolytes` khớp nhầm sang `NAVET-ELECTROLYTES` (gói xanh lá) vừa mới xuất hiện trong file!
+
+## 3. Các điểm đã khắc phục triệt để trên Logistics Pro v3.10
+1. **Thêm luật Combo mới `COMBO TIÊU CHẢY LITE` vào `data/combos.json` & `DEFAULT_COMBO_RULES`**:
+   - ID: `combo_tieu_chay_lite_betazyme_enro_electrolytes`
+   - Tên: `COMBO TIÊU CHẢY LITE _ Navet-Betazyme + Navet-Enro 100 + Navet-Electrolytes`
+   - Từ khóa: `TIÊU CHẢY LITE, tieu chay lite, Betazyme + Enro 100 + Navet-Electrolytes, Betazyme + Enro + Electrolytes`
+   - Thành phần: `1 Navet-Betazyme (1kg) + 1 Navet-Enro 100 (100ml) + 1 NAVET-ELECTROLYTES (1kg)`
+2. **Khóa chặn tương thích tuyệt đối giữa `VITA-ELECTROLYTES` và `NAVET-ELECTROLYTES` trong `findMatchingTargetCandidate`**:
+   - `isCompVitaElec !== isCandVitaElec` & `isCompNavetElec !== isCandNavetElec` $\rightarrow$ không bao giờ ghép lộn gói xanh dương với gói xanh lá.
+3. **Bảo toàn danh tính sản phẩm gốc khi ghi đè biến thể từ SKU**:
+   - Khi SKU có dấu `+` (ví dụ `Amoxicol Plus 100g + Electrolytes 1kg`), thuật toán bóc tách bảo toàn tên thương hiệu gốc đã chỉ định trong luật combo (`VITA-ELECTROLYTES`), chỉ cập nhật số lượng và quy cách (100g, 1kg), tránh bị suy thoái thành tên chung `Electrolytes`.
+4. **Bảo vệ tra cứu ảnh sản phẩm trong `findProductImageFuzzy`**:
+   - Phân biệt độc lập giữa `VITA-ELECTROLYTES` và `NAVET-ELECTROLYTES` ở cả 3 cấp độ tra cứu ảnh, đảm bảo hiển thị đúng ảnh gói xanh dương hoặc gói xanh lá tương ứng.
+5. **Nâng cấp badge giao diện lên `Logistics Pro v3.10`**.
+
+## 4. Kiểm thử & Triển khai
+- Chạy toàn bộ test suites:
+  - `scratch/test_tieu_chay_lite.js`: Bóc tách đúng 3 thành phần của Combo Tiêu Chảy Lite; bảo toàn chính xác `VITA-ELECTROLYTES` cho combo Amoxicol.
+  - `scratch/test_comprehensive_v310.js`: 100% test cases pass.
+  - Các bộ kiểm thử hồi quy: `test_flor_butavit.js`, `test_vitamino_lite.js`, `test_calcifort_merge.js`, `test_full_combos_regression.js` đều pass không xung đột.
+- Đã deploy bản v3.10 và cập nhật `data/combos.json` lên VPS `76.13.211.166`, restart service `tiktok-tools-api.service` (trạng thái `active`).
+- Live site: [https://tiktok-tools.nodelee.tech](https://tiktok-tools.nodelee.tech) (đã verify badge v3.10).
+
+---
+
 # Cập nhật Logistics Pro v3.9: Tách biệt tuyệt đối quy cách XÔ vs GÓI (Khắc phục lỗi nhảy số lượng 4 Xô Vitamino)
 
 ## 1. Vấn đề thực tế từ phản hồi khách hàng (09/10/2026)

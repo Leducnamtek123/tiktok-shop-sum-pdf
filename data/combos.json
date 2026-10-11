@@ -393,5 +393,13 @@
     "productKeyword": "Kháng Gum + Interferon",
     "skuKeyword": "",
     "components": "1 NAVET-KHÁNG GUM (100ml) + 1 NAVET-INTERFERON (Chai 1 triệu IU)"
+  },
+  {
+    "id": "combo_tieu_chay_lite_betazyme_enro_electrolytes",
+    "category": "combo",
+    "name": "COMBO TIÊU CHẢY LITE _ Navet-Betazyme + Navet-Enro 100 + Navet-Electrolytes",
+    "productKeyword": "TIÊU CHẢY LITE, tieu chay lite, Betazyme + Enro 100 + Navet-Electrolytes, Betazyme + Enro + Electrolytes",
+    "skuKeyword": "",
+    "components": "1 Navet-Betazyme (1kg) + 1 Navet-Enro 100 (100ml) + 1 NAVET-ELECTROLYTES (1kg)"
   }
 ]
