@@ -158,25 +158,25 @@
     "id": "combo_vo_beo_bioglucan_vitamino",
     "category": "combo",
     "name": "COMBO SẢN PHẨM VỖ BÉO _ Navet-BioGlucan + Vitamino",
-    "productKeyword": "Navet-BioGlucan + Vitamino",
+    "productKeyword": "Navet-BioGlucan + Vitamino, SẢN PHẨM VỖ BÉO, san pham vo beo",
     "skuKeyword": "",
-    "components": "1 Navet-BioGlucan (1kg) + 1 Vitamino (1kg)"
+    "components": "1 NAVET-BIOGLUCAN (Gói 1kg) + 1 NAVET-VITAMINO (Gói 1kg)"
   },
   {
     "id": "combo_vo_beo_lite_betazyme_vitamino",
     "category": "combo",
     "name": "COMBO VỖ BÉO LITE _ Navet BETAZYME + Vitamino LITE",
-    "productKeyword": "VỖ BÉO LITE",
+    "productKeyword": "VỖ BÉO LITE, vo beo lite, BETAZYME + Vitamino LITE, Betazyme + Vitamino",
     "skuKeyword": "",
-    "components": "1 Navet BETAZYME (1kg) + 1 Vitamino LITE (1kg)"
+    "components": "1 NAVET BETAZYME (Gói 1kg) + 1 NAVET-VITAMINO LITE (Gói 1kg)"
   },
   {
     "id": "combo_vo_beo_b_betazyme_vitamino",
     "category": "combo",
     "name": "Combo Vỗ Béo B (Betazyme + Vitamino)",
-    "productKeyword": "Vỗ Béo B",
+    "productKeyword": "Vỗ Béo B, Betazyme + Vitamino",
     "skuKeyword": "",
-    "components": "1 Betazyme (1kg) + 1 Vitamino (1kg)"
+    "components": "1 NAVET BETAZYME (Gói 1kg) + 1 NAVET-VITAMINO (Gói 1kg)"
   },
   {
     "id": "combo_tieu_chay_heo_con_ampicol_scour",
@@ -190,7 +190,7 @@
     "id": "combo_tri_bo_an_excel_analgin_butavital",
     "category": "combo",
     "name": "Combo trị bỏ ăn: Navet Excel + Analgin C + Butavital",
-    "productKeyword": "trị bỏ ăn",
+    "productKeyword": "trị bỏ ăn, tri bo an, bỏ ăn, bo an, Navet Excel + Analgin C + Butavital, Excel + Analgin C + Butavital, Analgin C + Excel + Butavital, Excel + Analgin + Butavital, Excel 100 + Analgin C + Butavital, Navet-Excel + Analgin C + Butavital",
     "skuKeyword": "",
     "components": "1 Navet-Excel 100 (100ml) + 1 Navet-Analgin C (100ml) + 1 NAVET-BUTAVITAL (100ml)"
   },
@@ -230,9 +230,9 @@
     "id": "combo_sieu_vo_beo_bio_one_vitamino",
     "category": "combo",
     "name": "COMBO SIÊU VỖ BÉO _ Navet BIO.One + Vitamino",
-    "productKeyword": "BIO.One + Vitamino",
+    "productKeyword": "BIO.One + Vitamino, BioOne + Vitamino, Bio One + Vitamino, SIÊU VỖ BÉO, sieu vo beo",
     "skuKeyword": "",
-    "components": "1 Navet BIO.One (1kg) + 1 Vitamino (1kg)"
+    "components": "1 NAVET-BIO.ONE (Gói 1kg) + 1 NAVET-VITAMINO (Gói 1kg)"
   },
   {
     "id": "combo_enro_bioglucan_electrolytes",
@@ -291,36 +291,36 @@
     "components": "1 Navet-Verxil (100ml) + 1 Navet-Fer 200-B12 (100ml) + 1 Tulamycin (100ml) + 1 Navet Cox (100ml)"
   },
   {
+    "id": "combo_amoxicol_electrolytes_qc1",
+    "category": "combo",
+    "name": "Combo Heo nhập đàn - Quy cách 1 (1 gói Amoxicol 100g + 1 Electrolytes 1kg)",
+    "productKeyword": "Amoxicol Plus + Vita Electrolytes, Amoxicol Plus + Electrolytes, Heo nhập đàn, Heo mới nhập đàn, Amoxicol + Electrolytes, Amoxicol + Vita Electrolytes",
+    "skuKeyword": "1 gói, quy cách 1, qc1, qc 1, amoxicol plus 100g, 100g, 100gam",
+    "components": "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+  },
+  {
     "id": "combo_amoxicol_electrolytes_qc2",
     "category": "combo",
     "name": "Combo Heo nhập đàn - Quy cách 2 (2 gói Amoxicol 100g + 1 Electrolytes 1kg)",
-    "productKeyword": "Amoxicol Plus + Electrolytes",
-    "skuKeyword": "2 gói",
+    "productKeyword": "Amoxicol Plus + Vita Electrolytes, Amoxicol Plus + Electrolytes, Heo nhập đàn, Heo mới nhập đàn, Amoxicol + Electrolytes, Amoxicol + Vita Electrolytes",
+    "skuKeyword": "2 amoxicol plus 100g, 2 amoxicol plus 100gam, 2 amoxicol plus, 2 gói, quy cách 2, qc2, qc 2, 2 amoxicol, 200g",
     "components": "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
   },
   {
     "id": "combo_amoxicol_electrolytes_qc3",
     "category": "combo",
     "name": "Combo Heo nhập đàn - Quy cách 3 (1 hộp Amoxicol 1kg + 1 Electrolytes 1kg)",
-    "productKeyword": "Amoxicol Plus + Electrolytes",
-    "skuKeyword": "hộp",
+    "productKeyword": "Amoxicol Plus + Vita Electrolytes, Amoxicol Plus + Electrolytes, Heo nhập đàn, Heo mới nhập đàn, Amoxicol + Electrolytes, Amoxicol + Vita Electrolytes",
+    "skuKeyword": "hộp, 1 hộp, quy cách 3, qc3, qc 3, amoxicol plus 1kg, amoxicol 1kg, hop 1kg, 1kg amoxicol, 1 hộp amoxicol 1kg",
     "components": "1 Amoxicol Plus (1kg) + 1 Vita-Electrolytes (1kg)"
-  },
-  {
-    "id": "combo_amoxicol_electrolytes_qc1",
-    "category": "combo",
-    "name": "Combo Heo nhập đàn - Quy cách 1 (1 gói Amoxicol 100g + 1 Electrolytes 1kg)",
-    "productKeyword": "Amoxicol Plus + Electrolytes",
-    "skuKeyword": "1 gói",
-    "components": "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
   },
   {
     "id": "combo_amoxicol_electrolytes",
     "category": "combo",
     "name": "Combo Amoxicol Plus + Electrolytes (Heo nhập đàn)",
-    "productKeyword": "Amoxicol Plus + Electrolytes",
+    "productKeyword": "Amoxicol Plus + Vita Electrolytes, Amoxicol Plus + Electrolytes, Heo nhập đàn, Heo mới nhập đàn, Amoxicol + Electrolytes, Amoxicol + Vita Electrolytes",
     "skuKeyword": "",
-    "components": "2 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
+    "components": "1 Amoxicol Plus (100g) + 1 Vita-Electrolytes (1kg)"
   },
   {
     "id": "combo_amoxy_analgin_calcifort",
@@ -401,5 +401,13 @@
     "productKeyword": "TIÊU CHẢY LITE, tieu chay lite, Betazyme + Enro 100 + Navet-Electrolytes, Betazyme + Enro + Electrolytes",
     "skuKeyword": "",
     "components": "1 Navet-Betazyme (1kg) + 1 Navet-Enro 100 (100ml) + 1 NAVET-ELECTROLYTES (1kg)"
+  },
+  {
+    "id": "combo_ho_hap_ghep_azifluxin_flor",
+    "category": "combo",
+    "name": "COMBO HÔ HẤP GHÉP _ Navet Azifluxin + Flor",
+    "productKeyword": "HÔ HẤP GHÉP, ho hap ghep, Navet Azifluxin + Flor, Azifluxin + Flor, Navet-Azifluxin + Navet-Flor, Navet-Azifluxin + Flor",
+    "skuKeyword": "",
+    "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Flor (100ml)"
   }
 ]
