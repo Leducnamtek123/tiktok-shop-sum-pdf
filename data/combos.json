@@ -27,20 +27,11 @@
     "unit": "Chai 100ml"
   },
   {
-    "id": "pkg_navetcide_thung_4_can",
-    "category": "packaging",
-    "name": "NAVETCIDE (Thùng 4 can 5L)",
-    "productKeyword": "NAVETCIDE",
-    "skuKeyword": "Thùng 4 can",
-    "packSize": 4,
-    "unit": "Can 5 lít"
-  },
-  {
     "id": "pkg_navetcide_can_5l",
     "category": "packaging",
     "name": "NAVETCIDE (Can 5 lít)",
     "productKeyword": "NAVETCIDE",
-    "skuKeyword": "Can 5",
+    "skuKeyword": "Can 5, 5 lít, 5L",
     "packSize": 1,
     "unit": "Can 5 lít"
   },
@@ -142,7 +133,7 @@
     "id": "combo_chuyen_ho_hap",
     "category": "combo",
     "name": "COMBO Chuyên Hô Hấp _ Navet-Flor + Doxy-T",
-    "productKeyword": "Navet-Flor + Doxy-T",
+    "productKeyword": "Chuyên Hô Hấp",
     "skuKeyword": "",
     "components": "1 Navet-Flor (100ml) + 1 Navet-Doxy-T (100ml)"
   },
@@ -174,9 +165,9 @@
     "id": "combo_vo_beo_b_betazyme_vitamino",
     "category": "combo",
     "name": "Combo Vỗ Béo B (Betazyme + Vitamino)",
-    "productKeyword": "Vỗ Béo B, Betazyme + Vitamino",
+    "productKeyword": "Vỗ Béo B",
     "skuKeyword": "",
-    "components": "1 NAVET BETAZYME (Gói 1kg) + 1 NAVET-VITAMINO (Gói 1kg)"
+    "components": "1 Betazyme (1kg) + 1 Vitamino (1kg)"
   },
   {
     "id": "combo_tieu_chay_heo_con_ampicol_scour",
@@ -280,7 +271,7 @@
     "name": "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
     "productKeyword": "cho Dê đẻ",
     "skuKeyword": "",
-    "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)"
+    "components": "1 Oxytocin (Chai 20ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)"
   },
   {
     "id": "combo_cho_de_con",
@@ -409,5 +400,14 @@
     "productKeyword": "HÔ HẤP GHÉP, ho hap ghep, Navet Azifluxin + Flor, Azifluxin + Flor, Navet-Azifluxin + Navet-Flor, Navet-Azifluxin + Flor",
     "skuKeyword": "",
     "components": "1 Navet-Azifluxin (100ml) + 1 Navet-Flor (100ml)"
+  },
+  {
+    "id": "pkg_navetcide_can_5l",
+    "category": "packaging",
+    "name": "NAVETCIDE (Can 5 lít)",
+    "productKeyword": "NAVETCIDE",
+    "skuKeyword": "Can 5, 5 lít, 5L",
+    "packSize": 1,
+    "unit": "Can 5 lít"
   }
 ]

@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Gộp Phiếu Nhặt Hàng TikTok Shop - Tự Động & Chính Xác</title>
   
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS (build sẵn: chạy build-css.sh khi thêm class mới) -->
+  <link rel="stylesheet" href="assets/tailwind.css">
   
   <!-- Local Assets for 100% Offline & High-Speed Processing -->
   <script src="assets/pdf.min.js"></script>
@@ -20,40 +20,12 @@
   <script src="assets/jspdf.umd.min.js"></script>
   
   <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="assets/lucide.min.js"></script>
 
   <!-- Google Fonts: 100% Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-            },
-            crimson: {
-              50: '#fff1f2',
-              100: '#ffe4e6',
-              500: '#f43f5e',
-              600: '#e11d48',
-              700: '#be123c',
-            }
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
     body, input, button, select, textarea {
@@ -334,6 +306,7 @@
       <!-- Header Actions (no-print) -->
       <div class="flex items-center space-x-2.5">
         <button 
+          style="display:none"
           onclick="openComboModal()" 
           class="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 transition-all border border-slate-200 shadow-2xs cursor-pointer active:scale-[0.98]"
           title="Quản lý và thiết lập quy tắc quy đổi Combo &amp; Thùng"
@@ -974,6 +947,13 @@
             <button onclick="filterShippingList('single')" id="shipFilterSingle" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn 1 món (1 trang) (<span id="shipCountSingle">0</span>)</button>
             <button onclick="filterShippingList('multi')" id="shipFilterMulti" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-medium transition-all cursor-pointer">Đơn nhiều món / 2 trang (<span id="shipCountMulti">0</span>)</button>
           </div>
+
+          <!-- Carrier grouping -->
+          <select id="carrierGroupSelect" onchange="setCarrierGroupMode(this.value)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-bold text-slate-800 cursor-pointer shadow-2xs focus:outline-none focus:border-rose-500">
+            <option value="BEST_FIRST">Gom ĐVVC: BEST trước → J&amp;T</option>
+            <option value="JT_FIRST">Gom ĐVVC: J&amp;T trước → BEST</option>
+            <option value="OFF">Không gom theo ĐVVC</option>
+          </select>
 
           <!-- Search Input -->
           <div class="relative flex-1 sm:w-80">
@@ -1996,7 +1976,7 @@
             "name": "Combo cho Dê đẻ (Oxytocin + Gentamox + Butavital + Calcifort)",
             "productKeyword": "cho Dê đẻ",
             "skuKeyword": "",
-            "components": "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)"
+            "components": "1 Oxytocin (Chai 20ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)"
       },
       {
             "id": "combo_cho_de_con",
@@ -2165,8 +2145,8 @@
         r.productKeyword = "cho heo nái, Oxytocin + Gentamox";
         r.components = "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 CALCIFORT B12 (100ml) + 1 ADE B.COMPLEX (100ml)";
       }
-      if (r.id === 'combo_cho_de_de' || (r.name && r.name.toLowerCase().includes('cho dê đẻ') && r.components && !r.components.toLowerCase().includes('hộp 10 ống'))) {
-        r.components = "1 Oxytocin (Hộp 10 ống 2ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)";
+      if (r.id === 'combo_cho_de_de' || (r.name && r.name.toLowerCase().includes('cho dê đẻ'))) {
+        r.components = "1 Oxytocin (Chai 20ml) + 1 Gentamox (100ml) + 1 NAVET-BUTAVITAL (100ml) + 1 CALCIFORT B12 (100ml)";
       }
       if (r.id === 'combo_navet_cel_analgin_calcifort_butavit' || (
         r.name && (r.name.toLowerCase().includes('navet-cel') || r.name.toLowerCase().includes('navet cel') || r.name.toLowerCase().includes('sau sinh')) &&
@@ -2293,7 +2273,7 @@
     async function loadComboRules() {
       let loadedFromServer = false;
       try {
-        const resp = await fetch('/api/combos', { cache: 'no-store' });
+        const resp = await fetch('/api/combos', { cache: 'no-cache' });
         if (resp.ok) {
           const serverRules = await resp.json();
           if (Array.isArray(serverRules) && serverRules.length > 0) {
@@ -2378,24 +2358,6 @@
 
       updateComboBadge();
       renderConfigRulesLists();
-      updateSyncStatusText('Đang lưu lên máy chủ...');
-
-      // 2. Sync to Server API
-      try {
-        const resp = await fetch('/api/combos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(comboRules)
-        });
-        if (resp.ok) {
-          const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-          updateSyncStatusText(`Đã lưu máy chủ lúc ${nowStr}`, 'success');
-        } else {
-          updateSyncStatusText('Đã lưu trên máy (Máy chủ phản hồi ' + resp.status + ')', 'warn');
-        }
-      } catch (e) {
-        updateSyncStatusText('Đã lưu trên trình duyệt (Máy chủ ngoại tuyến)', 'warn');
-      }
     }
 
     function updateSyncStatusText(msg, type = 'info') {
@@ -2469,6 +2431,7 @@
     }
 
     function openComboModal(initialTab = null) {
+      return; // Quy cách & combo do quản trị viên chỉnh trong data/combos.json, khách không tự nhập.
       document.getElementById('comboModal').classList.remove('hidden');
       if (initialTab) {
         switchConfigModalTab(initialTab);
@@ -3578,6 +3541,8 @@
         // Chống nhầm lẫn chéo combo (Cross-combo guards):
         // 1. Combo heo nái (Oxytocin + Gentamox) tuyệt đối không nuốt chửng Combo Navet-Cel
         if (rule.id === 'combo_heo_nai_oxytocin_gentamox_calcifort') {
+          // Combo dê đẻ cũng có Oxytocin + Gentamox nhưng không phải heo nái
+          if (/(?:^|\s)de (?:de|con)(?:\s|$)/.test(pNoTone)) continue;
           if ((pNoTone.includes('cel') || pNoTone.includes('navet-cel') || pNoTone.includes('navet cel') || pNoTone.includes('butavit')) &&
               !pNoTone.includes('oxytocin') && !pNoTone.includes('gentamox')) {
             continue;
@@ -3666,6 +3631,10 @@
           matchProd = true;
           matchedKw = matchedKw || 'oxytocin + gentamox';
           score += 100;
+        } else if (rule.id === 'combo_cho_de_de' && /(?:^|\s)de de(?:\s|$)/.test(pNoTone)) {
+          matchProd = true;
+          matchedKw = matchedKw || 'cho de de';
+          score += 300;
         } else if (rule.id === 'combo_flor_analgin_butavit' && (
           (pNoTone.includes('flor') || pNoTone.includes('navet-flor') || pNoTone.includes('navet flor')) &&
           (pNoTone.includes('butavit') || pNoTone.includes('butavital') || pNoTone.includes('analgin'))
@@ -5195,7 +5164,7 @@
 
       let loaded = false;
       try {
-        const resp = await fetch('/api/product-images', { cache: 'no-store' });
+        const resp = await fetch('/api/product-images', { cache: 'no-cache' });
         if (resp.ok) {
           const data = await resp.json();
           if (data && typeof data === 'object' && Object.keys(data).length > 0) {
@@ -5208,7 +5177,7 @@
 
       if (!loaded) {
         try {
-          const resp = await fetch('assets/product_images.json', { cache: 'no-store' });
+          const resp = await fetch('assets/product_images.json', { cache: 'no-cache' });
           if (resp.ok) {
             const data = await resp.json();
             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
@@ -5425,10 +5394,12 @@
 
           const slipWords = items.filter(it => it.y >= 295 && it.y <= 395);
           const pageIdx = pNum - 1;
+          const pageCarrier = detectCarrier(fullText);
 
           if (!ordersDict[orderId]) {
             ordersDict[orderId] = {
               orderId,
+              carrier: pageCarrier,
               tracking,
               receiver,
               weight,
@@ -5442,6 +5413,7 @@
             };
             orderSequence.push(orderId);
           } else {
+            if (ordersDict[orderId].carrier === 'OTHER') ordersDict[orderId].carrier = pageCarrier;
             ordersDict[orderId].pages.push(pageIdx);
             ordersDict[orderId].pageNumbers.push(pNum);
             ordersDict[orderId].sourceFile = file;
@@ -5657,13 +5629,50 @@
     // Complex order checker: Multi-item OR Multi-page (2+ pages)
     const isComplexOrder = o => Boolean(o.isMultiItem || (o.pages && o.pages.length > 1));
 
-    // Sort Shipping Orders by Product, SKU & Quantity
+    // Carrier from label text, e.g. "TT-VN-BEST-COD-STD". shortcut: J&T = text hint or tracking 862xxxxxxxxx (inferred from sample, not confirmed); verify with real file.
+    function detectCarrier(text) {
+      if (/BEST/i.test(text)) return 'BEST';
+      if (/J&T|\bJNT\b|TT-VN-JT|JTEXPRESS|\b862\d{9}\b/i.test(text)) return 'JT';
+      return 'OTHER';
+    }
+    const CARRIER_LABEL = { BEST: 'BEST', JT: 'J&T', OTHER: 'Khác' };
+    let carrierGroupMode = 'BEST_FIRST'; // 'BEST_FIRST' | 'JT_FIRST' | 'OFF'
+
+    function setCarrierGroupMode(mode) {
+      carrierGroupMode = mode;
+      sortAndRenderShippingOrders();
+    }
+
+    // Sort Shipping Orders: group by carrier first (if enabled), then by product within each group
     function sortAndRenderShippingOrders() {
       if (shippingOrders.length === 0) return;
 
+      if (carrierGroupMode === 'OFF') {
+        sortedShippingOrders = sortShippingGroup(shippingOrders);
+      } else {
+        const order = carrierGroupMode === 'JT_FIRST' ? ['JT', 'BEST', 'OTHER'] : ['BEST', 'JT', 'OTHER'];
+        sortedShippingOrders = order.flatMap(c => sortShippingGroup(shippingOrders.filter(o => (o.carrier || 'OTHER') === c)));
+      }
+
+      // Assign new sequential numbers and page spans
+      let currPage = 1;
+      sortedShippingOrders.forEach((o, idx) => {
+        o.newSeq = idx + 1;
+        const pCount = o.pages.length;
+        o.newStartPage = currPage;
+        o.newEndPage = currPage + pCount - 1;
+        currPage += pCount;
+      });
+
+      renderShippingUI();
+    }
+
+    function sortShippingGroup(orders) {
+      if (orders.length === 0) return [];
+
       // Single-item 1-page orders go first; Multi-item and 2+ page orders go last
-      const singleOrders = shippingOrders.filter(o => !isComplexOrder(o));
-      const multiOrders = shippingOrders.filter(o => isComplexOrder(o));
+      const singleOrders = orders.filter(o => !isComplexOrder(o));
+      const multiOrders = orders.filter(o => isComplexOrder(o));
 
       // Count frequency of products for single-item 1-page orders
       const prodCounts = {};
@@ -5708,19 +5717,7 @@
         return a.primaryProduct.localeCompare(b.primaryProduct, 'vi');
       });
 
-      sortedShippingOrders = [...singleOrders, ...multiOrders];
-
-      // Assign new sequential numbers and page spans
-      let currPage = 1;
-      sortedShippingOrders.forEach((o, idx) => {
-        o.newSeq = idx + 1;
-        const pCount = o.pages.length;
-        o.newStartPage = currPage;
-        o.newEndPage = currPage + pCount - 1;
-        currPage += pCount;
-      });
-
-      renderShippingUI();
+      return [...singleOrders, ...multiOrders];
     }
 
     // Render Shipping Orders UI
@@ -6070,6 +6067,7 @@
                         <td class="py-4 px-5 font-mono">
                           <div class="flex items-center gap-2">
                             <span class="font-mono font-black text-slate-900 text-xs sm:text-sm tracking-tight bg-slate-100 px-2 py-0.5 rounded border border-slate-200 select-all">${escapeHtml(o.tracking)}</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${o.carrier === 'BEST' ? 'bg-amber-100 text-amber-800' : o.carrier === 'JT' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-600'}">${CARRIER_LABEL[o.carrier] || 'Khác'}</span>
                             <button onclick="copyText('${escapeQuotes(o.tracking)}')" class="text-slate-400 hover:text-slate-800 p-1 rounded hover:bg-slate-100 transition-all cursor-pointer" title="Sao chép mã vận đơn">
                               <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                             </button>
