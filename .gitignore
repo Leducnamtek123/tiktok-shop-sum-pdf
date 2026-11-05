@@ -3,3 +3,7 @@ __pycache__/
 .system_generated/
 *.xlsx
 *.pdf
+
+# Script tạm/debug (từng chứa thông tin đăng nhập), không đưa lên git
+scratch/
+.playwright-mcp/
