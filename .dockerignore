@@ -1,0 +1,10 @@
+.git
+scratch
+.playwright-mcp
+__pycache__
+*.pdf
+*.xlsx
+*.md
+*.py
+Dockerfile
+node_modules
