@@ -4193,6 +4193,8 @@
           const volStr = skuVolMatch[0].trim();
           if (!unit || /^(?:món|cái)$/i.test(unit.trim())) {
             unit = volStr;
+          } else if (/^(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)\s*\d/i.test(unit.trim()) && /^(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)/i.test(volStr)) {
+            unit = volStr; // quy cách ghi "Chai 100ml" nhưng SKU là "Thùng 6 chai 20ml" -> lấy dung tích của SKU
           } else if (/^(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)$/i.test(unit.trim())) {
             if (/^(?:gói|chai|hộp|can|lọ|túi|vỉ|ống)/i.test(volStr)) {
               unit = volStr;
