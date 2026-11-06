@@ -4033,6 +4033,13 @@
           continue; // Incompatible: Never pair Butavit with Butavital
         }
 
+        // Strict distinction: Flor 20 (thuốc bột) vs Flor (thuốc tiêm chai 100ml)
+        const isCompFlor20 = /\bflor[\s-]*20\b/i.test(compName);
+        const isCandFlor20 = /\bflor[\s-]*20\b/i.test(candPName);
+        if (isCompFlor20 !== isCandFlor20 && /\bflor\b/i.test(compName) && /\bflor\b/i.test(candPName)) {
+          continue; // Incompatible: Never pair Flor 20 (powder) with Flor (injectable)
+        }
+
         // Strict distinction: LITE vs Non-LITE (e.g. Vitamino vs Vitamino LITE, Betazyme vs Betazyme LITE, E-Selen vs E-Selen LITE)
         const isCompLite = /\blite\b/i.test(compName);
         const isCandLite = /\blite\b/i.test(candPName);
