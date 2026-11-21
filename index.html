@@ -4013,7 +4013,8 @@
       for (const cand of candidates) {
         const candPName = cand.productName || '';
         // CRITICAL GUARD: Never pair a loose component with a combo product!
-        if (candPName.includes('+') || /^(?:combo\b|bộ\s+(?:thuốc|sản\s+phẩm|combo)|cặp\b)/i.test(candPName)) {
+        // Chỉ xét phần tên trước "|" / ":" — phần mô tả sau đó (vd "Men vi sinh + Beta Glucan + MOS") có thể chứa dấu "+".
+        if (candPName.split(/[|:]/)[0].includes('+') || /^(?:combo\b|bộ\s+(?:thuốc|sản\s+phẩm|combo)|cặp\b)/i.test(candPName)) {
           continue;
         }
         const candClean = cleanItemProductName(candPName).toLowerCase().replace(/[\-_–—]/g, ' ').replace(/\s+/g, ' ').trim();
